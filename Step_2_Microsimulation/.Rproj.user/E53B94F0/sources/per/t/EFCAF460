@@ -1,0 +1,24 @@
+{
+    "id": "EFCAF460",
+    "path": "D:/CIRED/Projet_Ademe/MATISSE/Step_2_Microsimulation/2.1_evolution_conso_energie.R",
+    "project_path": "2.1_evolution_conso_energie.R",
+    "type": "r_source",
+    "hash": "4290045231",
+    "contents": "",
+    "dirty": false,
+    "created": 1595955289352.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "43,0",
+        "scrollLine": "31"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1606407441,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1606407441937,
+    "read_only": false,
+    "read_only_alternatives": []
+}

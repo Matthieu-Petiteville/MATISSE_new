@@ -1,0 +1,26 @@
+{
+    "id": "8AC3D920",
+    "path": "D:/Stage_Petiteville/Projet_Ademe/MATISSE/Step_0_Mise_forme_BDF/5_export_share_savings.R",
+    "project_path": "5_export_share_savings.R",
+    "type": "r_source",
+    "hash": "3027221624",
+    "contents": "",
+    "dirty": false,
+    "created": 1616405526881.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "21,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1616151097,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1616151097,
+    "read_only": false,
+    "read_only_alternatives": []
+}

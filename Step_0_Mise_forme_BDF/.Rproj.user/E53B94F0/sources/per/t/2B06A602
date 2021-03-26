@@ -1,0 +1,24 @@
+{
+    "id": "2B06A602",
+    "path": "D:/CIRED/Projet_Ademe/Donnees_brutes/PHEBUS/lecture_donnees_phebus.R",
+    "project_path": null,
+    "type": "r_source",
+    "hash": "561731271",
+    "contents": "",
+    "dirty": false,
+    "created": 1612105402060.0,
+    "source_on_save": false,
+    "relative_order": 12,
+    "properties": {
+        "cursorPosition": "62,13",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1477314662,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1477314662,
+    "read_only": false,
+    "read_only_alternatives": []
+}

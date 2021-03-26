@@ -1,0 +1,13 @@
+{
+    "dialog-state": {
+        "query": "D:/CIRED/Projet_Ademe/Publication/From_F4_to_ZNE/Code_data_F4_ZN",
+        "path": "D:/Stage_Petiteville/Projet_Ademe/MATISSE",
+        "regex": false,
+        "caseSensitive": false,
+        "filePatterns": [],
+        "excludeFilePatterns": [],
+        "resultsCount": 2,
+        "errorCount": 0,
+        "replaceErrors": ""
+    }
+}

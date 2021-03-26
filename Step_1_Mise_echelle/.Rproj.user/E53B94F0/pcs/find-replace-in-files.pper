@@ -1,0 +1,13 @@
+{
+    "dialog-state": {
+        "query": "rev801",
+        "path": "D:/CIRED/Projet_Ademe/MATISSE/Step_1_Mise_echelle",
+        "regex": false,
+        "caseSensitive": false,
+        "filePatterns": [],
+        "excludeFilePatterns": [],
+        "resultsCount": 2,
+        "errorCount": 0,
+        "replaceErrors": ""
+    }
+}

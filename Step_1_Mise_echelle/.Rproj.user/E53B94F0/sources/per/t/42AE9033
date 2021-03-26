@@ -1,0 +1,24 @@
+{
+    "id": "42AE9033",
+    "path": "D:/CIRED/Projet_Ademe/MATISSE/Step_1_Mise_echelle/1.1_mise_echelle_revenus.R",
+    "project_path": "1.1_mise_echelle_revenus.R",
+    "type": "r_source",
+    "hash": "173067747",
+    "contents": "",
+    "dirty": false,
+    "created": 1595952659748.0,
+    "source_on_save": false,
+    "relative_order": 3,
+    "properties": {
+        "cursorPosition": "16,31",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1596060413,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1596060413115,
+    "read_only": false,
+    "read_only_alternatives": []
+}

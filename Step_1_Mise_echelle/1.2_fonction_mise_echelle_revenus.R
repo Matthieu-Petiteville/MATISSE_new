@@ -1,0 +1,137 @@
+mise_echelle_revenu<-function(FC,menage_forme,Iter){
+  
+  
+  # Mise à l'échelle des revenus  -------------------------------------------
+  
+  menage_echelle<-menage_forme
+  
+  
+  menage_echelle<-
+    menage_echelle %>%
+    mutate(rev_total=
+             rev_sociaux+
+             rev_activites+
+             rev_patrimoine)
+  #on n'inclut pas les revenus exceptionnels récurrents rev700, rev701, rev999 parce qu'on n'a pas de facteur de mise à l'échelle, on veut calculer une moyenne pondérée 
+  # du FC des revenus de chaque ménage.
+  
+  ## TEST
+  # au total : 957 912 572 743€ # en 2010 dans BDF contre 1457 milliards dans IMACLIM (il manque 35%, notamment due à la sous déclaration, problème récurrent de 
+  # l'ajustement entre base micro et vision macro)
+  # vérif : 
+  # menage_echelle %>% mutate(rev_total_macro=rev_sociaux+rev_activites+rev_patrimoine+rev700+rev701+rev999+rev801)%>%summarise(sum(pondmen*rev_total_macro)) #=> en comptant les loyers imputés on parvient à 1070 milliards €. 
+  # menage_echelle %>% mutate(rev_tot_bis=rev_activites_sans_etranger+rev_etranger+rev_patrimoine+rev_sociaux_autres+chomage+rev700+rev701+rev999)%>%summarise(sum(pondmen*rev_tot_bis)) #957912572743 même total
+  
+  
+  
+
+# FC_RDB_MENAGE -----------------------------------------------------------
+
+  # FC_rdb_menage est la moyenne pondérée des taux de croissance de ménage pour màj certaines dépenses et revenus
+  menage_echelle<-
+    menage_echelle %>%
+    mutate(FC_rdb_menage=
+             (FC$revsoc*rev_sociaux_autres+
+                FC$revchom*chomage+
+                FC$revact*rev_activites_sans_etranger+
+                FC$revetranger*rev_etranger+
+                FC$revpat*rev_patrimoine )/rev_total)
+  
+  
+  
+  
+  ###
+  ### TEST ###
+  ###
+   #value for AMS 2035 optimiste forfait => moyenne non pondérée des parts de revenus
+  # mean(menage_echelle$rev_sociaux_autres/menage_echelle$rev_total,na.rm=T) #0.4015651
+  # mean(menage_echelle$chomage/menage_echelle$rev_total,na.rm=T) #0.03399645
+  # mean(menage_echelle$rev_activites_sans_etranger/menage_echelle$rev_total,na.rm=T) #0.5220058
+  # mean(menage_echelle$rev_etranger/menage_echelle$rev_total,na.rm=T) #0.001779618
+  # mean(menage_echelle$rev_patrimoine/menage_echelle$rev_total,na.rm=T) #0.03346953
+  
+  # Part agrégée de chaque revenu dans le revenu total
+  # menage_echelle%>%summarise(sum(rev_sociaux_autres*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.3093684
+  # menage_echelle%>%summarise(sum(chomage*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.0293001
+  # menage_echelle%>%summarise(sum(rev_activites_sans_etranger*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.6222393
+  # menage_echelle%>%summarise(sum(rev_etranger*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.002079752
+  # menage_echelle%>%summarise(sum(rev_patrimoine*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.03701243
+  
+  #Comparons : 
+  # 0.3093684*FC$revsoc+0.0293001*FC$revchom+0.6222393*FC$revact+0.002079752*FC$revetranger+0.03701243*FC$revpat
+  # et
+  # menage_echelle %>% summarise(weighted.mean(x=FC_rdb_menage,w=pondmen,na.rm=T))
+  
+  
+  
+
+# CORRECTION --------------------------------------------------------------
+  
+  # Trois ménages ont des revenus nuls en 2010, ident_men=2548, 4710 et 10828
+  menage_echelle<-
+    menage_echelle %>%
+    mutate_when(is.na(FC_rdb_menage),list(FC_rdb_menage=FC$rdb)) 
+  
+
+# MISE à l'ECHELLE --------------------------------------------------------
+
+
+  menage_echelle <-
+    menage_echelle %>%
+    mutate(retraites = retraites * (FC$revsoc)) %>%
+    mutate(chomage = chomage * (FC$revchom)) %>%
+    mutate(rev_activites_sans_etranger = rev_activites_sans_etranger * (FC$revact)) %>%
+    mutate(rev_etranger = rev_etranger * (FC$revetranger)) %>%
+    mutate(rev_exceptionnel=rev_exceptionnel * (FC_rdb_menage)) %>%
+    mutate(rev_patrimoine = rev_patrimoine * (FC$revpat)) %>%
+    mutate(rev_sociaux_autres = rev_sociaux_autres * (FC$revsoc)) %>%
+    mutate(rev700=rev700 * (FC_rdb_menage))%>%
+    mutate(rev701=rev701 * (FC_rdb_menage))%>%
+    mutate(rev999=rev999 * (FC_rdb_menage))%>%
+    mutate(rev60x=rev60x * (FC_rdb_menage))
+  # NB : les revenus exceptionnels et autres revenus des ménages sont mise à l'échelle comme la moyenne de leurs revenus (FC_rdb_menage), ménage par ménage
+  # NB2: rev801, rev800 et rev850 sont mis à jours comme des dépenses (resp loyers, BTP et prod_veh)
+  
+  # On n'a plus égalité entre les masses sommables en 2010 car taux de màj différents
+  table(menage_echelle$rev_sociaux_autres+menage_echelle$chomage==menage_echelle$rev_sociaux)
+  
+  # on corrige
+  menage_echelle <- 
+    menage_echelle %>%
+    mutate(rev_sociaux = rev_sociaux_autres+chomage) %>% 
+    mutate(rev_activites=rev_activites_sans_etranger+rev_etranger)%>%
+    select(-rev_total) #rev_total a été utilisé comme variable de construction du FC_RDB_menage, pas un vrai revenu total (avant impôt)
+  
+  
+  menage_echelle$RDBAI <- 
+    rowSums(menage_echelle[c("rev_activites","rev_sociaux","rev_patrimoine","rev700","rev701","rev999")])
+  # menage_echelle %>% summarise(sum(RDBAI*pondmen)) 2.259077e+12 contre DISPINC_VAL_0 à 3.346e+12, 3.32e+12 non compensé par les rev_tco de la taxe carbone rétrocédée pas encore attribuée aux ménages. 2.25/3.32=0.67 => on reste dans les bons ordres de grandeur par rapport à la sous-déclaration de 2010. 
+  
+  
+  menage_echelle$taux_AID<-menage_echelle$taux_AID * (FC$tauAID)
+  
+  menage_echelle$taux_IR<-menage_echelle$taux_IR * (FC$tauIR)
+  
+  # Quand RDBAI=0, taux_IR et taux_AID sont Inf ou Nan.
+  menage_echelle <- 
+    menage_echelle %>%
+    mutate(taux_AID=ifelse(is.na(taux_AID),0,taux_AID))%>%
+    mutate(taux_AID=ifelse(is.infinite(taux_AID),0,taux_AID))%>%
+    mutate(taux_IR=ifelse(is.na(taux_IR),0,taux_IR))%>%
+    mutate(taux_IR=ifelse(is.infinite(taux_IR),0,taux_IR))
+  
+  
+  menage_echelle%>%filter(taux_IR==0 &impot_revenu>0 )%>%select(ident_men)
+  menage_echelle%>%filter(taux_AID==0 &AID>0 )%>%select(ident_men)
+  #exemple du ménage 2548, AID=733 en 2010 mais RDBAI=0, donc taux_AID=0, on garde le même montant d'AID qu'en 2010.
+  # same for menage 10828
+  menage_echelle <- 
+    menage_echelle %>%
+    mutate(impot_revenu=ifelse(taux_IR==0,impot_revenu,taux_IR*RDBAI))%>%
+    mutate(AID=ifelse(taux_AID==0,AID,taux_AID*RDBAI))
+  
+  menage_echelle$RDB <- menage_echelle$RDBAI - rowSums(menage_echelle[c("impot_revenu","AID")])
+  
+  
+  return(menage_echelle)
+}

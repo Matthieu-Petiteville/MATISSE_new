@@ -1,0 +1,44 @@
+A <- 
+  menage_bis %>% 
+  select(ident_men,agriculture,share_A01)%>%
+  mutate(agriculture_2=agriculture)%>%
+  mutate(share_A01_2=share_A01)%>%
+  select(-agriculture,-share_A01)%>%
+  left_join(menage %>% select(ident_men,agriculture,share_A01),by="ident_men")%>%
+  mutate(agriculture_1=agriculture)%>%
+  mutate(share_A01_1=share_A01)%>%
+  select(-agriculture,-share_A01)%>%
+  left_join(solde,by="ident_men")%>%
+  mutate(diff_agriculture=agriculture_2-agriculture_1)%>%
+  mutate(diff_share=share_A01_2-share_A01_1)
+
+table(A$diff_agriculture==0)
+table(A$diff_share==0)
+
+A<-A %>%
+  filter(!diff_agriculture==0)
+
+
+solde_all <- 
+  solde_decile %>%
+  dplyr::rename("solde_decile"="solde")%>%
+  left_join(solde_niveau_vie,by="ident_men")%>%
+  dplyr::rename("solde_niveau_vie"="solde")%>%
+  mutate(gap=solde_niveau_vie/solde_decile-1)%>%
+  arrange(gap)
+solde_all
+solde_all %>% arrange(-gap)
+
+# menage_echelle_decile<-menage_echelle
+# menage_echelle_niveau_vie<-menage_echelle
+
+menage_echelle_niveau_vie %>% filter(ident_men==8437)%>%select(year_VE,carb_lubr,potentiel_VE,solv,VE_rank,rev_TCO,decuc2,RDB)
+menage_echelle_niveau_vie %>% summarise(sum(pondmen*rev_TCO))
+
+menage_echelle_decile%>% filter(ident_men==8437)%>%select(year_VE,carb_lubr,potentiel_VE,solv,VE_rank,rev_TCO,decuc2)
+menage_echelle_decile %>% summarise(sum(pondmen*rev_TCO))
+
+
+# Menage problématique 13927
+
+compute_share_export(menage_bis%>%filter(!ident_men==13927))

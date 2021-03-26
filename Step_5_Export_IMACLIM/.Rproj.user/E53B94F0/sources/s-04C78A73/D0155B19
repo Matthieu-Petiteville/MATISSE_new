@@ -1,0 +1,25 @@
+{
+    "id": "D0155B19",
+    "path": "D:/CIRED/Projet_Ademe/MATISSE/Step_5_Export_IMACLIM/1_export_to_IMACLIM.R",
+    "project_path": "1_export_to_IMACLIM.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1595947130433.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "tempName": "Untitled1",
+        "cursorPosition": "88,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1598524626,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1598524626607,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,60 @@
+
+
+# LIBRARY -----------------------------------------------------------------
+library(pracma)
+library(tidyverse)
+setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
+
+# DATA --------------------------------------------------------------------
+
+load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_1_1.RData",sep=""))
+
+load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
+
+load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/EMS.RData",sep=""))
+
+load("Step_0_Mise_forme_BDF/Output/menage_forme.RData")
+
+
+# source("Step_1_Mise_echelle/2.3_emission_gap_2010.R")
+# pour gagner du temps : 
+facteur_dec1 <-  2.201544
+facteur_tuu0 <-  3.32953
+
+source("Step_1_Mise_echelle/2.2_fonction_retrocession_carbon_tax.R")
+
+
+# Taxe Carbone ------------------------------------------------------------
+
+# Taxe carbone totale prélevée aux ménages et rétrocédée
+TCO_tot<-as.numeric(IMACLIM %>% 
+                      filter(year==horizon) %>%
+                      filter(model=="IMACLIM")%>%
+                      filter(Variable=="TCO_RTCD_tot")%>%
+                      select(value))*10^6
+
+# Taxe carbone €/tonne CO2eq
+TCO<-as.numeric(IMACLIM %>% 
+                  filter(year==horizon) %>%
+                  filter(model=="IMACLIM")%>%
+                  filter(Variable=="TCO")%>%
+                  select(value))*10^6
+
+
+# Appel Fonction ----------------------------------------------------------
+
+menage_echelle <- retrocession_carbon_tax(TCO,TCO_tot,menage_echelle)
+
+
+# Save --------------------------------------------------------------------
+
+save(menage_echelle,file=paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep=""))
+
+
+
+
+# Success -----------------------------------------------------------------
+
+print("Step 1 : 2_retrocession_carbon_tax : SUCCESS")
+
+

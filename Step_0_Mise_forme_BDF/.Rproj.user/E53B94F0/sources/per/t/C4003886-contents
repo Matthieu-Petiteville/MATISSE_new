@@ -1,0 +1,180 @@
+setwd("D:/CIRED/Projet_Ademe/MATISSE")
+
+
+# 2010 --------------------------------------------------------------------
+
+
+load("Step_0_Mise_forme_BDF/Output/menage_forme_4.RData")
+source("Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R")
+
+variables <-read_csv("D:/CIRED/Projet_Ademe/MATISSE/Analyse des résultats/variables.csv")
+
+
+detach("package:plyr")
+
+menage_forme_ener<-energie_dom_surf(menage_forme)
+Tab_conso_DPE<-menage_forme_ener %>% 
+  dplyr::group_by(DPE_pred)%>%
+  summarise("Mwh_m2"=weighted.mean(x=ener_dom_surf,w=pondmen)*1000)%>%
+  mutate(scenario="-",
+         horizon="2010",
+         scenario_classement="-",
+         redistribution="-")
+  
+
+source("D:/CIRED/Projet_Ademe/MATISSE/Analyse des résultats/ener_dom_kWh_m2.R")
+
+
+
+
+
+# HORIZONS --------------------------------------------------------------------
+
+Scenarios=c("AMS")
+Redistribution=c("niveau_vie","forfait","decile","tuu","ssrec")
+Horizon=c("2025","2030","2035")
+Scenario_classement=c("Optimiste","Median","Pessimiste")
+
+menage_compil<-c()
+
+
+for (s in Scenarios){
+  for (h in Horizon){
+    for (sc in Scenario_classement){
+      for (r in Redistribution){
+        
+      
+          load(paste("D:/CIRED/Projet_Ademe/Results/",s,"/",h,"/",sc,"/",r,"/menage_iteration.RData",sep=""))
+          
+          output_macro<-read_excel(paste("D:/CIRED/Projet_Ademe/Results/",s,"/",h,"/",sc,"/",r,"/Output_macro_code.xlsx",sep=""))
+          
+          
+          menage_iteration <- 
+            menage_iteration %>%
+            select(variables$x)%>%
+            mutate(scenario=s,
+                   horizon=h,
+                   scenario_classement=sc,
+                   redistribution=r)
+          
+          
+          
+          output_macro <-  output_macro %>%  gather(key=year_model,value=value,-c(1:3))
+          
+          IMACLIM<-  output_macro  %>%  separate(col="year_model",into=c("year","model"),sep="_")
+          FC <- 
+            IMACLIM %>%
+            filter(year==h) %>%
+            filter(model=="IMACLIM")%>%
+            filter(Variable %in% c(
+              "A01",
+              "A02",
+              "A03",
+              "A04",
+              "A05",
+              "A06",
+              "A07",
+              "A08",
+              "A09",
+              "A10",
+              "A11",
+              "A12",
+              "A13")) %>%
+            select(Variable,value)
+          
+          FC <- FC %>%
+            mutate(value=as.numeric(value)) %>%
+            spread(key=Variable,value=value)
+        
+          menage_ener<-energie_dom_surf(menage_iteration,FC)
+          Tab<-menage_ener %>% 
+            dplyr::group_by(DPE_pred)%>%
+            summarise("kwh_m2"=weighted.mean(x=ener_dom_surf,w=pondmen))%>%
+            mutate(scenario=s,
+                   horizon=h,
+                   scenario_classement=sc,
+                   redistribution=r)
+      menage_compil<- rbind(menage_compil,menage_ener%>%
+                              mutate(scenario=s,
+                                     horizon=h,
+                                     scenario_classement=sc,
+                                     redistribution=r))
+     Tab_conso_DPE<-rbind(Tab_conso_DPE,Tab)     
+          
+      }}}}
+
+
+# En 2010
+# ThreeME
+# AMS
+load(paste("D:/CIRED/Projet_Ademe/","AMS","/","2035","/","Optimiste","/","ssrec","/Iteration_0/Input/ThreeME.RData",sep=""))
+
+#ENER_BUIL_H01_C",i,"_2*11630/BUIL_H01_C est en kWh/hectare 
+
+conso_moy_dep_2010=data.frame("A"=0, "B"=0, "C"=0, "D"=0, "E"=0, "F"=0, "G"=0)
+for (i in LETTERS[1:7]){
+  conso_moy_dep_2010[i]<-
+    as.numeric(
+      ThreeME %>% 
+        filter(Var==
+                 paste("ENER_BUIL_H01_C",i,"_2*11630/BUIL_H01_C",i,"_2",sep="")
+        ) %>% 
+        filter(year=="2010") %>% 
+        mutate(value=value/10^7)%>%
+        select(value)
+    )
+}
+
+conso_moy_dep_2010
+Tab_conso_DPE %>% filter(horizon==2010)
+# très différent
+
+
+# Mais les consos de ThreME sont irréalistes
+max(menage_forme_ener$ener_dom_surf)
+menage_forme_ener%>%filter(ener_dom_surf>2)%>%summarise(sum(pondmen*surfhab_d))/menage_forme_ener%>%summarise(sum(pondmen*surfhab_d))
+ggplot(menage_forme_ener,aes(ener_dom_surf))+geom_density()+
+  geom_vline(xintercept=(conso_moy_dep_2010%>%gather(key="DPE",value="value")%>%select(value))$value,colour="red")
+
+ggplot(menage_forme_ener,aes(y=DPE_pred,x=ener_dom_surf))+geom_density_ridges()+
+  geom_vline(xintercept=(conso_moy_dep_2010%>%gather(key="DPE",value="value")%>%select(value))$value,colour="red")+scale_x_continuous(limits=c(0,0.7))
+
+
+
+
+# AMS 2035 --------------------------------------------------------------------
+conso_moy_dep_2035=data.frame("A"=0, "B"=0, "C"=0, "D"=0, "E"=0, "F"=0, "G"=0)
+for (i in LETTERS[1:7]){
+  conso_moy_dep_2035[i]<-
+    as.numeric(
+      ThreeME %>% 
+        filter(Var==
+                 paste("ENER_BUIL_H01_C",i,"_2*11630/BUIL_H01_C",i,"_2",sep="")
+        ) %>% 
+        filter(year=="2035") %>% 
+        mutate(value=value/10^7)%>%
+        select(value)
+    )
+}
+conso_moy_dep_2035
+
+
+
+ggplot(menage_compil%>%filter(horizon=="2035" & scenario=="AMS" & redistribution=="ssrec"),aes(y=scenario_classement,x=ener_dom_surf))+geom_density_ridges()
+
+ggplot(menage_compil%>%filter(horizon=="2035" & scenario=="AMS" & redistribution=="ssrec" & scenario_classement=="Optimiste"),aes(y=DPE_pred,x=ener_dom_surf))+geom_density_ridges()+
+  geom_vline(xintercept=(conso_moy_dep_2035%>%gather(key="DPE",value="value")%>%select(value))$value,colour="red")+scale_x_continuous(limits=c(0,0.7))
+
+
+conso_moy_dep_2035
+Tab_conso_DPE %>% filter(horizon==2035 & scenario=="AMS" &redistribution=="ssrec")%>%spread(key=DPE_pred,value=kwh_m2)
+
+ggplot(Tab_conso_DPE%>% filter(horizon==2035 & scenario=="AMS" ),aes(x=DPE_pred,y=kwh_m2,fill=redistribution))+geom_bar(stat="identity",position="dodge")+facet_grid(~scenario_classement)+geom_hline(yintercept=(conso_moy_dep_2035%>%gather(key="DPE",value="value")%>%select(value))$value,colour="red")
+
+
+
+
+# Etude ADEME -------------------------------------------------------------
+
+#Guilain CALS, 26/01/2021 Emilien doit nous sortir les données sur émissions directes en absolu, par variante en distinguant énergie domestique par classe de DPE et carburant
+

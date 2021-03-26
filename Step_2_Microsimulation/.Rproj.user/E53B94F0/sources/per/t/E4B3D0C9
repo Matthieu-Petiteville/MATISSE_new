@@ -1,0 +1,24 @@
+{
+    "id": "E4B3D0C9",
+    "path": "D:/CIRED/Projet_Ademe/MATISSE/Step_2_Microsimulation/calc_energie_kWh_m2.R",
+    "project_path": "calc_energie_kWh_m2.R",
+    "type": "r_source",
+    "hash": "3989520985",
+    "contents": "",
+    "dirty": false,
+    "created": 1590422754315.0,
+    "source_on_save": false,
+    "relative_order": 7,
+    "properties": {
+        "cursorPosition": "274,0",
+        "scrollLine": "18"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1613498334,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1613498334533,
+    "read_only": false,
+    "read_only_alternatives": []
+}

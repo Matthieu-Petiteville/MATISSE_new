@@ -1,0 +1,164 @@
+
+# Libraries ---------------------------------------------------------------
+
+library(tidyverse)
+library(readxl)
+library(cowplot)
+library(ggplot2)
+# Data --------------------------------------------------------------------
+
+
+load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+
+Output_macro_code <- read_excel("D:/CIRED/Projet_Ademe/IMACLIM/Output_macro_code.xlsx",sheet=scenario,skip=1)%>%
+  gather(key=year_model,value=value,-c(1:3))%>%
+  separate(col="year_model",into=c("year","model"),sep="_")
+
+
+# Description -------------------------------------------------------------
+
+
+# Par classe
+# Fioul € courant/par veh 
+# = Dépenses énergétiques des véhicules des ménages par classe de performance et motorisation (en euros courants) (CD, fioul)(toute la classe) / Parc de véhicules  de  classe D
+# ie   EXP_AUTO_H01_CD_22_2*PEXP_22_H01_2 / AUTO_H01_CD_2
+# 
+# vkm : Km-véhicules parcourus par classe de performance et motorisation (CD, fioul)
+# /Parc de véhicules  de  classe D
+# ie KM_AUTO_H01_CD_22_2/AUTO_H01_CD_2
+
+# d'où € courant /vkm = € courant/par veh / vkm/veh
+
+
+# Core --------------------------------------------------------------------
+# attention les VE sont comptés dans la classe A => corrigés
+# En revanche les KM totaux sont comptés par fuel (fioul ou elec)
+# on ne considère que les dépenses de fioul _22 (catégorie ThreeME)
+
+VEH <- 
+  ThreeME %>% 
+  filter(Var %in% c(paste("EXP_AUTO_H01_C",LETTERS[1:7],"_22_2*PEXP_22_H01_2",sep=""),paste("AUTO_H01_C",LETTERS[1:7],"_2",sep=""),paste("KM_AUTO_H01_C",LETTERS[1:7],"_22_2",sep=""),"AUTO_ELEC_H01_2"))%>%
+  filter(year>=2006 & year<=2050)%>%
+  spread(key=Var,value=value)%>%
+  mutate(AUTO_H01_CA_2=AUTO_H01_CA_2-AUTO_ELEC_H01_2)%>%
+  select(-AUTO_ELEC_H01_2)%>%
+  gather(key="Var",value="value",-1) %>%
+  separate(col=Var,into=c("Var_short","Classe"),sep="_H01_C")%>%
+  separate(col=Classe,into=c("Classe"),sep="_2")%>%
+  spread(key=Var_short,value=value)%>%
+  mutate(AUTO=AUTO*1000)%>%mutate(EXP_AUTO=EXP_AUTO*10^6)%>%
+  mutate(KM_AUTO=KM_AUTO*1000)%>%
+  mutate(dep_veh=EXP_AUTO/AUTO)%>%
+  mutate(vkm=KM_AUTO/AUTO)%>%
+  mutate(dep_vkm=dep_veh/vkm)
+
+
+ggplot(VEH,aes(x=year,y=dep_vkm,group=Classe,colour=Classe))+geom_line(lwd=1.2)+theme_minimal_hgrid()+scale_x_discrete(breaks=c(2006,2010,2020,2025,2030,2035,2050))+ggtitle("Evolution coût courant du vkm")
+
+ggplot(VEH%>%filter(Classe=="A"),aes(x=year,y=dep_vkm,group=Classe,colour=Classe))+geom_line(lwd=1.2)+theme_minimal_hgrid()+scale_x_discrete(breaks=c(2006,2010,2020,2025,2030,2035,2050))+ggtitle("Evolution coût courant du vkm")
+
+ggplot(VEH,aes(x=year,y=vkm,group=Classe,colour=Classe))+geom_line(lwd=1.2)+theme_minimal_hgrid()+scale_x_discrete(breaks=c(2006,2010,2020,2025,2030,2035,2050))
+
+ggplot(VEH,aes(x=year,y=dep_veh,group=Classe,colour=Classe))+geom_line(lwd=1.2)+theme_minimal_hgrid()+scale_x_discrete(breaks=c(2006,2010,2020,2025,2030,2035,2050))
+
+
+
+
+dep_vkm_classe <-
+  cbind(
+    VEH %>%
+  filter(year==2010)%>%
+  summarise("dep_vkm_2010"=weighted.mean(x=dep_vkm,w=AUTO)),
+  VEH %>%
+    filter(year==2025)%>%
+    summarise("dep_vkm_2025"=weighted.mean(x=dep_vkm,w=AUTO)),
+  VEH %>%
+    filter(year==2030)%>%
+    summarise("dep_vkm_2030"=weighted.mean(x=dep_vkm,w=AUTO)),
+  VEH %>%
+    filter(year==2035)%>%
+    summarise("dep_vkm_2035"=weighted.mean(x=dep_vkm,w=AUTO)))
+
+dep_vkm_classe_2<-data.frame("Variable"="dep_vkm","year"=c(2010,2025,2030,2035) ,"value"=as.numeric(dep_vkm_classe))%>%mutate(TC_dep_vkm=value/as.numeric(dep_vkm_classe$dep_vkm_2010)-1)
+
+
+dep_vkm_classe_3 <- VEH %>% group_by(year)%>%summarise("dep_vkm_avg_courant"=weighted.mean(x=dep_vkm,w=AUTO))%>%mutate(TC_dep_vkm=dep_vkm_avg_courant/as.numeric(dep_vkm_classe$dep_vkm_2010)-1)%>%mutate(year=as.numeric(year))
+
+ggplot(dep_vkm_classe_3,aes(x=year,y=dep_vkm_avg_courant,group=1))+geom_line(lwd=1.2)+theme_minimal_hgrid()+scale_x_discrete(breaks=c(2006,2010,2020,2025,2030,2035,2050))
+
+dep_vkm_classe_4 <- dep_vkm_classe_3 %>% left_join(Output_macro_code %>% filter(model=="ThreeME",Variable %in% c("A07"))%>%select(year,value),by="year")%>%rename("A07"="value")%>%gather(key="var",value="value",-1)%>%mutate(value=as.numeric(value))%>%filter(year<=2035)
+
+ggplot(dep_vkm_classe_4,aes(x=year,y=value,group=var,colour=var))+geom_line(lwd=1.2)+theme_minimal_hgrid()+scale_x_discrete(breaks=c(2006,2010,2020,2025,2030,2035,2050))+facet_wrap(~var,scales="free")+theme(legend.position="bottom")
+
+
+IPC <- 
+  cbind(Output_macro_code %>% 
+          mutate(year=as.numeric(year))%>%
+  filter(year<=2035,model=="ThreeME",Variable %in% c("A07","IPC2"))%>%
+  select(year,Variable,value)%>%
+    mutate(value=as.numeric(value))%>%
+    spread(key=Variable,value=value)%>%
+    mutate(TC_courant_A07=A07-1)%>%
+    select(year,TC_courant_A07),
+  dep_vkm_classe_3%>%filter(year<=2035)%>%select(TC_dep_vkm))%>%
+  mutate(TC_conso=TC_dep_vkm/TC_courant_A07)%>%
+  mutate(TC_conso_bis=(1+TC_dep_vkm)/(1+TC_courant_A07)-1)
+
+# avec conso => on obtient La dépense par km par : (1+TC_conso*TC_courant_A07)
+# avec conso_bis => on obtient La dépense par km par : (1+TC_conso)*(1+TC_courant_A07) => taux de croissance de la conso réelle
+# 
+
+ggplot(IPC%>%select(year,TC_courant_A07,TC_conso_bis,TC_dep_vkm)%>%gather(key="TC",value="value",-1),aes(x=year,y=value,group=TC,colour=TC))+geom_line(lwd=1.2)+theme_minimal_hgrid()+theme(legend.position="top")
+
+
+# Avec toutes les courbes
+  ggplot(IPC%>%gather(key="TC",value="value",-1),aes(x=year,y=value,group=TC,colour=TC))+geom_line(lwd=1.2)+theme_minimal_hgrid()+theme(legend.position="bottom")
+
+
+# Essai avec D ------------------------------------------------------------
+# => CCL : cohérent avec excel
+
+dep_vkm_classe_D <-
+  cbind(
+    VEH %>%
+      filter(year==2010 & Classe=="D")%>%
+      summarise("dep_vkm_2010"=weighted.mean(x=dep_vkm,w=AUTO)),
+    VEH %>%
+      filter(year==2025 & Classe=="D")%>%
+      summarise("dep_vkm_2025"=weighted.mean(x=dep_vkm,w=AUTO)),
+    VEH %>%
+      filter(year==2030 & Classe=="D")%>%
+      summarise("dep_vkm_2030"=weighted.mean(x=dep_vkm,w=AUTO)),
+    VEH %>%
+      filter(year==2035 & Classe=="D")%>%
+      summarise("dep_vkm_2035"=weighted.mean(x=dep_vkm,w=AUTO)))
+
+dep_vkm_classe_D_2<-data.frame("Variable"="dep_vkm","year"=c(2010,2025,2030,2035) ,"value"=as.numeric(dep_vkm_classe_D))%>%mutate(TC_dep_vkm=value/as.numeric(dep_vkm_classe_D$dep_vkm_2010)-1)
+
+
+IPC_D <- 
+  cbind(Output_macro_code %>% 
+          filter(year %in% c("2010","2025","2030","2035"),model=="ThreeME",Variable %in% c("A07","IPC2"))%>%
+          select(year,Variable,value)%>%
+          mutate(value=as.numeric(value))%>%
+          spread(key=Variable,value=value)%>%
+          mutate(TC_courant_A07=A07-1)%>%
+          select(year,TC_courant_A07),
+        dep_vkm_classe_D_2%>%select(TC_dep_vkm))%>%
+  mutate(TC_conso=TC_dep_vkm/TC_courant_A07)%>%
+  mutate(TC_conso_bis=(1+TC_dep_vkm)/(1+TC_courant_A07)-1)
+
+
+
+
+# # Microsimulation ---------------------------------------------------------
+
+
+#base 2010
+load("D:/CIRED/Projet_Ademe/MATISSE/Step_0_Mise_forme_BDF/Output/menage_forme.RData")
+load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_2.RData",sep=""))
+
+dep_carb <- menage_forme %>%filter(carb_lubr>0) %>%select(ident_men, pondmen,carb_lubr)%>%rename("carb_2010"="carb_lubr")%>%
+  left_join(menage_echelle%>%filter(carb_lubr>0)%>% select(ident_men,carb_lubr)%>%rename("carb_2035"="carb_lubr"))%>%
+  mutate(TC_carb=carb_2035/carb_2010-1)%>%
+  summarise("TC_carb_avg"=weighted.mean(TC_carb,pondmen))

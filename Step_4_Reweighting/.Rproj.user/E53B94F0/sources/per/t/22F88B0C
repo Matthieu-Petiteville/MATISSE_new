@@ -1,0 +1,24 @@
+{
+    "id": "22F88B0C",
+    "path": "D:/CIRED/Projet_Ademe/MATISSE/Step_4_Reweighting/3_pondr.R",
+    "project_path": "3_pondr.R",
+    "type": "r_source",
+    "hash": "3213705188",
+    "contents": "",
+    "dirty": false,
+    "created": 1593469138413.0,
+    "source_on_save": false,
+    "relative_order": 4,
+    "properties": {
+        "cursorPosition": "251,16",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1608206383,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1608206383320,
+    "read_only": false,
+    "read_only_alternatives": []
+}

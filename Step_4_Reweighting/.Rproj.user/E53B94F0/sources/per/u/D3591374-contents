@@ -1,0 +1,65 @@
+# test
+
+
+scenario="AMS"
+horizon=2035
+scenario_classement="Median"
+redistribution="decile"
+Iter=0
+
+
+# agreg_final
+
+
+
+
+# Sans stock --------------------------------------------------------------
+
+load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/pond_final_sans_stock_vehic.RData",sep=""))
+load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle_sans_stock_vehic.RData",sep=""))
+
+
+
+pond_final_sans_stock_vehic<-pond_final
+
+menage_echelle_sans_stock_vehic<-menage_echelle
+
+# Avec stock --------------------------------------------------------------
+
+load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/pond_final_stock_VT.RData",sep=""))
+load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle_stock_VT.RData",sep=""))
+
+
+
+pond_final_stock_VT<-pond_final
+
+menage_echelle_stock_VTc<-menage_echelle
+
+
+# diff --------------------------------------------------------------------
+
+
+
+pond_diff<-as.data.frame(cbind(pond_final_stock_VT,pond_final_sans_stock_vehic,pond_final_sans_stock_vehic/pond_final_stock_VT-1))
+
+table(pond_diff[,3]) #=> tous 0 ou NaN
+# Aucune différence
+
+
+# Zéro ? ------------------------------------------------------------------
+
+table(pond_final_stock_VT<10^-10)
+# 61%
+
+table(pond_final_sans_stock_vehic<10^-10)
+
+
+# Verif stock VT ----------------------------------------------------------
+
+menage_echelle %>% summarise(sum(pondmen*nbvehic,na.rm=T)) #36220982.
+# 0.2171251
+# 21%
+menage_echelle_bis<-menage_echelle
+menage_echelle_bis$pondmen<-pond_init
+menage_echelle_bis %>% summarise(sum(pondmen*nbvehic,na.rm=T)) #33187741.
+

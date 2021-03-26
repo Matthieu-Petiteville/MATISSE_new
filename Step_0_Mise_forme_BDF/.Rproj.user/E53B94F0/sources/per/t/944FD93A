@@ -1,0 +1,32 @@
+{
+    "id": "944FD93A",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1610372500152.0,
+    "source_on_save": false,
+    "relative_order": 11,
+    "properties": {
+        "expression": "Tab_conso_DPE %>% filter(horizon == 2035 & scenario == \"AMS\" &      scenario_classement == \"Optimiste\") %>% spread(key = DPE_pred,      value = kwh_m2)",
+        "caption": "Tab_conso_DPE %>% filter(horizon == 2035 & scenario == \"AMS\" & ",
+        "totalObservations": "5",
+        "displayedObservations": "5",
+        "variables": "11",
+        "cacheKey": "79C61FA6",
+        "object": "",
+        "environment": "_rs_no_env",
+        "contentUrl": "grid_resource/gridviewer.html?env=_rs_no_env&obj=&cache_key=79C61FA6&max_cols=50",
+        "preview": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1610372452,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1610372500152,
+    "read_only": false,
+    "read_only_alternatives": []
+}

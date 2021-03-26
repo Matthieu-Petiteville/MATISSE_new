@@ -1,0 +1,16 @@
+#Basic function starting the chrono for benchmark of solutions
+ChrStart <- function(){
+  chrono_timest <<- Sys.time()
+}
+
+#Basic function printing the chrono for benchmark of solutions
+ChrPrint <- function(){
+  print(Sys.time()-chrono_timest)
+}
+
+#Basic function stopping the chrono and removing the variable for benchmark of solutions
+ChrEnd <- function(){
+  print(Sys.time()-chrono_timest)
+  glob_var <- ls(pos = ".GlobalEnv")
+  rm(list = glob_var[grep("chrono_timest", glob_var)] , pos=".GlobalEnv")
+}

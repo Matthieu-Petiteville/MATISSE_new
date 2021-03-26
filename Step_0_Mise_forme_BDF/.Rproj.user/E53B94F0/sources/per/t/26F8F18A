@@ -1,0 +1,25 @@
+{
+    "id": "26F8F18A",
+    "path": "D:/CIRED/Projet_Ademe/MATISSE/Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R",
+    "project_path": "3_bonus_energies_kwh.R",
+    "type": "r_source",
+    "hash": "525559278",
+    "contents": "",
+    "dirty": false,
+    "created": 1610362359502.0,
+    "source_on_save": false,
+    "relative_order": 9,
+    "properties": {
+        "tempName": "Untitled1",
+        "cursorPosition": "233,32",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1612108177,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1612108177251,
+    "read_only": false,
+    "read_only_alternatives": []
+}

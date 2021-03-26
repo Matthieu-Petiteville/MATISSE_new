@@ -1,0 +1,24 @@
+{
+    "id": "53B75B7C",
+    "path": "D:/CIRED/Projet_Ademe/MATISSE/Step_0_Mise_forme_BDF/0_mise_forme_elast.R",
+    "project_path": "0_mise_forme_elast.R",
+    "type": "r_source",
+    "hash": "1331989201",
+    "contents": "",
+    "dirty": false,
+    "created": 1589526293038.0,
+    "source_on_save": false,
+    "relative_order": 1,
+    "properties": {
+        "cursorPosition": "25,11",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1589356175,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1589356175,
+    "read_only": false,
+    "read_only_alternatives": []
+}

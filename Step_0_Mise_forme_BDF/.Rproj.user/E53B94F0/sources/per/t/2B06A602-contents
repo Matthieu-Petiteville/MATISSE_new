@@ -1,0 +1,486 @@
+###### chargement des packages
+require(data.table)
+require(ggplot2)
+require(Hmisc)
+require(reshape2)
+require(plyr)
+require(ggthemes)
+
+##### th?mes graphiques #####
+
+orange_logement = rgb(0.94,0.51,0)
+vert_DD = rgb(0.47,0.70,0.12)
+light_vert_DD = rgb(0.47,0.70,0.12) 
+light_orange_logement=rgb(0.94,0.51,0) 
+violet_transport = rgb(0.35,0.31,0.59)
+light_violet_transport= rgb(0.35,0.31,0.59)
+turquoise_enerclimat = rgb(0,0.65,0.71)
+
+mytheme_plot <-   theme(legend.background = element_blank(),
+                        plot.margin = unit(c("2","2","3","3"),"cm"),
+                        plot.background = element_blank(),
+                        panel.background = element_blank() ,
+                        axis.title.x = element_text(size = 30, vjust =-3),
+                        axis.title.y = element_text(size = 30, vjust =3),
+                        text = element_text(size = 30),axis.line = element_line(linetype = 1),
+                        legend.key = element_blank(), 
+                        panel.grid.minor = element_blank(),
+                        panel.grid.major.x = element_blank(),
+                        panel.margin = unit(0, "cm"), 
+                        panel.border = element_rect(color = "black", fill=NA),
+                        panel.grid.major.y = element_line(colour = "grey70"),
+                        legend.key.height = unit(2, "cm"))
+
+mytheme_facet_plot <- 
+  theme(legend.background = element_blank(),
+        plot.margin = unit(c("2","2","3","3"),"cm"),
+        plot.background = element_blank(),
+        panel.background = element_blank() ,
+        axis.title.x = element_text(size = 30, vjust =-3),
+        axis.title.y = element_text(size = 30, vjust =3),
+        text = element_text(size = 20),axis.line = element_line(linetype = 1),
+        legend.key = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.grid.major.x = element_blank(),
+        panel.margin = unit(0, "cm"), 
+        panel.grid.major.y = element_line(colour = "grey70"),
+        legend.key.height = unit(2, "cm"), 
+        panel.border = element_rect(color = "black", fill=NA), 
+        strip.background = element_rect(color = "black", fill=NA)) 
+
+
+mytheme_map  = theme(legend.background = element_blank(),plot.margin = unit(c("2","2","3","3"),"cm"),
+                     plot.background = element_blank(),panel.background = element_blank() ,
+                     axis.title.x = element_text(size = 30, vjust =-3),
+                     axis.title.y = element_text(size = 30, vjust =3),
+                     panel.grid.major.y = element_line(size =0.5,color="grey80"),
+                     panel.grid.minor.y = element_blank(),
+                     text = element_text(size = 30),axis.line = element_line(linetype = 1),
+                     legend.key.height = unit(2, "cm"), axis.ticks = element_blank(), axis.text=element_blank(),
+                     panel.grid = element_blank(), panel.background =element_rect(fill = "white",color = "black"), 
+                     legend.position = "right",legend.background = element_rect(fill = "white",color = "black"))
+
+#### lecture donnees CLODE ####
+logements_old = fread("../Donnees/Phebus_v3/fichiers Clode/Tables_csv/logement_old.csv",
+                  colClasses = list("character" = c("ident","CATAEU2010","EHTLC_aut","TAU2010","RP_TAILLE_UU", "ERESTRIC3")))
+
+logements = fread("../Donnees/Phebus_v3/fichiers Clode/Tables_csv/logement.csv"
+                  , colClasses = list("character" = c("ident","RP_TAILLE_UU", "ERESTRIC3")))
+
+logements = merge(logements, logements_old[,c("ident","TAU2010","CATAEU2010"), with=F], by = "ident")
+
+#### nombre de m?nages 
+
+Nb_men_tot = logements[,sum(poids_clode)]
+Nb_men_ini = Nb_men_tot 
+
+####### ajouts variables de localisation #######
+
+####### TUU
+#logements$RP_TAILLE_UU
+####### zone climatique
+#logements$Zone_climatique_1_position
+#logements$Zone_climatique_2_positions
+
+###### typologie AU
+#logements$CATAEU2010
+
+###### ajout typologies personnelles 
+TUU2010_corresp= fread("csv_ajouts_variables/TUU2010_corresp.csv",colClasses="character")
+CATAEU2010_corresp = fread("csv_ajouts_variables/CATAEU2010_corresp.csv",colClasses="character")
+TAU2010_corresp = fread("csv_ajouts_variables/TAU2010_corresp.csv",colClasses="character")
+setnames(TUU2010_corresp, "TUU2010", "RP_TAILLE_UU")
+
+logements= merge(logements,TUU2010_corresp, by="RP_TAILLE_UU",all.x=T)
+logements= merge(logements,CATAEU2010_corresp, by="CATAEU2010",all.x=T)
+logements= merge(logements,TAU2010_corresp, by="TAU2010",all.x=T)
+
+###### cr?ation zonage publi CGDD #######
+
+logements[,zonage_phebus:= paste0(CATAEU_LIB2,TUU_phebus, sep="_")]
+
+logements[CATAEU_LIB2 == "HorsAU",zonage_phebus:="Autre_rural"]
+logements[CATAEU_LIB2 == "AutresAU_Couronne",zonage_phebus:="Autre_rural"]
+
+logements[,zonage_phebus:=factor(zonage_phebus, labels =c("Autre_rural","pole_AutreAU","periurbain_rural",
+                                                          "periurbain_urbain","Paris","pole_GAU"))]
+logements[,zonage_phebus:=factor(zonage_phebus, levels =c("Paris","pole_GAU","pole_AutreAU",
+                                                          "periurbain_urbain","periurbain_rural",
+                                                          "Autre_rural"))]
+
+#### Noms du zonage version longue
+zonage_phebus_corresp = fread("csv_ajouts_variables/zonage_phebus_corresp.csv")
+logements= merge(logements, zonage_phebus_corresp, by="zonage_phebus")
+logements[,zonage_phebus_long := factor(zonage_phebus_long, 
+                                        levels = c("Unit? urbaine de Paris", "P?les des grandes aires urbaines",
+                                                   "P?les des petites et moyennes aires urbaines", "Unit?s urbaines de l'espace p?riurbain", 
+                                                   "Communes rurales de l'espace p?riurbain","Autres espaces ? dominante rurale"))]
+
+logements[zonage_phebus_long =="Unit? urbaine de Paris" | zonage_phebus_long == "P?les des grandes aires urbaines" | zonage_phebus_long =="P?les des petites et moyennes aires urbaines",  zonage_phebus_long2:="P?les urbains"]
+logements[zonage_phebus_long =="Unit?s urbaines de l'espace p?riurbain" ,zonage_phebus_long2 :="Unit?s urbaines de l'espace p?riurbain"]
+logements[zonage_phebus_long =="Communes rurales de l'espace p?riurbain" ,zonage_phebus_long2 :="Communes rurales de l'espace p?riurbain"]
+logements[zonage_phebus_long =="Autres espaces ? dominante rurale",zonage_phebus_long2 :="Autres espaces ? dominante rurale"]
+
+logements[zonage_phebus_long =="Unit? urbaine de Paris" | 
+            zonage_phebus_long == "P?les des grandes aires urbaines" | 
+            zonage_phebus_long =="P?les des petites et moyennes aires urbaines",  
+          zonage_phebus_long3:="P?les urbains"]
+logements[zonage_phebus_long %in% c("Unit?s urbaines de l'espace p?riurbain","Communes rurales de l'espace p?riurbain")
+          ,zonage_phebus_long3 :="Espace p?riurbain"]
+logements[zonage_phebus_long =="Autres espaces ? dominante rurale",
+          zonage_phebus_long3 :="Autres espaces ? dominante rurale"]
+
+############################################
+###### CARACTERISTIQUES LOGEMENTS ##########
+############################################
+
+### periode du bati
+# 1. Avant 1919
+# 2. 1919 ? 1945
+# 3. 1946 ? 1970
+# 4. 1971 ? 1990
+# 5. 1991 ? 2005
+# 6. 2006 et apr?s
+#logements$BATI_PERIODE
+
+logements[,BATI_PERIODE2 := factor(BATI_PERIODE, labels = c("av1919","19-45","46-70","71-90","91-05","ap2006"))]
+
+# ##### type de logement
+# 1  une maison individuelle
+# 2  un logement dans un immeuble collectif
+# 3	une pi?ce ind?pendante ayant sa propre entr?e
+# 4	un logement-foyer pour personnes ?g?es
+# 5	une ferme, un b?timent d'exploitation agricole
+# 6	une chambre d'h?tel
+# 7	une construction provisoire, une habitation de fortune
+# 8	un logement dans un immeuble collectif ? usage autre que d'habitation (usine, bureaux, commerce, b?timent public, ...)
+# 9	AUTRE
+
+#summary(as.factor(logements$EHTLC))
+
+logements[EHTLC ==1 ,TYP_LOG := "Maison"]
+logements[EHTLC ==2 ,TYP_LOG := "Appart"]
+logements[EHTLC ==3 | EHTLC ==4 ,TYP_LOG := "Autre"]
+
+#summary(as.factor(logements$TYP_LOG))
+
+### si le logement est une pi?ce ind?pendante, est-il dans un immeuble collectif (1 oui 2 non)
+#logements[EHTLC == 3, EINDCOLL]
+### si le logement est une maison individuelle, fait-il partie d'une r?sidence, d'un "village" en copropri?t? (1 oui 2 non)
+#logements[EHTLC == 1, EICOI]
+
+### morphologie de la maison 
+# 1  isol?e
+# 2	mitoyenne sur un c?t?
+# 3	mitoyenne sur (au moins) deux c?t?s 
+
+#logements[EHTLC == 1, EIMORPH1]
+
+### morphologie de la maison 2
+# 1  de plain pied
+# 2	rez de chauss?e et comble habit?
+# 3	rez de chauss?e +1 et comble perdu
+# 4	rez de chauss?e +2 et comble perdu
+# 5	autre 
+
+#logements[EHTLC == 1, EIMORPH2]
+
+### pr?sence d'un ascenceur pour les logements en immeubles collectifs
+#logements[EHTLC == 2, EIAS]
+### nature de la ppt? pour les logements en immeubles collectifs
+# 1  L'immeuble est en copropri?t?
+# 2	L'immeuble appartient ? un propri?taire unique
+# 3	NSP* 
+
+#logements[EHTLC == 2, EICO]
+
+### logement : surface totale
+#summary(logements[,EHST])
+
+#### cr?ation d'une variable tranche de surface habitable
+
+logements[, Tr_Shab := cut(EHST, breaks=c(0,25,40,70,100,150,max(logements$EHST)), include.lowest = T, right=T,
+                           labels = c("inf25m2","25-40m2","40-70m2","70-100m2","100-150m2","sup150m2"))]
+
+
+##### nombres de pi?ces 
+
+logements[,nb_pieces :=  cut(EHPH, breaks=c(1,2,3,4,5,6,max(logements$EHPH)), include.lowest = T, right=F,
+                             labels = c("1p","2p","3p","4p","5p","6et+"))]
+
+
+# calcul Taux d'?quipement
+
+logements[, equip := 0]
+vectEBDU = paste("EBDU",c(1:17),sep="_")
+for(i in 1:length(c(1:14))){
+  logements[get(vectEBDU[i]) == 1, equip := equip + 1] 
+}
+
+table(logements$equip)
+
+logements[,Taux_equip :=equip/ENBPERS]
+summary(logements$Taux_equip)
+
+## Climatisation
+
+logements[logements$EKCLIM2_1 == 1, Climatisation := "appareils ind?pendants"]
+logements[logements$EKCLIM2_2 == 1, Climatisation := "centralis?e"]
+logements[logements$EKCLIM1 == 4, Climatisation := "Pas de climatisation"]
+logements[logements$EKCLIM4 == 5, Climatisation := NA]
+logements[, Climatisation := factor(Climatisation, levels = c("Pas de climatisation","appareils ind?pendants","centralis?e"))]
+
+## Inoccupation
+summary(as.factor(logements$EOCCUP1))
+
+logements[,Inoccupation :=factor(EOCCUP1,levels = c(as.character(1:5)),labels = c("-4h", "4h-8h", "8h-12h", "+12h", NA))]
+summary(logements$Inoccupation)
+
+
+
+##### fonction plot part #####
+
+var1 = "zonage_phebus_long2"
+var2 = "nb_pieces"
+poids = "poids_clode"
+
+ggplot_share = function(data, var1, var2, poids, facet = ""){
+  f = formula(paste(var1,var2,sep="~"))
+  tmp = dcast.data.table(data= data, formula=f, value.var=poids, fun.aggregate=sum)
+  tmp2 = data[,sum(get(poids)), by=var1]
+  tmp = merge(tmp, tmp2, by=var1)
+  tmp = melt(tmp, id.vars=c(var1,"V1"))
+  tmp[, perc:=value/V1*100]
+  tmp[, percsum:=cumsum(perc), by=var1]
+  tmp[perc <= 2, percsum:= NA]
+  
+  ggplot(tmp) + geom_bar(aes(x=get(var1),y=value/V1*100,fill=variable), stat="identity") +
+    geom_text(aes(x=get(var1),y=percsum,label = paste(round(value/V1*100), "%")),
+              vjust = 2) + xlab(label=var1) + ylab("Part des m?nages") + scale_fill_discrete(name=var2)  +
+    theme(axis.text.x=element_text(angle=+30, size = 25, hjust = 1)) + mytheme_plot
+}
+
+#ggplot_share(data=logements,var1= "zonage_phebus_long2",var2="nb_pieces",poids="poids_clode"  )
+#ggplot_share(data=logements,var1= "TYP_LOG",var2="nb_pieces",poids="poids_clode"  )
+
+
+######################################
+##### VARIABLES ENERGETIQUES #########
+######################################
+
+### type de chauffage (9 modalit?s)
+vectEKMOD = paste("EKMOD",1:9,sep="_")
+
+### d?finition du mode de chauffage et ECS (collectif/indiv), m?me champ que SOES #########
+
+##### chauffage ou eau chaude dans les charges -> ener_coll == 1
+logements[EFCHP_1 == 1 | EFCHP_2 == 1 | ELCHC_2 == 1 | ELCHC_3 == 1,  ener_coll := 1]
+logements[ is.na(ener_coll), ener_coll := 2]
+##### chauffage  dans les charges -> chauf_coll == 1
+logements[EFCHP_1 == 1 | ELCHC_3 == 1,  chauf_coll := 1]
+logements[ is.na(chauf_coll), chauf_coll := 2]
+##### eau chaude  dans les charges -> eau_chaude_coll== 1
+logements[EFCHP_2 == 1 | ELCHC_2 == 1,  eau_chaude_coll := 1]
+logements[ is.na(eau_chaude_coll), eau_chaude_coll := 2]
+
+### Autre fa?on de d?finir le chauffage collectif : m?nage d?clarant avoir un chauffage central collectif, 
+### un chauffage collectif urbain ou un chauffage mixte (EKMOD_2, EKMOD_3, EKMOD_5)
+logements[EKMOD_2== 1 | EKMOD_3==1 | EKMOD_5 ==1, chauf_coll_bis:=1]
+logements[is.na(chauf_coll_bis), chauf_coll_bis := 2]
+
+### gestion incoh?rence type de chauffage et pr?sence ou non de charges collectives
+###table(logements$chauf_coll, logements$chauf_coll_bis)
+##logements[chauf_coll_bis==1 & chauf_coll==2,.N, by ="EHTLC"]
+#logements[chauf_coll_bis==1 & chauf_coll==2,vectEKMOD, with=F]
+
+### cas 1 chauf_coll_bis="2" and chauf_coll="1" (il n'y en a pas dans notre ?chantillon)
+logements[chauf_coll_bis==2 & chauf_coll==1]
+
+###  cas 2 chauf_coll_bis="1" and chauf_coll="2",
+logements[chauf_coll_bis==1 & chauf_coll==2]
+logements[chauf_coll_bis==1 & chauf_coll==2 & EHTLC !=1 & ESTOC %in% c(1,2), EFCHP_1 :=1 ]
+logements[chauf_coll_bis==1 & chauf_coll==2 & EHTLC !=1 & ESTOC %in% c(3,4), ELCHC_3 :=1 ]
+
+##### On modifie les variables types de chauff en cons?quence
+
+logements[EFCHP_1 == 1 | ELCHC_3 == 1,  chauf_coll := 1]
+logements[ is.na(chauf_coll), chauf_coll := 2]
+logements[EFCHP_2 == 1 | ELCHC_2 == 1,  eau_chaude_coll := 1]
+logements[ is.na(eau_chaude_coll), eau_chaude_coll := 2]
+
+logements[EKMOD_2== 1 | EKMOD_3==1 | EKMOD_5 ==1, chauf_coll_bis:=1]
+logements[is.na(chauf_coll_bis), chauf_coll_bis := 2]
+
+logements[, ener_coll:=NULL]
+
+logements[chauf_coll_bis==1 | eau_chaude_coll==1, ener_coll:=1]
+logements[is.na(ener_coll),ener_coll:=2]
+
+
+
+logements[chauf_coll==1 | eau_chaude_coll==1,ener_coll_bis:=1]
+logements[is.na(ener_coll_bis),ener_coll_bis:=2]
+
+logements[chauf_coll_bis==1 | chauf_coll==1, chauf_coll_ter:=1]
+logements[is.na(chauf_coll_ter), chauf_coll_ter := 2]
+
+#table(logements$ener_coll_bis, logements$ener_coll)
+
+##################################################################
+### D?finition du  type d'?nergie de chauffage principale ########
+##################################################################
+
+
+##### sur le volet clode
+source("Type_energie_clode.R",encoding = "ISO8859-1")
+
+logements[,sum(poids_clode)/logements[,sum(poids_clode)], by="Typ_Energie_Chauff_P3"]
+logements[,sum(poids_clode)/logements[,sum(poids_clode)], by="Typ_Energie_Chauff_P4"][order(Typ_Energie_Chauff_P4)]
+logements[,sum(poids_clode)/logements[,sum(poids_clode)], by="Mode_chauff_P2"][order(Mode_chauff_P2)]
+logements[,sum(poids_clode), by="Typ_Energie_Chauff_P4"]
+
+
+# #### Ajout type d'?nergie du cuisson, nom plus clair (Attention, encore plusieurs types possibles)
+
+# logements[EKCUI_1 == 1 & (EKCUI_2 ==1 | EKCUI_3 ==1 |EKCUI_4 ==1 |EKCUI_5 ==1 |EKCUI_6 ==1 |EKCUI_7 ==1 |EKCUI_8 ==1 |EKCUI_9 ==1), ]
+# logements[EKCUI_2 ==1 & (EKCUI_1 ==1 | EKCUI_3 ==1 |EKCUI_4 ==1 |EKCUI_5 ==1 |EKCUI_6 ==1 |EKCUI_7 ==1 |EKCUI_8 ==1 |EKCUI_9 ==1), ]
+# logements[EKCUI_3 == 1 & (EKCUI_1 ==1 | EKCUI_2 ==1 |EKCUI_4 ==1 |EKCUI_5 ==1 |EKCUI_6 ==1 |EKCUI_7 ==1 |EKCUI_8 ==1 |EKCUI_9 ==1), ]
+# logements[EKCUI_4 == 1 & (EKCUI_1 ==1 | EKCUI_2 ==1 |EKCUI_3 ==1 |EKCUI_5 ==1 |EKCUI_6 ==1 |EKCUI_7 ==1 |EKCUI_8 ==1 |EKCUI_9 ==1), ]
+# logements[EKCUI_5 == 1 & (EKCUI_1 ==1 | EKCUI_2 ==1 |EKCUI_3 ==1 |EKCUI_4 ==1 |EKCUI_6 ==1 |EKCUI_7 ==1 |EKCUI_8 ==1 |EKCUI_9 ==1), ]
+# logements[EKCUI_6 == 1 & (EKCUI_1 ==1 | EKCUI_2 ==1 |EKCUI_3 ==1 |EKCUI_4 ==1 |EKCUI_5 ==1 |EKCUI_7 ==1 |EKCUI_8 ==1 |EKCUI_9 ==1), ]
+# logements[EKCUI_7 == 1 & (EKCUI_1 ==1 | EKCUI_2 ==1 |EKCUI_3 ==1 |EKCUI_4 ==1 |EKCUI_5 ==1 |EKCUI_6 ==1 |EKCUI_8 ==1 |EKCUI_9 ==1), ]
+logements[EKCUI_8 == 1 & (EKCUI_1 ==1 | EKCUI_2 ==1 |EKCUI_3 ==1 |EKCUI_4 ==1 |EKCUI_5 ==1 |EKCUI_6 ==1 |EKCUI_7 ==1 |EKCUI_9 ==1), ]
+# logements[EKCUI_9 == 1 & (EKCUI_1 ==1 | EKCUI_2 ==1 |EKCUI_3 ==1 |EKCUI_4 ==1 |EKCUI_5 ==1 |EKCUI_6 ==1 |EKCUI_7 ==1 |EKCUI_8 ==1), ]
+
+logements[EKCUI_1 == 1, Cuisson_Gaz := 1]
+logements[EKCUI_1 == 0, Cuisson_Gaz := 0]
+logements[EKCUI_2 == 1, Cuisson_GPLB := 1]
+logements[EKCUI_2 == 0, Cuisson_GPLB := 0]
+logements[EKCUI_3 == 1, Cuisson_GPLC := 1]
+logements[EKCUI_3 == 0, Cuisson_GPLC := 0]
+logements[EKCUI_4 == 1, Cuisson_Elec := 1]
+logements[EKCUI_4 == 0, Cuisson_Elec := 0]
+logements[EKCUI_5 == 1, Cuisson_Bois := 1]
+logements[EKCUI_5 == 0, Cuisson_Bois := 0]
+logements[EKCUI_6 == 1, Cuisson_Charbon := 1]
+logements[EKCUI_6 == 0, Cuisson_Charbon := 0]
+logements[EKCUI_7 == 1, Cuisson_Autres := 1]
+logements[EKCUI_7 == 0, Cuisson_Autres := 0]
+
+##############################################
+##### calculs des consommations r?elles #####
+##############################################
+#### check_conso_bois ######
+
+logements[VOL_BOIS_GRATUIT_2012 + VOL_BOIS_ACHAT_2012 == VOL_BOIS_2012]
+
+### calcul st?re en tep ##
+logements[TYPE_BOIS == 1,VOL_BOIS_UNITES ]
+logements[TYPE_BOIS == 1,VOL_BOIS_2012_TEP/(VOL_BOIS_GRATUIT_2012 + VOL_BOIS_ACHAT_2012) ]
+logements[TYPE_BOIS == 2,VOL_BOIS_UNITES ]
+logements[TYPE_BOIS == 2,VOL_BOIS_2012_TEP/(VOL_BOIS_GRATUIT_2012 + VOL_BOIS_ACHAT_2012) ]
+
+logements[TYPE_BOIS == 1 & VOL_BOIS_UNITES == 1, 
+          list(test = (VOL_BOIS_GRATUIT_2012 + VOL_BOIS_ACHAT_2012)*0.147, VOL_BOIS_2012, VOL_BOIS_2012_TEP) ]
+
+###### calc conso EF et EP 
+
+logements[, conso_tot_tep_EF := sum(as.numeric(VOL_ELEC_2012_TEP),
+                                    as.numeric(VOL_GAZ_2012_TEP),
+                                    as.numeric(VOL_FIOUL_2012_TEP),
+                                    as.numeric(VOL_GPLC_2012_TEP),
+                                    as.numeric(VOL_CHARBON_2012_TEP),
+                                    as.numeric(VOL_BOIS_2012_TEP),
+                                    as.numeric(VOL_GPLB_2012_TEP),
+                                    as.numeric(VOL_PK_2012_TEP), na.rm = T), by = "ident"]
+
+logements[, conso_tot_tep_EP := sum(VOL_ELEC_2012_TEP*2.58,
+                                    VOL_GAZ_2012_TEP,
+                                    VOL_FIOUL_2012_TEP,
+                                    VOL_GPLC_2012_TEP,
+                                    VOL_CHARBON_2012_TEP,
+                                    VOL_BOIS_2012_TEP,
+                                    VOL_GPLB_2012_TEP,
+                                    VOL_PK_2012_TEP, na.rm = T), by = "ident"]
+
+
+logements[, conso_tot_kwh_EP := conso_tot_tep_EP*11630]
+logements[, conso_tot_kwh_EF := conso_tot_tep_EF*11630]
+
+logements[EHSP !=0 & EHST !=0, conso_tot_kwh_EP_m2 := conso_tot_kwh_EP/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_tot_kwh_EP_m2 := conso_tot_kwh_EP/(EHST)]
+logements[EHSP !=0 & EHST !=0, conso_tot_kwh_EF_m2 := conso_tot_kwh_EF/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_tot_kwh_EF_m2 := conso_tot_kwh_EF/(EHST)]
+
+##### conso totales EP par ?nergie  ##### 
+
+logements[, conso_gaz_kwh_EP := VOL_GAZ_2012_TEP*11630]
+logements[EHSP !=0 & EHST !=0, conso_gaz_kwh_EP_m2 := conso_gaz_kwh_EP/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_gaz_kwh_EP_m2 := conso_gaz_kwh_EP/(EHST)]
+
+logements[, conso_elec_kwh_EP := VOL_ELEC_2012_TEP*11630*2.58]
+logements[EHSP !=0 & EHST !=0, conso_elec_kwh_EP_m2 := conso_elec_kwh_EP/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_elec_kwh_EP_m2 := conso_elec_kwh_EP/(EHST)]
+
+logements[, conso_fioul_kwh_EP := VOL_FIOUL_2012_TEP*11630]
+logements[EHSP !=0 & EHST !=0, conso_fioul_kwh_EP_m2 := conso_fioul_kwh_EP/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_fioul_kwh_EP_m2 := conso_fioul_kwh_EP/(EHST)]
+
+logements[, conso_gplc_kwh_EP := VOL_GPLC_2012_TEP*11630]
+logements[EHSP !=0 & EHST !=0, conso_gplc_kwh_EP_m2 := conso_gplc_kwh_EP/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_gplc_kwh_EP_m2 := conso_gplc_kwh_EP/(EHST)]
+
+logements[, conso_gplb_kwh_EP := VOL_GPLB_2012_TEP*11630]
+logements[EHSP !=0 & EHST !=0, conso_gplb_kwh_EP_m2 := conso_gplb_kwh_EP/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_gplb_kwh_EP_m2 := conso_gplb_kwh_EP/(EHST)]
+
+logements[, conso_bois_kwh_EP := VOL_BOIS_2012_TEP*11630]
+logements[EHSP !=0 & EHST !=0, conso_bois_kwh_EP_m2 := conso_bois_kwh_EP/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_bois_kwh_EP_m2 := conso_bois_kwh_EP/(EHST)]
+
+logements[, conso_charbon_kwh_EP := VOL_CHARBON_2012_TEP*11630]
+logements[EHSP !=0 & EHST !=0, conso_charbon_kwh_EP_m2 := conso_charbon_kwh_EP/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_charbon_kwh_EP_m2 := conso_charbon_kwh_EP/(EHST)]
+
+logements[, conso_pk_kwh_EP := VOL_PK_2012_TEP*11630]
+logements[EHSP !=0 & EHST !=0, conso_pk_kwh_EP_m2 := conso_pk_kwh_EP/(EHST+EHSP)]
+logements[(EHSP ==0 |is.na(EHSP)) & EHST !=0, conso_pk_kwh_EP_m2 := conso_pk_kwh_EP/(EHST)]
+
+#verif 
+temp = logements[, list(verif = sum(conso_gaz_kwh_EP_m2, conso_elec_kwh_EP_m2, conso_fioul_kwh_EP_m2, 
+                                    conso_gplc_kwh_EP_m2, conso_gplb_kwh_EP_m2, conso_bois_kwh_EP_m2, 
+                                    conso_charbon_kwh_EP_m2, conso_pk_kwh_EP_m2, na.rm=T), conso_tot_kwh_EP_m2) , by="ident"]
+
+temp[verif - conso_tot_kwh_EP_m2 < -0.1]
+temp[verif - conso_tot_kwh_EP_m2 > 0.1]
+
+
+####################################
+###### Definition du champ #########
+####################################
+
+logements[TYP_LOG == "Maison", TYPLOG_bis := "Maison"]
+logements[TYP_LOG != "Maison", TYPLOG_bis := "Collectif"]
+
+logements[, sum(poids_clode)/Nb_men_tot, by=c("ener_coll","TYPLOG_bis")]
+
+
+#### bug une observation avec surface nulle et une non renseign?e, on les enl?ve
+#logements[EHST == 0,]
+#logements[EHST == 999,]
+#logements = logements[EHST > 0 & EHST != 999 ,]
+
+#### nombre de m?nages 
+Nb_men_tot = logements[,sum(poids_clode)]
+logements[,.N]
+
+##### Part de chaque type de chauffage
+logements[, .N, by="ener_coll"]
+
+logements[, sum(poids_clode)/Nb_men_tot, by="ener_coll"]
+logements[, sum(poids_clode)/Nb_men_tot, by="chauf_coll"]
+logements[, sum(poids_clode)/Nb_men_tot, by="eau_chaude_coll"]
+
+rm(list = ls(all = T)[!(ls(all = T) %in% c("logements","Nb_men_tot"))])
+
+

@@ -1,0 +1,13 @@
+{
+    "dialog-state": {
+        "query": "rev801",
+        "path": "D:/CIRED/Projet_Ademe/MATISSE/Step_2_Microsimulation",
+        "regex": false,
+        "caseSensitive": false,
+        "filePatterns": [],
+        "excludeFilePatterns": [],
+        "resultsCount": 5,
+        "errorCount": 0,
+        "replaceErrors": ""
+    }
+}

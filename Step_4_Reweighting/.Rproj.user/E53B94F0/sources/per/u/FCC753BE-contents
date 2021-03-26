@@ -1,0 +1,21 @@
+library(tidyverse)
+
+scenario="AMS"
+horizon=2035
+redistribution="ssrec"
+
+
+
+
+scenario_classement="Optimiste"
+load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle.RData",sep=""))
+menage_echelle %>% group_by(decuc2)%>%summarise(sum(pondmen*RDB))
+
+scenario_classement="Optimal_co2"
+load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle.RData",sep=""))
+menage_echelle %>% group_by(decuc2)%>%summarise(sum(pondmen*RDB))
+
+
+# test
+# View(cbind(rownames(agreg_init),rownames(agreg_best)))
+sauv<-cbind("Init"=agreg_init, "Best"=agreg_best,"Way to go"=bvec/agreg_init)

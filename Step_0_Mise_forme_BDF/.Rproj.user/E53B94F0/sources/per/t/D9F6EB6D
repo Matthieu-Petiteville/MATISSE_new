@@ -1,0 +1,32 @@
+{
+    "id": "D9F6EB6D",
+    "path": null,
+    "project_path": null,
+    "type": "r_dataframe",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1612108224062.0,
+    "source_on_save": false,
+    "relative_order": 13,
+    "properties": {
+        "expression": "menage_forme_ener %>% dplyr::group_by(DPE_pred) %>% summarise(kwh_m2 = weighted.mean(x = energie_tot_surf,      w = pondmen))",
+        "caption": "menage_forme_ener %>% dplyr::group_by(DPE_pred) %>% summarise(kwh_m2 = weighted.mean(x = energie_tot_surf, ",
+        "totalObservations": 7,
+        "displayedObservations": 7,
+        "variables": 2,
+        "cacheKey": "B6CC7F83",
+        "object": "",
+        "environment": "_rs_no_env",
+        "contentUrl": "grid_resource/gridviewer.html?env=_rs_no_env&obj=&cache_key=B6CC7F83&max_cols=50",
+        "preview": 0
+    },
+    "folds": "",
+    "lastKnownWriteTime": 8243621665628056688,
+    "encoding": "",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1612108224062,
+    "read_only": false,
+    "read_only_alternatives": []
+}
