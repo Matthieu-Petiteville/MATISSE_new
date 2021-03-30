@@ -29,3 +29,4 @@ colnames(Elast)<-
 # SAVE --------------------------------------------------------------------
 
 save(Elast,file=paste(M_data,"/Data/Econometrie_demande/elasticite_demande.RData",sep=""))
+rm(Elast)
