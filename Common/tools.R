@@ -26,3 +26,10 @@ mutate_when <- function(data, ...) {
   }
   data
 }
+# Source ------------------------------------------------------------------
+# https://stackoverflow.com/questions/34096162/dplyr-mutate-replace-on-a-subset-of-rows
+
+#Create folder if it doesn't exist, no warning
+CreateFolder <- function(folder_name){
+  if(!dir.exists(folder_name)){dir.create(folder_name)}
+}

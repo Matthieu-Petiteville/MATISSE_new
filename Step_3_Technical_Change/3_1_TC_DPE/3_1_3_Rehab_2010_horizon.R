@@ -10,20 +10,23 @@ library(dplyr)
 
 # DATA --------------------------------------------------------------------
 
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
-source("D:/Stage_Petiteville/Projet_Ademe/Code_global_Ademe/mutate_when.R")
-source("Step_3_Technical_Change/Repayment.R")
-source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
-source("Step_2_Microsimulation/calc_energie_kWh_m2.R") # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
-source("Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R")
+# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
+source(paste(M_home,"/Common/tools.R",sep=""))
+
+source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
+source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/calc_ems.R",sep=""))
+source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
+source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
+TCO<-as.numeric(read_excel(path=paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/","Optimiste","/","ssrec","/IMACLIM_3ME.xlsx",sep=""),range="C103",col_names=F))*10^6
 
 # Base ménage
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_32.RData",sep=""))
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
-load("Data/Data_interne/list_source_usage.RData")
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
-
-
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_32.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+load(paste(M_data,"/Data/Data_interne/coeff_ems_2010.RData",sep=""))
+coeff_dep_ems<-read_csv(paste(M_data,"/IMACLIM/coeff_dep_ems.csv",sep=""))
 
 
 # DONNEES MANUELLES -------------------------------------------------------
@@ -721,12 +724,12 @@ for (Y in 2010:horizon){
   
   # les ménages insolvables sont "rebootés" à l'itération précédente, avant leur rénovation
   if(dim(menages_insolvables)[1]>0){
-menage_echelle <-
+  menage_echelle <-
   rbind(menage_echelle %>%
   filter(!ident_men %in% menages_insolvables$ident_men),
   sauv_menages_insolvables)%>%
   arrange(ident_men)
-}
+  }
   
   
   
@@ -914,13 +917,10 @@ Subvention<-
 #le prix total doit donc prendre en compte tous les remises de TVA pour tous les agents (et pas seulement privés)
 sBCE<-as.numeric(Subvention/(Subvention+menage_echelle%>%summarise(sum(pondmen*BTP))))
 
-save(sBCE,file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/sBCE.RData",sep=""))
-save(Subvention,file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Subvention_rehab.RData",sep=""))
-save(Cout_bailleur_public,file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Cout_bailleur_public.RData",sep=""))
-
-
-
-save(menage_echelle,file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33_avant_reventil.RData",sep=""))
+save(sBCE,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/sBCE.RData",sep=""))
+save(Subvention,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Subvention_rehab.RData",sep=""))
+save(Cout_bailleur_public,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Cout_bailleur_public.RData",sep=""))
+save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33_avant_reventil.RData",sep=""))
 
 # REVENTILATION -----------------------------------------------------------
 
@@ -967,7 +967,7 @@ not_inter<-setdiff(colnames(menage_echelle_33), colnames(menage_echelle_32))
 
 menage_echelle_33<-menage_echelle %>% select(inter,year_rehab,DPE_horizon,solv)
 
-save(menage_echelle_33, file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33.RData",sep=""))
+save(menage_echelle_33, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33.RData",sep=""))
 
 
 

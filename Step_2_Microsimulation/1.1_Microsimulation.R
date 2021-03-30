@@ -2,33 +2,33 @@
 # Library -----------------------------------------------------------------
 library(tidyverse)
 
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
+# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 #function
-source("D:/Stage_Petiteville/Projet_Ademe/Code_Global_ADEME/mutate_when.R")
-source("Step_2_Microsimulation/1.2_fonction_microsimulation.R")
-source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
+source(paste(M_home,"/Step_2_Microsimulation/1.2_fonction_microsimulation.R",sep=""))
+source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Common/tools.R",sep=""))
 
 
 # DATA --------------------------------------------------------------------
 
 ## Menages
 # 2010
-load("Step_0_Mise_forme_BDF/Output/menage_forme.RData")
+load(paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
 # mise à l'échelle
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep=""))
 
 ## MACRO
 # FC
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
 
 # ThreeME
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
 
 
 
 # ELASTICITES -------------------------------------------------------------
 # Importer élasticités prix et revenus de chaque TYPO x DECILE
-load("Data/Econometrie_demande/elasticite_demande.RData") #Elast
+load(paste(M_data,"/Data/Econometrie_demande/elasticite_demande.RData",sep="")) #Elast
 
 # Nom de tous les catégories de "A01" à "A014")
 Cat<-names(FC)[1:14]
@@ -132,7 +132,7 @@ surfhab_hab_horizon<-BUIL_H01_2_horizon/POP_TOT_horizon
 
 FC$surface<-surfhab_hab_horizon/surfhab_hab_2010
 
-save(FC,file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+save(FC,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
 
 
 menage_echelle <- 
@@ -157,7 +157,7 @@ menage_echelle <-
 
 # Save --------------------------------------------------------------------
 
-save(menage_echelle,file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_2_1.RData",sep=""))
+save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_2_1.RData",sep=""))
 
 
 # Epargne -----------------------------------------------------------------

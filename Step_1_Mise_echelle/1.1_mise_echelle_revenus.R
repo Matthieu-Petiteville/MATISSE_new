@@ -2,25 +2,23 @@
 # LIBRARY -----------------------------------------------------------------
 
 library(tidyverse)
-
-
-
+source(paste(M_home,"/Common/tools.R",sep=""))
 
 # DATA --------------------------------------------------------------------
 
 
 ## MICRO
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
-source("D:/Stage_Petiteville/Projet_Ademe/Code_global_Ademe/mutate_when.R")
-load("Step_0_Mise_forme_BDF/Output/menage_forme.RData")
-source("Step_1_Mise_echelle/1.2_fonction_mise_echelle_revenus.R")
+# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
+
+load(paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
+source(paste(M_home,"/Step_1_Mise_echelle/1.2_fonction_mise_echelle_revenus.R",sep=""))
 # source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
 
 
 ## MACRO
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
 
 
 
@@ -56,7 +54,7 @@ menage_echelle <- mise_echelle_revenu(FC,menage_forme,Iter)
 
 # Save files --------------------------------------------------------------
 
-save(menage_echelle,file=paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_1_1.RData",sep=""))
+save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_1_1.RData",sep=""))
 
 
 

@@ -18,8 +18,8 @@ Ventil_solde <- function(solde,menage,step){
   
   menage_bis<-menage
   menage_bis <- menage_bis %>% left_join(solde,by="ident_men")
-  source("D:/Stage_Petiteville/Projet_Ademe/Code_global_Ademe/mutate_when.R")
-  load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+  source(paste(M_home,"/Common/tools.R",sep=""))
+  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
   
   
   list_dep_14=c("agriculture",

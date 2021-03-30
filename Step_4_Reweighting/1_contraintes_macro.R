@@ -7,20 +7,17 @@ library(dplyr)
 library(base)
 
 # DATA --------------------------------------------------------------------
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
-source("D:/Stage_Petiteville/Projet_Ademe/Code_global_Ademe/mutate_when.R")
-source("D:/Stage_Petiteville/Projet_Ademe/MATISSE/Step_4_Reweighting/Stock_VP_Particuliers_horizon.R")
+# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
+source(paste(M_home,"/Common/tools.R",sep=""))
+source(paste(M_home,"/Step_4_Reweighting/Stock_VP_Particuliers_horizon.R",sep=""))
 
 
-load("Step_0_Mise_forme_BDF/Output/menage_forme.RData")
-individu<-read_excel("Data/BDF_2010/individu.xlsx")
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
+load(paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
+individu<-read_excel(paste(M_data,"/Data/BDF_2010/individu.xlsx",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
 
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
-
-
-
-ventes_VP <- read_excel(path="Data/ThreeME/Ventes_VP.xlsx")
+ventes_VP <- read_excel(path=paste(M_data,"/Data/ThreeME/Ventes_VP.xlsx",sep=""))
 ventil_VP <- as.numeric(ventes_VP %>% filter(Year==horizon)%>%select(Particuliers))
 Stock_VP_Particuliers_horizon<-as.numeric(Stock_list %>% filter(Year==horizon)%>%select(Stock_VP_Particuliers))
 
@@ -191,7 +188,7 @@ contraintes_calage <-Calage_relatif %>% select(Variable,value) %>% spread(key=Va
 
 # Pondmen
 
-men_INSEE <- read_excel("D:/Stage_Petiteville/Projet_Ademe/Donnees_brutes/INSEE/INSEE - projection men.xlsx",sheet="men")
+men_INSEE <- read_excel(paste(M_data,"/Donnees_brutes/INSEE/INSEE - projection men.xlsx",sep=""),sheet="men")
 
 
 # Réarranger dans ordre cohérent avec étape 4.2
@@ -216,7 +213,7 @@ FC_pondmen <-
 
 
 # Import des contraintes INSEE pop 2025
-pop_INSEE <- read_excel("D:/Stage_Petiteville/Projet_Ademe/Donnees_brutes/INSEE/INSEE - projection pop.xlsx",sheet="Pop")
+pop_INSEE <- read_excel(paste(M_data,"/Donnees_brutes/INSEE/INSEE - projection pop.xlsx",sep=""),sheet="Pop")
 pop_INSEE <- pop_INSEE %>% 
   gather(key=year, value=part_age_sexe, -c(1:2)) %>% mutate(cat_sexe_age=paste("part",Sexe,Age,sep="_"))
 
@@ -227,7 +224,7 @@ pop_INSEE_horizon<- pop_INSEE %>% filter(year==horizon)
 for (k in pop_INSEE_horizon$cat_sexe_age){
   value<-as.numeric(pop_INSEE_horizon %>% filter(cat_sexe_age==k) %>% select(part_age_sexe))
   assign(k,value)}
-save(pop_INSEE,file="D:/Stage_Petiteville/Projet_Ademe/Donnees_brutes/INSEE/pop_INSEE.RData")
+save(pop_INSEE,file=paste(M_data,"/Donnees_brutes/INSEE/pop_INSEE.RData",sep=""))
 rm(pop_INSEE,pop_INSEE_horizon)
 
 
@@ -432,9 +429,9 @@ agreg_best <-
 
 
 save(agreg_best, file=
-       paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/agreg_best.RData",sep=""))
+       paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/agreg_best.RData",sep=""))
 save(menage_calibr_2010,file=
-       paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_calibr_2010.RData",sep=""))
+       paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_calibr_2010.RData",sep=""))
 
 
 

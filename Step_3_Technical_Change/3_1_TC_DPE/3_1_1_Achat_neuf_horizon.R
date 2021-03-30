@@ -6,35 +6,31 @@
 # LIBRARIES ---------------------------------------------------------------
 library(tidyverse)
 library(ggplot2)
-# library(FinancialMath)
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
-source("D:/Stage_Petiteville/Projet_Ademe/Code_global_Ademe/mutate_when.R")
-source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
-source("Step_2_Microsimulation/calc_energie_kWh_m2.R") # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
-source("Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R")
+# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
+source(paste(M_home,"/Common/tools.R",sep=""))
 
-# source("Step_3_Technical_Change/3_1_TC_DPE/calc_VAN.R")
-source("Step_3_Technical_Change//Repayment.R")
-# source("Step_3_Technical_Change/3_1_TC_DPE/calc_VAN.R")
-coeff_dep_ems<-read_csv("D:/Stage_Petiteville/Projet_Ademe/IMACLIM/coeff_dep_ems.csv")
-load("D:/Stage_Petiteville/Projet_Ademe/MATISSE/Data/Data_interne/coeff_ems_2010.RData")
-TCO<-as.numeric(read_excel(path=paste("D:/Stage_Petiteville/Projet_Ademe/Results/",scenario,"/",horizon,"/","Optimiste","/","ssrec","/IMACLIM_3ME.xlsx",sep=""),range="C103",col_names=F))*10^6
+source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
+source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
+source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
+
+coeff_dep_ems<-read_csv(paste(M_data,"/IMACLIM/coeff_dep_ems.csv",sep=""))
+load(paste(M_data,"/Data/Data_interne/coeff_ems_2010.RData",sep=""))
+TCO<-as.numeric(read_excel(path=paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/","Optimiste","/","ssrec","/IMACLIM_3ME.xlsx",sep=""),range="C103",col_names=F))*10^6
 # TCO ne dépend pas de la rétrocession, c'est du calibrage
 
-source("Step_3_Technical_Change/3_1_TC_DPE/calc_ems.R")
+source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/calc_ems.R",sep=""))
 
 
 # DATA --------------------------------------------------------------------
 
 # Donnes ThreeME : m2 et valeurs d'achats de logement neufs trajectoire
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
-load("Data/Data_interne/list_source_usage.RData")
-
-
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
 
 #horizon
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_2.RData",sep=""))
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_2.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
 
 
 list_dep=c("agriculture",
@@ -504,7 +500,7 @@ table((menage_echelle_31$dep_Solides-menage_echelle_31$dep_Solides_verif)<10^(-9
 # SAVE --------------------------------------------------------------------
 
 
-save(menage_echelle_31, file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_31.RData",sep=""))
+save(menage_echelle_31, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_31.RData",sep=""))
 
 
 

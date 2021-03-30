@@ -10,8 +10,6 @@
 library(tidyverse)
 library(readxl)
 
-setwd("D:/Stage_Petiteville/Projet_Ademe/")
-
 
 
 
@@ -26,14 +24,10 @@ if(scenario=="ssRES"){S="scen AMS ss residentiel"}
 if(scenario=="ssVE"){ S="scen AMS ss VE"}
 
 
-suppressWarnings(scen<-read_excel(path="D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Sorties Three-ME.xlsx",sheet=S))
+suppressWarnings(scen<-read_excel(path=paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep=""),sheet=S))
 
 ThreeME<- scen %>% select(-Def)%>% gather(key=year, value=value, -c(1))
-
-save(ThreeME, file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
-
-
-
+save(ThreeME, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
 
 
 # IMACLIM -----------------------------------------------------------------
@@ -41,9 +35,9 @@ save(ThreeME, file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horiz
 
 # VARIABLES MACRO
 if(scenario_classement=="ssrec"){
-  output_macro<-read_excel(path ="IMACLIM/Output_macro_code_iter_0_ssrec.xlsx",sheet=scenario,skip = 1)
+  output_macro<-read_excel(path = paste(M_data , "/IMACLIM/Output_macro_code_iter_0_ssrec.xlsx",sep=""),sheet=scenario,skip = 1)
 } else {
-  output_macro<-read_excel(path ="IMACLIM/Output_macro_code_iter_0.xlsx",sheet=scenario,skip = 1)
+  output_macro<-read_excel(path = paste(M_data , "/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=scenario,skip = 1)
 }
 output_macro <-
   output_macro %>%
@@ -55,8 +49,7 @@ IMACLIM<-
 
 rm(output_macro)
 
-save(IMACLIM,file=
-       paste(scenario,"/",horizon,"/IMACLIM.RData",sep=""))
+save(IMACLIM,file=  paste(M_data , "/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
 
 
 
@@ -95,15 +88,14 @@ FC <- FC %>%
   spread(key=Variable,value=value) 
 
 
-save(FC,file=paste(scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+save(FC,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
 
 
 
 # Emissions ---------------------------------------------------------------
 
-EMS<-read_excel(path=paste("IMACLIM/EMS.xlsx",sep=""),range=paste(scenario,"!B1:AF5",sep=""),col_names=T)
-
-save(EMS,file=paste(scenario,"/EMS.RData",sep=""))
+EMS<-read_excel(path=paste(M_data,"/IMACLIM/EMS.xlsx",sep=""),range=paste(scenario,"!B1:AF5",sep=""),col_names=T)
+save(EMS,file=paste(M_data,"/Output/Projet_ADEME/",scenario,"/EMS.RData",sep=""))
 
 
 

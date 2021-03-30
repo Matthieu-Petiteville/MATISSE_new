@@ -10,18 +10,18 @@ library(dplyr)
 
 # DATA --------------------------------------------------------------------
 
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
+# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
 
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_31.RData",sep=""))
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
-load("Data/Data_interne/list_source_usage.RData")
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_31.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
 
-source("D:/Stage_Petiteville/Projet_Ademe/Code_global_Ademe/mutate_when.R")
-source("Step_3_Technical_Change/Repayment.R")
-source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
-source("Step_2_Microsimulation/calc_energie_kWh_m2.R") # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
-source("Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R")
+source(paste(M_home,"/Common/tools.R",sep=""))
+source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
+source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
+source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
 
 
 
@@ -543,7 +543,7 @@ print(compute_savings_rate_export(menage_echelle_32))
 
 
 
-save(menage_echelle_32, file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_32.RData",sep=""))
+save(menage_echelle_32, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_32.RData",sep=""))
 
 
 # 

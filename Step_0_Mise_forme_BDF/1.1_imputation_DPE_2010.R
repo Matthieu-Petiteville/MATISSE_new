@@ -9,16 +9,12 @@ library(tidyverse)
 library(car)
 library(readxl)
 
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
-
-
-
 # CHARGER STOCK DPE ---------------------------------------------------------------
 
 #Stock de DPE en 2010 pour caler les variables agrégées => dpe_stock_2010
 
 #LOAD
-suppressWarnings(scen <- read_excel(path="D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Sorties Three-ME.xlsx",sheet="scen AMS"))
+suppressWarnings(scen <- read_excel(path=paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep=""),sheet="scen AMS"))
 #Voir si possible d'opti avec un read csv au lieu de read excel - timing excel 55s timing csv 0.06s
 
 
@@ -26,7 +22,7 @@ suppressWarnings(scen <- read_excel(path="D:/Stage_Petiteville/Projet_Ademe/IMAC
 
 # Base INSEE menage
 menage<-
-  read.csv("Data/BDF_2010/menage.csv",
+  read.csv(paste(M_data,"/Data/BDF_2010/menage.csv",sep=""),
            header=TRUE,
            sep=";",
            dec=".",
@@ -34,7 +30,7 @@ menage<-
 #2.2s
 
 depmen<-
-  read.csv("Data/BDF_2010/depmen.csv",
+  read.csv(paste(M_data,"/Data/BDF_2010/depmen.csv",sep=""),
            header=TRUE,
            sep=";",
            dec=".",
@@ -43,7 +39,7 @@ depmen<-
 
 
 # load menage_calibr_2010 avec ménages pré_selectionnés
-load("Data/BDFE_delauretis/menage_calibr_2010.RData")
+load(paste(M_data,"/Data/BDFE_delauretis/menage_calibr_2010.RData",sep=""))
 #0.15s
 
 
@@ -68,7 +64,7 @@ dpe_stock_2010<- dpe_stock_2010 %>%
   mutate(DPE= str_replace_all(Var, pattern="BUIL_H01_C",replacement="")) %>% 
   mutate(DPE= str_replace_all(DPE, patter="_2",replacement=""))
 
-save(dpe_stock_2010,file="Step_0_Mise_forme_BDF/Output/dpe_stock_2010.RData")
+save(dpe_stock_2010,file=paste(M_data,"/Output/Step_0/dpe_stock_2010.RData",sep=""))
 
 
 
@@ -76,7 +72,7 @@ save(dpe_stock_2010,file="Step_0_Mise_forme_BDF/Output/dpe_stock_2010.RData")
 
 # Load estm_dpe_acp, 
 # list 27 paramètres
-source("Step_0_Mise_forme_BDF/1.2_estimateur_dpe_phebus.R")
+source(paste(M_home , "/Step_0_Mise_forme_BDF/1.2_estimateur_dpe_phebus.R", sep=""))
 
 
 
@@ -245,7 +241,7 @@ print(ggplot(dat,aes(fill=statut,x=cat_DPE,y=DPE))+geom_bar(stat="identity",posi
 # SAVE DPE ----------------------------------------------------------------
 menage_DPE<-appariement_menages_DPE %>% select(ident_men,DPE_pred)
 
-save(menage_DPE,file="Step_0_Mise_forme_BDF/Output/menage_DPE.RData")
+save(menage_DPE,file=paste(M_data,"/Output/Step_0/menage_DPE.RData",sep=""))
 
 # SUCCESS -----------------------------------------------------------------
 

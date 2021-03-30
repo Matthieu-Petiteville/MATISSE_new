@@ -4,27 +4,27 @@
 library(tidyverse)
 library(FinancialMath)
 library(readxl)
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
+# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 
 # SOURCE ------------------------------------------------------------------
 
-source("Step_3_Technical_Change/Repayment.R")
-source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
-source("Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R")
-source("Step_2_Microsimulation/calc_energie_kWh_m2.R")
-source("Step_3_Technical_Change/3_2_TC_VE/3_2_1_VE_classement_horizon.R")
+source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
+source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
+source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep=""))
+source(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/3_2_1_VE_classement_horizon.R",sep=""))
 
 
 # DATA --------------------------------------------------------------------
 
-load("Data/Data_interne/list_source_usage.RData")
+load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
 
 # Paramètre de ventilation du volume de vente des Véhicules particuliers aux privés ou entreprises (flotte)
 # Issu des données fournies par l'Ademe (source autoactu.com), régression par Franck Nadaud sur données 2005-2019
 # pour estimer l'évolution jusqu'en 2035, stabilisation de la part d'achats des VP par des particuliers 
 # (dire d'experts ADEME, cf Stéphane BARBUSSE)
 
-ventes_VP <- read_excel(path="Data/ThreeME/Ventes_VP.xlsx")
+ventes_VP <- read_excel(path=paste(M_data,"/Data/ThreeME/Ventes_VP.xlsx",sep=""))
 
 
 sources=c("Elec","Gaz","Fuel","GPL","Urbain","Solides")
@@ -642,7 +642,7 @@ sauv_int<-menage_echelle
 # # -30.7% 2035
 
 # Diminution des usages (télétravail et voirie)
-forcage_vkm<-read_excel(path="Data/ThreeME/forcage_vkm_teletravail_voirie.xlsx",sheet="value")
+forcage_vkm<-read_excel(path=paste(M_data,"/Data/ThreeME/forcage_vkm_teletravail_voirie.xlsx",sep=""),sheet="value")
 gain_vkm<-as.numeric(forcage_vkm %>% filter(year==horizon)%>%select(gain_vkm))
 
 
@@ -658,7 +658,7 @@ menage_echelle <-
 
 Bonus_VE_tot<-Bonus_VE_horizon *  menage_echelle %>% filter(year_VE==horizon)%>%summarise(sum(pondmen))
 Bonus_malus_net<-Bonus_VE_tot-menage_echelle %>% summarise(sum(solde_malus*pondmen))
-write.csv(c(Bonus_malus_net,scenario,scenario_classement,horizon, redistribution),file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/BM_net.csv",sep=""))
+write.csv(c(Bonus_malus_net,scenario,scenario_classement,horizon, redistribution),file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/BM_net.csv",sep=""))
 
 
 # Variable New_VT
@@ -691,7 +691,7 @@ menage_echelle <-
     RDB=RDB+solde_rev_capital)
 
 
-save(menage_echelle,file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE_avant_reventil.RData",sep=""))
+save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE_avant_reventil.RData",sep=""))
 
 # Reventilation -----------------------------------------------------------
 
@@ -826,13 +826,13 @@ menage_echelle_VE<-
 
 menage_echelle_TC_VE<-menage_echelle_VE
 
-save(menage_echelle_TC_VE, file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE.RData",sep=""))
+save(menage_echelle_TC_VE, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE.RData",sep=""))
 
 
 
 menage_echelle <- menage_echelle_TC_VE %>% select(-typmen5,-
 percent_pkm_eligible,-potentiel_VE,-VE_rank_pess,- VE_rank_opt,-VE_rank,-solde_dette,-solde_elec,-solde_carb,-solde_veh)
-save(menage_echelle,file=paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_echelle.RData",sep=""))
+save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_echelle.RData",sep=""))
 
 
 compute_share_export(menage_echelle_TC_VE)

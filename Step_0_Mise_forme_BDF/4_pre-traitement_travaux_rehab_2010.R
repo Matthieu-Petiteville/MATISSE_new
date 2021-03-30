@@ -23,23 +23,24 @@
 
 library(tidyverse)
 library(readxl)
+# fonction permettant de changer les valeurs de certains rangs seulement (une merveille !)
+source(paste(M_home,"/Common/tools.R",sep=""))
+
 
 # DATA --------------------------------------------------------------------
 
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
-
 
 # menage_forme
-load("Step_0_Mise_forme_BDF/Output/menage_forme_3.RData")
+load(paste(M_data,"/Output/Step_0/menage_forme_3.RData",sep=""))
 
 # ThreeME
-suppressWarnings(scen<-read_excel(path="D:/CIRED/Projet_Ademe/IMACLIM/Sorties Three-ME.xlsx",sheet="scen AMS"))
+suppressWarnings(scen<-read_excel(path=paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep=""),sheet="scen AMS"))
 ThreeME<- scen %>% select(-Def)%>% gather(key=year, value=value, -c(1))%>%filter(year==2010)
   
 #C05
-c05 <- read.csv2("Data/BDF_2010/c05.csv")
+c05 <- read.csv2(paste(M_data,"/Data/BDF_2010/c05.csv",sep=""))
 
-source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
+source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
 # PREPARATION DONNEES COUT REHAB THREEME ----------------------------------
 
@@ -327,8 +328,6 @@ c13_2010_GT<-
   mutate(REHAB=FALSE) %>% 
   mutate(REHAB_m2=0)
 
-# fonction permettant de changer les valeurs de certains rangs seulement (une merveille !)
-source("D:/Stage_Petiteville/Projet_Ademe/Code_global_ADEME/mutate_when.R")
 
 # on parcourt tous les transitions dep->arr
 for(i in 1:dim(Seuils)[1]){
@@ -418,8 +417,8 @@ rm(Gros_travaux_2010)
   
 menage_forme<-menage_forme %>% select(-GT_REHAB,-GT_RENO)
 
-save(menage_forme,file="Step_0_Mise_forme_BDF/Output/menage_forme_4.RData")
-save(menage_forme,file="Step_0_Mise_forme_BDF/Output/menage_forme.RData")
+save(menage_forme,file=paste(M_data,"/Output/Step_0/menage_forme_4.RData",sep=""))
+save(menage_forme,file=paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
 
 compute_savings_rate_export(menage_forme) #0.1055916
 compute_share_export(menage_forme)

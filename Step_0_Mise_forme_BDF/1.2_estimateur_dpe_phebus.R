@@ -19,9 +19,7 @@ library(plyr)
 library(cowplot)
 library(stringr)
 
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
-
-Phebus <-read.table("Data/PHEBUS/Clode_dpe_energie_decideur_revenu.csv",header=TRUE,sep=";",dec=".")
+Phebus <-read.table(paste(M_data,"/Data/PHEBUS/Clode_dpe_energie_decideur_revenu.csv",sep=""),header=TRUE,sep=";",dec=".")
 
 
 ######################################"

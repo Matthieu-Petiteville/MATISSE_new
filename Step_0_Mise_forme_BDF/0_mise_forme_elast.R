@@ -11,7 +11,7 @@ library(readxl)
 
 # DATA --------------------------------------------------------------------
 
-Elast<- read_excel("D:/Stage_Petiteville/Projet_Ademe/MATISSE/Data/Econometrie_demande/elasticite_demande_finale.xlsx")
+Elast<- read_excel(paste(M_data,"/Data/Econometrie_demande/elasticite_demande_finale.xlsx",sep=""))
 
 Elast <-
   Elast %>%
@@ -26,9 +26,6 @@ colnames(Elast)<-
     "elast"
     )
 
-# View(Elast)
-
-
 # SAVE --------------------------------------------------------------------
 
-save(Elast,file="D:/Stage_Petiteville/Projet_Ademe/MATISSE/Data/Econometrie_demande/elasticite_demande.RData")
+save(Elast,file=paste(M_data,"/Data/Econometrie_demande/elasticite_demande.RData",sep=""))

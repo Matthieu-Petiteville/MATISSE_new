@@ -1,15 +1,5 @@
 
 
-
-
-
-
-
-
-
-
-
-
 # DO NOT RUN ! runned through 2.2_fonction_retrocession_carbon_tax.R
 
 
@@ -40,8 +30,8 @@ library(matrixStats)
 # Data --------------------------------------------------------------------
 
 
-load("D:/CIRED/Projet_Ademe/MATISSE/Step_0_Mise_forme_BDF/Output/menage_forme.RData")
-load(paste("D:/CIRED/Projet_Ademe/",scenario,"/EMS.RData",sep=""))
+load(paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/EMS.RData",sep=""))
 EMS<-EMS %>% gather(key=year,value=emission,-1)%>%filter(!Var=="EMS_HH_2")
 
 

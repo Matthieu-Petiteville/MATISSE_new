@@ -19,9 +19,7 @@ calc_ems<-function(menage,FC){
     mutate(CL_2010=(Solides_chauff+Solides_ECS)/FC$A04)%>% 
     mutate(Oil_2010=(Fuel_chauff+Fuel_ECS+GPL_chauff+GPL_ECS)/FC$A07)%>%
     mutate(Gaz_2010=(Gaz_chauff+Gaz_ECS+Urbain_ECS+Urbain_chauff)/FC$A03)
-  
-  
-  
+
   menage <- 
     menage %>% 
     mutate(TCO_CL=CL_2010*coeff_ems_2010$coeff_CL_2010*FC_coeff$C21*TCO)%>%

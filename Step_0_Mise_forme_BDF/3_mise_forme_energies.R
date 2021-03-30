@@ -17,17 +17,14 @@ library(tidyverse)
 
 # DONNEES -----------------------------------------------------------------
 
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
-
-  load("Data/BDFE_delauretis/appmen_intensites_2010.RData")
+  load(paste(M_data,"/Data/BDFE_delauretis/appmen_intensites_2010.RData",sep=""))
 # NB : dans appmen_intensites : dépenses détaillées par source_activite et par usage_activite. Variables souhaitée : source_usage. 
 
-load("Step_0_Mise_forme_BDF/Output/menage_forme_2.RData")
+load(paste(M_data,"/Output/Step_0/menage_forme_2.RData",sep=""))
 
-source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
-source("Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R")
+source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R",sep=""))
 compute_savings_rate_export(menage_forme)
-
 
 
 # SOURCES & USAGES & ACTIVITES --------------------------------------------
@@ -273,7 +270,7 @@ for (usage in usages_bis){ #usages_bis = ECS, chauff, Cuisson
 }
 
 # les source_usages qui existent
-save(list_source_usage,file="Data/Data_interne/list_source_usage.RData")
+save(list_source_usage,file=paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
 
 # on rajoute de nouveau ElecSpe au total de l'elec (cf ligne 170)
 dep_ener$Elec<-
@@ -384,7 +381,7 @@ for (source in sources){
 # Save --------------------------------------------------------------------
 
 dep_ener_2010<-dep_ener
-save(dep_ener_2010,file="Step_0_Mise_forme_BDF/Output/dep_ener_2010.RData")
+save(dep_ener_2010,file=paste(M_data,"/Output/Step_0/dep_ener_2010.RData",sep=""))
 
 
 
@@ -415,7 +412,7 @@ menage_forme$dep_Urbain_verif<-dep_ener$Urbain
 # menage_forme %>% mutate(dep_v=dep_Urbain+dep_Solides+dep_GPL+dep_Gaz+dep_Elec+dep_Fuel)%>% summarise(sum(dep_v*pondmen))
 # menage_forme %>% mutate(dep_verif=dep_Urbain_verif+dep_Solides_verif+dep_GPL_verif+dep_Gaz_verif+dep_Elec_verif+dep_Fuel_verif)%>% summarise(sum(dep_verif*pondmen))
 
-save(menage_forme,file="Step_0_Mise_forme_BDF/Output/menage_forme_3.RData")
+save(menage_forme,file=paste(M_data,"/Output/Step_0/menage_forme_3.RData",sep=""))
 
 compute_savings_rate_export(menage_forme) #0.1206374
 compute_share_export(menage_forme)
@@ -423,7 +420,7 @@ compute_share_export(menage_forme)
 
 
 # Consommation Energie physique -------------------------------------------
-detach("package:plyr")
+#detach("package:plyr")
 
 menage_forme_ener<-energie_dom_surf(menage_forme)
 menage_forme_ener %>% 

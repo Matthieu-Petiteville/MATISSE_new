@@ -2,7 +2,7 @@ evolution_conso_ener<-function(menage_echelle,FC){
   
   
   # Importer les noms des variables existantes (Elec_clim et pas Solides_clim)
-  load("Data/Data_interne/list_source_usage.RData")
+  load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
   
   ## Source ##
   sources=c("Elec", "Gaz", "GPL", "Fuel", "Solides", "Urbain")
@@ -31,8 +31,8 @@ evolution_conso_ener<-function(menage_echelle,FC){
   
   # A03 : Gaz
   menage_echelle[c("Gaz_ECS","Gaz_chauff","Gaz_Cuisson","dep_Gaz_verif")]<-
-    menage_echelle[c("Gaz_ECS","Gaz_chauff","Gaz_Cuisson","dep_Gaz_verif")]*(1+menage_echelle$elast_prix_A03*(-1+FC$A03/menage_echelle$IP_stone)) 
-    *(1+ menage_echelle$elast_rev_A03*menage_echelle$TC_RDB_reel)*FC$A03
+    menage_echelle[c("Gaz_ECS","Gaz_chauff","Gaz_Cuisson","dep_Gaz_verif")]*(1+menage_echelle$elast_prix_A03*(-1+FC$A03/menage_echelle$IP_stone)) *
+    (1+ menage_echelle$elast_rev_A03*menage_echelle$TC_RDB_reel)*FC$A03
   
   # A04 : Autres energies domestiques
   

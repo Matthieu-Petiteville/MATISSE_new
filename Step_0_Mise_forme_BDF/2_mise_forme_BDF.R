@@ -5,37 +5,35 @@
 
 
 # LIBRARY -----------------------------------------------------------------
+
 library(tidyverse)
 library(readxl)
 library(car)
 # library(dplyr)
 library(reshape2)
-#-------------------------------------------------------
 
 
 # Load --------------------------------------------------------------------
 
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
-
 #Donnees Brutes BDF 2010
-menage<-as.data.frame(read_excel("Data/BDF_2010/menage.xlsx"),stringsAsFactors=F)
-individu<-read_excel("Data/BDF_2010/individu.xlsx")
-c05<-read_csv2("Data/BDF_2010/c05.csv")
-depmen<-read_csv2("Data/BDF_2010/depmen.csv")
+menage <- as.data.frame(read_excel(paste(M_data,"/Data/BDF_2010/menage.xlsx",sep="")),stringsAsFactors=F)
+individu <- read_excel(paste(M_data,"/Data/BDF_2010/individu.xlsx",sep=""))
+c05 <- read_csv2(paste(M_data,"/Data/BDF_2010/c05.csv",sep=""))
+depmen <- read_csv2(paste(M_data,"/Data/BDF_2010/depmen.csv",sep=""))
 
 # Typologie de vulnérabilité
-typo_vuln<-read_excel("Data/Econometrie_demande/datacp_typovuln_bdf_2011.xlsx",sheet="identmen")
+typo_vuln <- read_excel(paste(M_data,"/Data/Econometrie_demande/datacp_typovuln_bdf_2011.xlsx",sep=""),sheet="identmen")
 
 
 #BDFE S. De Lauretis
-load("Data/BDFE_delauretis/appmen_depensesactiv_2010.RData")
+load(paste(M_data,"/Data/BDFE_delauretis/appmen_depensesactiv_2010.RData",sep=""))
 appmen_depensesactiv_2010<-appmen_depensesactiv
 rm(appmen_depensesactiv)
 
 # Output étape précédente, estimation des DPE
-load("Step_0_Mise_forme_BDF/Output/menage_DPE.RData")
+load(paste(M_data,"/Output/Step_0/menage_DPE.RData",sep=""))
 
-source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
+source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
 # Selection ménages -------------------------------------------------------
 
@@ -187,7 +185,7 @@ menage_forme$nbinact <-
 
 
 # Rajout nombre de véhicule 
-auto<-read_excel("Data/BDF_2010/AUTOMOBILE.xlsx",sheet="AUTO_METROPOLE") #uniquement AUTOMOBILE
+auto<-read_excel(paste(M_data,"/Data/BDF_2010/AUTOMOBILE.xlsx",sep=""),sheet="AUTO_METROPOLE") #uniquement AUTOMOBILE
 menage_forme <-
   menage_forme %>%
   left_join(auto %>% select(ident_men, nbvehic) %>% distinct(),by="ident_men")
@@ -244,7 +242,7 @@ rm(auto)
 
 #categories de revenus definies dans excel
 def_rev<- 
-  read_excel("Data/Nomenclature_CIRED_ADEME/Definition_revenus.xlsx")
+  read_excel(paste(M_data,"/Data/Nomenclature_CIRED_ADEME/Definition_revenus.xlsx",sep=""))
 # View(def_rev)
 
 # Revenus de l'activité salariale et/ou independante + revenus de l'étranger
@@ -335,7 +333,7 @@ menage_forme$dep_Solides <- rowSums(appmen_depensesactiv_2010[grep("Solides_", n
 # MISE FORME DEPENSES - Nomenclature ADEME ---------------------------------------------------------
 
 Nomenclature_ADEME_COICOP <-
-  read_excel("Data/Nomenclature_CIRED_ADEME/Nomenclature_coicop_threeme.xlsx")
+  read_excel(paste(M_data,"/Data/Nomenclature_CIRED_ADEME/Nomenclature_coicop_threeme.xlsx",sep=""))
 
 
 
@@ -468,7 +466,7 @@ rm(nbactoccup,nbchomeurs,nbretraites,Nomenclature_ADEME_COICOP,def_rev,individu,
 
 # Save --------------------------------------------------------------------
 
-save(menage_forme,file="Step_0_Mise_forme_BDF/Output/menage_forme_2.RData")
+save(menage_forme,file=paste(M_data,"/Output/Step_0/menage_forme_2.RData",sep=""))
 
 
 

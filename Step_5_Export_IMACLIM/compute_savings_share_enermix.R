@@ -4,7 +4,8 @@
 
 library(tidyverse)
 library(readxl)
-source("D:/Stage_Petiteville/Projet_Ademe/Code_global_ADEME/mutate_when.R")
+source(paste(M_home,"/Common/tools.R",sep=""))
+
 
 # TAUX d'EPARGNE ----------------------------------------------------------
 
@@ -183,11 +184,11 @@ energie_mix<-function(menage,FC){
   
   # IMPORT DATA -------------------------------------------------------------
   
-  setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
-  load("Data/Data_interne/list_source_usage.RData")
+  # setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
+  load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
   
   # Import des prix d'énergie par classe de ménage : en €/MWh
-  prix_classe <- read.csv2("Data/BDFE_delauretis/Prix_energie_par_classe.csv", header = TRUE, sep = ";",dec = ".", fill = TRUE)
+  prix_classe <- read.csv2(paste(M_data,"/Data/BDFE_delauretis/Prix_energie_par_classe.csv",sep=""), header = TRUE, sep = ";",dec = ".", fill = TRUE)
   
   # PREPARATION DONNEES PRIX ENERGIE ----------------------------------------
 
@@ -401,7 +402,7 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
 
 # Data --------------------------------------------------------------------
 
-  load("D:/Stage_Petiteville/Projet_Ademe/MATISSE/Step_0_Mise_forme_BDF/Output/menage_forme_4.RData")
+  load(paste(M_data,"/Output/Step_0/menage_forme_4.RData",sep=""))
   try(
     detach("package:plyr"), 
     silent=T
@@ -417,23 +418,23 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
   # # Indices de prix ---------------------------------------------------------
   if(Iter>0){
     #attention décalage avec Output_macro_code => skip first line lors de l'enregistrement
-    IP_A02<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"13",sep=""),col_names = F))
+    IP_A02<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"13",sep=""),col_names = F))
     
-    IP_A03<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"14",sep=""),col_names = F))
+    IP_A03<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"14",sep=""),col_names = F))
     
-    IP_A04<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"15",sep=""),col_names = F))
+    IP_A04<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"15",sep=""),col_names = F))
     
-    IP_A07<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"18",sep=""),col_names = F))
+    IP_A07<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"18",sep=""),col_names = F))
   }
   
   if(Iter==0){
-    IP_A02<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"14",sep=""),col_names = F))
+    IP_A02<-as.numeric(read_excel(paste(M_data,"/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"14",sep=""),col_names = F))
     
-    IP_A03<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"15",sep=""),col_names = F))
+    IP_A03<-as.numeric(read_excel(paste(M_data,"/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"15",sep=""),col_names = F))
     
-    IP_A04<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"16",sep=""),col_names = F))
+    IP_A04<-as.numeric(read_excel(paste(M_data,"/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"16",sep=""),col_names = F))
     
-    IP_A07<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"19",sep=""),col_names = F))
+    IP_A07<-as.numeric(read_excel(paste(M_data,"/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"19",sep=""),col_names = F))
   }
   
   

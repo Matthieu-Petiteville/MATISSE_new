@@ -6,25 +6,25 @@
 library(tidyverse)
 library(readxl)
 library(plyr)
-setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
-source("D:/Stage_Petiteville/Projet_Ademe/Code_global_Ademe/mutate_when.R")
-
+# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
+source(paste(M_home,"/Common/tools.R",sep=""))
 
 
 # DATA --------------------------------------------------------------------
 
 # code permettant de créer dans le dossier D:\Stage_Petiteville\Projet_Ademe\VE\Codes => to be verified
 # Base appariée BDF-ENTD
-load("Step_3_Technical_Change/3_2_TC_VE/appariement_bdf_entd.RData")
+load(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/appariement_bdf_entd.RData",sep=""))
 
 
 # Bases étapes précédentes (Step 3.1)
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_DPE.RData",sep=""))
-load(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_DPE.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
 
 
 ## BDF
-auto<-as.data.frame(read_excel("Data/BDF_2010/AUTOMOBILE.xlsx"),stringsAsFactors=F)
+auto<-as.data.frame(read_excel(paste(M_data,"/Data/BDF_2010/AUTOMOBILE.xlsx",sep="")),stringsAsFactors=F)
+
 
 
 # PREPARATION DATA --------------------------------------------------------

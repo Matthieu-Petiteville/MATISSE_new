@@ -24,11 +24,11 @@ energie_dom_surf<-function(menage){
 
 # load("2025/menage_echelle_2025.RData")
 
-  load("D:/Stage_Petiteville/Projet_Ademe/MATISSE/Data/Data_interne/list_source_usage.RData")
+  load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
   
 
 # Import des prix d'énergie par classe de ménage : en €/MWh
-prix_classe <- read.csv2("D:/Stage_Petiteville/Projet_Ademe/MATISSE/Data/BDFE_delauretis/Prix_energie_par_classe.csv", header = TRUE, sep = ";",dec = ".", fill = TRUE)
+prix_classe <- read.csv2(paste(M_data,"/Data/BDFE_delauretis/Prix_energie_par_classe.csv",sep=""), header = TRUE, sep = ";",dec = ".", fill = TRUE)
 
 #Importer taux de croissance des prix et des revenus
 # load(paste(horizon,"/TC_prix_2010_",horizon,".RData",sep=""))
