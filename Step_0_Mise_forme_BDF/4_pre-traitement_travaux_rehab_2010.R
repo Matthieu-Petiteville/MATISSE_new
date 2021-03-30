@@ -31,7 +31,7 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 
 
 # menage_forme
-load(paste(M_data,"/Output/Step_0/menage_forme_3.RData",sep=""))
+load(paste(M_data,"/Output/Initial format/menage_forme_3.RData",sep=""))
 
 # ThreeME
 suppressWarnings(scen<-read_excel(path=paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep=""),sheet="scen AMS"))
@@ -417,8 +417,8 @@ rm(Gros_travaux_2010)
   
 menage_forme<-menage_forme %>% select(-GT_REHAB,-GT_RENO)
 
-save(menage_forme,file=paste(M_data,"/Output/Step_0/menage_forme_4.RData",sep=""))
-save(menage_forme,file=paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
+save(menage_forme,file=paste(M_data,"/Output/Initial format/menage_forme_4.RData",sep=""))
+save(menage_forme,file=paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
 
 compute_savings_rate_export(menage_forme) #0.1055916
 compute_share_export(menage_forme)

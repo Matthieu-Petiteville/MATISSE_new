@@ -13,7 +13,7 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 
 ## Menages
 # 2010
-load(paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
+load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
 # mise à l'échelle
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep=""))
 

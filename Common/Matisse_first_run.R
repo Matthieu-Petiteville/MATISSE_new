@@ -6,7 +6,7 @@ Initialize_output_folders <- function(){
   source(paste(M_home,"/Common/tools.r",sep=""))  
   
   CreateFolder(paste(M_data,"/Output",sep=""))
-  CreateFolder(paste(M_data,"/Output/Step_0",sep=""))
+  CreateFolder(paste(M_data,"/Output/Initial format",sep=""))
   CreateFolder(paste(M_data,"/Output/Projet_Ademe",sep=""))
 
   for(horizon in horizon_v){
@@ -19,6 +19,8 @@ Initialize_output_folders <- function(){
           CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,sep=""))
           for(Iteration in Iteration_v){
             CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,sep=""))
+            CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,"/Input",sep=""))
+            CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,"/Output",sep=""))
           }
           CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,"/Technical_change",sep=""))
         }

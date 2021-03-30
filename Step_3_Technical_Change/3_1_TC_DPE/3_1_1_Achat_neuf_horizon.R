@@ -6,7 +6,6 @@
 # LIBRARIES ---------------------------------------------------------------
 library(tidyverse)
 library(ggplot2)
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 source(paste(M_home,"/Common/tools.R",sep=""))
 
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))

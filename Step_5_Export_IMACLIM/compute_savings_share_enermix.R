@@ -402,7 +402,7 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
 
 # Data --------------------------------------------------------------------
 
-  load(paste(M_data,"/Output/Step_0/menage_forme_4.RData",sep=""))
+  load(paste(M_data,"/Output/Initial format/menage_forme_4.RData",sep=""))
   try(
     detach("package:plyr"), 
     silent=T

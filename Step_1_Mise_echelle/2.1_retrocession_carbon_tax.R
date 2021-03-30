@@ -10,7 +10,7 @@ library(tidyverse)
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_1_1.RData",sep=""))
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/EMS.RData",sep=""))
-load(paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
+load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
 
 
 # source("Step_1_Mise_echelle/2.3_emission_gap_2010.R")

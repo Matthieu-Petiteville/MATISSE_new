@@ -22,7 +22,7 @@ source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep
 ###
 # 2010
 ###
-load(paste(M_data,"/Output/Step_0/menage_forme_4.RData",sep=""))
+load(paste(M_data,"/Output/Initial format/menage_forme_4.RData",sep=""))
 
 savings_rate_2010<-compute_savings_rate_export(menage_forme) #0.1055916
 share_2010<-compute_share_export(menage_forme)

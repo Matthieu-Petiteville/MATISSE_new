@@ -31,7 +31,7 @@ appmen_depensesactiv_2010<-appmen_depensesactiv
 rm(appmen_depensesactiv)
 
 # Output étape précédente, estimation des DPE
-load(paste(M_data,"/Output/Step_0/menage_DPE.RData",sep=""))
+load(paste(M_data,"/Output/Initial format/menage_DPE.RData",sep=""))
 
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
@@ -466,7 +466,7 @@ rm(nbactoccup,nbchomeurs,nbretraites,Nomenclature_ADEME_COICOP,def_rev,individu,
 
 # Save --------------------------------------------------------------------
 
-save(menage_forme,file=paste(M_data,"/Output/Step_0/menage_forme_2.RData",sep=""))
+save(menage_forme,file=paste(M_data,"/Output/Initial format/menage_forme_2.RData",sep=""))
 
 
 

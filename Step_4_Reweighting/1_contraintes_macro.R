@@ -12,7 +12,7 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_4_Reweighting/Stock_VP_Particuliers_horizon.R",sep=""))
 
 
-load(paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
+load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
 individu<-read_excel(paste(M_data,"/Data/BDF_2010/individu.xlsx",sep=""))
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))

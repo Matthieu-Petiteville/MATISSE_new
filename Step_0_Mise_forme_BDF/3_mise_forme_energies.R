@@ -20,7 +20,7 @@ library(tidyverse)
   load(paste(M_data,"/Data/BDFE_delauretis/appmen_intensites_2010.RData",sep=""))
 # NB : dans appmen_intensites : dépenses détaillées par source_activite et par usage_activite. Variables souhaitée : source_usage. 
 
-load(paste(M_data,"/Output/Step_0/menage_forme_2.RData",sep=""))
+load(paste(M_data,"/Output/Initial format/menage_forme_2.RData",sep=""))
 
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R",sep=""))
@@ -381,7 +381,7 @@ for (source in sources){
 # Save --------------------------------------------------------------------
 
 dep_ener_2010<-dep_ener
-save(dep_ener_2010,file=paste(M_data,"/Output/Step_0/dep_ener_2010.RData",sep=""))
+save(dep_ener_2010,file=paste(M_data,"/Output/Initial format/dep_ener_2010.RData",sep=""))
 
 
 
@@ -412,7 +412,7 @@ menage_forme$dep_Urbain_verif<-dep_ener$Urbain
 # menage_forme %>% mutate(dep_v=dep_Urbain+dep_Solides+dep_GPL+dep_Gaz+dep_Elec+dep_Fuel)%>% summarise(sum(dep_v*pondmen))
 # menage_forme %>% mutate(dep_verif=dep_Urbain_verif+dep_Solides_verif+dep_GPL_verif+dep_Gaz_verif+dep_Elec_verif+dep_Fuel_verif)%>% summarise(sum(dep_verif*pondmen))
 
-save(menage_forme,file=paste(M_data,"/Output/Step_0/menage_forme_3.RData",sep=""))
+save(menage_forme,file=paste(M_data,"/Output/Initial format/menage_forme_3.RData",sep=""))
 
 compute_savings_rate_export(menage_forme) #0.1206374
 compute_share_export(menage_forme)

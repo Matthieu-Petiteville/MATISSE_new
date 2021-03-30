@@ -64,7 +64,7 @@ dpe_stock_2010<- dpe_stock_2010 %>%
   mutate(DPE= str_replace_all(Var, pattern="BUIL_H01_C",replacement="")) %>% 
   mutate(DPE= str_replace_all(DPE, patter="_2",replacement=""))
 
-save(dpe_stock_2010,file=paste(M_data,"/Output/Step_0/dpe_stock_2010.RData",sep=""))
+save(dpe_stock_2010,file=paste(M_data,"/Output/Initial format/dpe_stock_2010.RData",sep=""))
 
 
 
@@ -241,7 +241,7 @@ print(ggplot(dat,aes(fill=statut,x=cat_DPE,y=DPE))+geom_bar(stat="identity",posi
 # SAVE DPE ----------------------------------------------------------------
 menage_DPE<-appariement_menages_DPE %>% select(ident_men,DPE_pred)
 
-save(menage_DPE,file=paste(M_data,"/Output/Step_0/menage_DPE.RData",sep=""))
+save(menage_DPE,file=paste(M_data,"/Output/Initial format/menage_DPE.RData",sep=""))
 
 # SUCCESS -----------------------------------------------------------------
 

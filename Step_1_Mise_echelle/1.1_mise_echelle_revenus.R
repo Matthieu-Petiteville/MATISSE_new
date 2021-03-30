@@ -10,7 +10,7 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 ## MICRO
 # setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 
-load(paste(M_data,"/Output/Step_0/menage_forme.RData",sep=""))
+load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
 source(paste(M_home,"/Step_1_Mise_echelle/1.2_fonction_mise_echelle_revenus.R",sep=""))
 # source("Step_5_Export_IMACLIM/compute_savings_share_enermix.R")
 
