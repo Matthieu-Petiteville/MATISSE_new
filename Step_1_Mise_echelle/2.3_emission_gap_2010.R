@@ -3,20 +3,6 @@
 # DO NOT RUN ! runned through 2.2_fonction_retrocession_carbon_tax.R
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Il nous faut un facteur relativement élevé pour permettre 1/ au décile 1 d'être plus compensé que les autres en moyenne, 2/ qu'une solution existe pour redistribuer le solde de TCO aux autres déciles selon la méthode dégressive créée. 
 # on veut un facteur en 2010 pour reproduire un écart entre dec_1/tuu_0 et le reste de la population en 2010 à l'horizon. En effet, si on veut compenser une part fixe d'une partie de la population à l'horizon, il faut itérer le paiement de la tco et la microsimulation pour prendre en compte les effets rebonds. 
 
