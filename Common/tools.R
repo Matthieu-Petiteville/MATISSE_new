@@ -33,3 +33,17 @@ mutate_when <- function(data, ...) {
 CreateFolder <- function(folder_name){
   if(!dir.exists(folder_name)){dir.create(folder_name)}
 }
+
+#Create log file if it doesn't exist
+CreateLogFile <- function(){
+    file_name <- paste(M_data,"/Logs/","log_",Sys.Date(),".log",sep="") 
+    if(!file.exists(file_name)){file.create(file_name)}
+    write("Timestamp;Params;LogType;Log",file = file_name,append = TRUE)
+    return(file_name)
+}
+
+
+#Add standardized logs
+AddLogs <- function(LogType,LogTxt){
+  print(paste(Sys.time(),paste("[",paste(scenario,horizon,scenario_classement,redistribution,sep="/"),"]",sep=""),LogType,LogTxt,sep=";"))
+}
