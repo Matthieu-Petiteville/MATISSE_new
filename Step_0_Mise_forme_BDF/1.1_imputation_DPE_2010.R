@@ -1,6 +1,8 @@
 
-# L'objectif de cette fonction est d'estimer une fonction de régression logistique permettant d'estimer les classes de DPE des ménages de BDF,le résultat se trouve dans menages_DPE, colonne DPE_pred
-# Pas besoin de faire fonctionner un autre code que celui-ci, il se charger de sourcer tous les scripts R qu'il requiert. (1.2_estimateur_DPE_phebus)
+# L'objectif de cette fonction est d'estimer une fonction de régression logistique permettant d'estimer les classes 
+# de DPE des ménages de BDF,le résultat se trouve dans menages_DPE, colonne DPE_pred
+# Pas besoin de faire fonctionner un autre code que celui-ci, il se charger de sourcer tous les scripts R qu'il requiert. 
+# (1.2_estimateur_DPE_phebus)
 
 
 # LIBRARIES  ----------------------------------------------------------------
@@ -12,10 +14,7 @@ library(readxl)
 # CHARGER STOCK DPE ---------------------------------------------------------------
 
 #Stock de DPE en 2010 pour caler les variables agrégées => dpe_stock_2010
-
-#LOAD
 suppressWarnings(scen <- read_excel(path=paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep=""),sheet="scen AMS"))
-#Voir si possible d'opti avec un read csv au lieu de read excel - timing excel 55s timing csv 0.06s
 
 
 # LOAD DONNEES BDF -------------------------------------------------------------
@@ -27,7 +26,6 @@ menage<-
            sep=";",
            dec=".",
            stringsAsFactors = FALSE)
-#2.2s
 
 depmen<-
   read.csv(paste(M_data,"/Data/BDF_2010/depmen.csv",sep=""),
@@ -35,12 +33,10 @@ depmen<-
            sep=";",
            dec=".",
            stringsAsFactors = FALSE)
-#3.3s
 
 
 # load menage_calibr_2010 avec ménages pré_selectionnés
 load(paste(M_data,"/Data/BDFE_delauretis/menage_calibr_2010.RData",sep=""))
-#0.15s
 
 
 
@@ -157,7 +153,6 @@ colnames(pred)<-c("A","B","C","D","E","F","G")
 
 appariement_menages_DPE[c("A","B","C","D","E","F","G")]<-pred
 appariement_menages_DPE$DPE_pred<-19
-# table(is.na(appariement_menages_DPE))
 
 
 
@@ -179,7 +174,6 @@ stock_m2_bdf/stock_m2_threeME2
 # On les x ménages les plus probablement dans la classe considérée pour atteindre le stock de m2 de cette classe dans ThreeME. 
 # les ménages déjà sélectionnées se voient attribuer une probabilité de -1 d'appartenance à toutes les DPE pour les exclure du choix.
 for (i in LETTERS[1:7]){
-# for (i in c("A","B","G","F","C","D","E")){
   count=0
   while(count<dpe_stock_2010_3ME %>% filter(DPE==i) %>% select(value)){
     indice=which.max(appariement_menages_DPE[,i])
@@ -237,10 +231,8 @@ print(ggplot(dat,aes(fill=statut,x=cat_DPE,y=DPE))+geom_bar(stat="identity",posi
 
 
 
-
 # SAVE DPE ----------------------------------------------------------------
 menage_DPE<-appariement_menages_DPE %>% select(ident_men,DPE_pred)
-
 save(menage_DPE,file=paste(M_data,"/Output/Initial format/menage_DPE.RData",sep=""))
 
 # SUCCESS -----------------------------------------------------------------

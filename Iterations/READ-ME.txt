@@ -1,0 +1,53 @@
+# Fonctionnement : 
+Le code MATISSE_iteration est appelé par la macro VBA Sub Iteration du fichier IMACLIM 3ME.xlsx
+
+Itération 0
+# Pour l'itération notée 0, c'est-à-dire directement issue de la macro ThreeME, le code télécharge directement le résultat des 5 premières étapes exécutées en amont et stocké dans le fichier export_Iter_0.csv de chaque scénario
+# les résultats micro agrégés sont importés dans "Input_macro.csv" sur lequel va boucler IMACLIM 3ME
+
+Itérations 1 à 10
+# Pour les itérations suivantes, ce script fait appel aux étapes itérées : étape 1 de mise à l'échelle, étape 2 de microsimulation et étape 5 d'export des résultats agrégés. 
+
+Last_iter
+# output du modèle dans le répertoire du scénario scenario/horizon/scenario_classement/redistribution/itération
+	* Stockage pour mémoire et vérification manuelle éventuelle de l'état du fichier "Output_macro_code_iter_X" à la dernière itération X
+	* Taux de croissance des des revenus et prix entre la dernière et l'avant dernière itération d'IMACLIM-3ME
+	* Stockage des itérations successives des parts budgétaires micro agrégées : output_micro_iter_X
+	* Stockage du modèle à convergence IMACLIM_3ME_iter_X
+	* Nombre d'itérations à convergence dans "Iterations_scenarios.xlsx"
+	
+# output du modèle utilisable pour analyse des résultats automatique dans le dossier Results/scenario/horizon/scenario_classement/redistribution/itération
+	* IMACLIM 3ME (_ssrec)
+	* output_macro_code
+	* output_micro
+	* menage_iteration.RDATA
+
+
+L'ensemble de ces scripts n'a pas vocation a été exécuté à la main mais uniquement depuis le script 
+VBA IMACLIM_3ME.xlsx
+
+Si scénario avec rétrocession
+	> IMACLIM 3ME.xlsx
+	> Module 1
+	> Itérer sur plusieurs scénarios dans "Sub iterer_all()"
+	> appel de la fonction Sub Iterer_all_sub(CODESC, HORIZON, TECH, DISTRIB)
+
+Si scénario SANS rétrocession
+deux solutions
+sol 1:
+	> IMACLIM 3ME.xlsx
+	> Module 1
+	> Itérer sur plusieurs scénarios dans "Sub iterer_all()"en appelant la fonction Iterer_all_sub_ssrec(CODESC, HORIZON, TECH, DISTRIB) qui elle même appelle le modèle IMACLIM_3ME_ssrec.xlsx
+
+sol 2:
+	> IMACLIM 3ME_ssrec.xlsx
+	> Module 1
+	> Itérer sur plusieurs scénarios dans "Sub iterer_all()" 
+	> en appelant la fonction Iterer_all_sub(CODESC, HORIZON, TECH, DISTRIB) 
+
+La solution 1 permet de faire tourner à partir du même script des scénarios avec et sans redistribution. 
+
+#Bonus_rattrapage_last_iter.R et Iterations/Bonus_rattrapage_last_iter_2.R
+En cas de mauvais export des données après la dernière itération permet d'assurer le stockage et l'export des données en repartant de la dernière itération de la micro-simulation
+Fonctions appelées par la macro VBA "Sub rattrapage_Output_macro_code()" de IMACLIM 3ME (Module 1)
+ 
