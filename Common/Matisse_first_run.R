@@ -6,41 +6,34 @@ Initialize_output_folders <- function(){
   source(paste(M_home,"/Common/tools.r",sep=""))  
   
   CreateFolder(paste(M_data,"/Output",sep=""))
+  CreateFolder(paste(M_data,"/Logs",sep=""))
   CreateFolder(paste(M_data,"/Output/Initial format",sep=""))
   CreateFolder(paste(M_data,"/Output/Projet_Ademe",sep=""))
-
-  for(horizon in horizon_v){
-    CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,sep=""))
-    for(scenario in scenario_v){
-      CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,sep=""))
+  CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results",sep=""))
+  
+  for(scenario in scenario_v){
+    CreateFolder(paste(M_data,"/Output/Projet_Ademe/",scenario,sep=""))
+    CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results/",scenario,sep=""))
+      for(horizon in horizon_v){
+      CreateFolder(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,sep=""))
+      CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,sep=""))
       for(scenario_classement in scenario_classement_v){
-        CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,sep=""))
+        CreateFolder(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,sep=""))
+        CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,sep=""))
         for(redistribution in redistribution_v){
-          CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,sep=""))
+          CreateFolder(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,sep=""))
+          CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,sep=""))
           for(Iteration in Iteration_v){
-            CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,sep=""))
-            CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,"/Input",sep=""))
-            CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,"/Output",sep=""))
+            CreateFolder(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,sep=""))
+            CreateFolder(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,"/Input",sep=""))
+            CreateFolder(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,"/Output",sep=""))
           }
-          CreateFolder(paste(M_data,"/Output/Projet_Ademe/",horizon,"/",scenario,"/",scenario_classement,"/",redistribution,"/Technical_change",sep=""))
+          CreateFolder(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change",sep=""))
         }
       }
     }    
   }
   
-  CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results",sep=""))
-  for(scenario in scenario_v){
-    CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results/",scenario,sep=""))
-    for(horizon in horizon_v){
-      CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,sep=""))
-      for(scenario_classement in scenario_classement_v){
-        CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,sep=""))
-        for(redistribution in redistribution_v){
-          CreateFolder(paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,sep=""))
-        }
-      }
-    }    
-  }
 
 }
 
