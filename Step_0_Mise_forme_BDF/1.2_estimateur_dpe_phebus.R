@@ -1,10 +1,5 @@
-
-
-
 # DO NOT RUN 
 # execute from 1.1_imputation_DPE_2010
-
-
 
 # LIBRARIES ---------------------------------------------------------------
 
@@ -20,7 +15,6 @@ library(cowplot)
 library(stringr)
 
 Phebus <-read.table(paste(M_data,"/Data/PHEBUS/Clode_dpe_energie_decideur_revenu.csv",sep=""),header=TRUE,sep=";",dec=".")
-
 
 ######################################"
 # PREPARATION DES DONNEES -------------------------------------------------
@@ -57,10 +51,6 @@ Phebus$DPEb<- ifelse(Phebus$TROIS_CL_DPE=="A",1,
 
 Variables<-Variables[Variables!="TROIS_CL_DPE"] 
 Variables=c(Variables,"DPEb") 
-
-# table(Phebus$DPEb)
-# 1   2   3   4   5   6   7 
-# 6  49 312 638 698 353 295 
 
 Phebus$MI<-ifelse(Phebus$TYP_LOG=="Maison",1,
                   ifelse(Phebus$TYP_LOG=="Appart",0,3))
