@@ -15,14 +15,7 @@ mise_echelle_revenu<-function(FC,menage_forme,Iter){
   #on n'inclut pas les revenus exceptionnels récurrents rev700, rev701, rev999 parce qu'on n'a pas de facteur de mise à l'échelle, on veut calculer une moyenne pondérée 
   # du FC des revenus de chaque ménage.
   
-  ## TEST
-  # au total : 957 912 572 743€ # en 2010 dans BDF contre 1457 milliards dans IMACLIM (il manque 35%, notamment due à la sous déclaration, problème récurrent de 
-  # l'ajustement entre base micro et vision macro)
-  # vérif : 
-  # menage_echelle %>% mutate(rev_total_macro=rev_sociaux+rev_activites+rev_patrimoine+rev700+rev701+rev999+rev801)%>%summarise(sum(pondmen*rev_total_macro)) #=> en comptant les loyers imputés on parvient à 1070 milliards €. 
-  # menage_echelle %>% mutate(rev_tot_bis=rev_activites_sans_etranger+rev_etranger+rev_patrimoine+rev_sociaux_autres+chomage+rev700+rev701+rev999)%>%summarise(sum(pondmen*rev_tot_bis)) #957912572743 même total
-  
-  
+
   
 
 # FC_RDB_MENAGE -----------------------------------------------------------
@@ -38,33 +31,6 @@ mise_echelle_revenu<-function(FC,menage_forme,Iter){
                 FC$revpat*rev_patrimoine )/rev_total)
   
   
-  
-  
-  ###
-  ### TEST ###
-  ###
-   #value for AMS 2035 optimiste forfait => moyenne non pondérée des parts de revenus
-  # mean(menage_echelle$rev_sociaux_autres/menage_echelle$rev_total,na.rm=T) #0.4015651
-  # mean(menage_echelle$chomage/menage_echelle$rev_total,na.rm=T) #0.03399645
-  # mean(menage_echelle$rev_activites_sans_etranger/menage_echelle$rev_total,na.rm=T) #0.5220058
-  # mean(menage_echelle$rev_etranger/menage_echelle$rev_total,na.rm=T) #0.001779618
-  # mean(menage_echelle$rev_patrimoine/menage_echelle$rev_total,na.rm=T) #0.03346953
-  
-  # Part agrégée de chaque revenu dans le revenu total
-  # menage_echelle%>%summarise(sum(rev_sociaux_autres*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.3093684
-  # menage_echelle%>%summarise(sum(chomage*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.0293001
-  # menage_echelle%>%summarise(sum(rev_activites_sans_etranger*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.6222393
-  # menage_echelle%>%summarise(sum(rev_etranger*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.002079752
-  # menage_echelle%>%summarise(sum(rev_patrimoine*pondmen))/menage_echelle%>%summarise(sum(rev_total*pondmen)) #0.03701243
-  
-  #Comparons : 
-  # 0.3093684*FC$revsoc+0.0293001*FC$revchom+0.6222393*FC$revact+0.002079752*FC$revetranger+0.03701243*FC$revpat
-  # et
-  # menage_echelle %>% summarise(weighted.mean(x=FC_rdb_menage,w=pondmen,na.rm=T))
-  
-  
-  
-
 # CORRECTION --------------------------------------------------------------
   
   # Trois ménages ont des revenus nuls en 2010, ident_men=2548, 4710 et 10828
