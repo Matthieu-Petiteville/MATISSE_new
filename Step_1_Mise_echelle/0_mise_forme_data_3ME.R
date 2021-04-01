@@ -1,20 +1,16 @@
 # Import data
-      # Mise en forme des hypothèses et trajectoires de ThreeME
-        # Lecture depuis fichier excel, converti en Rdata format long
-      # Lecture des données IMACLIM
+# Mise en forme des hypothèses et trajectoires de ThreeME
+# Lecture depuis fichier excel, converti en Rdata format long
+# Lecture des données IMACLIM
 # Output : ThreeME.RData
 
 
 # LIBRARIES ---------------------------------------------------------------
-
 library(tidyverse)
 library(readxl)
 
 
-
-
 # ThreeME -----------------------------------------------------------------
-
 
 # To open Sorties_ThreeME, tab names
 if(scenario=="AMS"){S="scen AMS"}
@@ -23,15 +19,12 @@ if(scenario=="ssTCO"){S="scen AMS ss TCO"}
 if(scenario=="ssRES"){S="scen AMS ss residentiel"}
 if(scenario=="ssVE"){ S="scen AMS ss VE"}
 
-
 suppressWarnings(scen<-read_excel(path=paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep=""),sheet=S))
 
 ThreeME<- scen %>% select(-Def)%>% gather(key=year, value=value, -c(1))
 save(ThreeME, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
 
-
 # IMACLIM -----------------------------------------------------------------
-
 
 # VARIABLES MACRO
 if(scenario_classement=="ssrec"){
@@ -86,7 +79,6 @@ FC <-
 FC <- FC %>%
   mutate(value=as.numeric(value)) %>%
   spread(key=Variable,value=value) 
-
 
 save(FC,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
 
