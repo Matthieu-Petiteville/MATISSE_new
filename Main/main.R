@@ -52,13 +52,11 @@ source(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/3_2_2_VE_2010_horizon.R"
 # # ####
 # # # Step 4
 # # ####
-#
-# source(paste(M_home,"/Step_4_Reweighting/1_contraintes_macro.R")
-# source(paste(M_home,"/Step_4_Reweighting/2_contraintes_micro.R")
-# source(paste(M_home,"/Step_4_Reweighting/3_pondr.R")
-# 
+source(paste(M_home,"/Step_4_Reweighting/1_contraintes_macro.R")
+source(paste(M_home,"/Step_4_Reweighting/2_contraintes_micro.R")
+source(paste(M_home,"/Step_4_Reweighting/3_pondr.R")
+
 # ####
 # # Step 5
 # ####
-# 
-# source(paste(M_home,"/Step_5_export_IMACLIM/1_export_to_IMACLIM.R")
+source(paste(M_home,"/Step_5_export_IMACLIM/1_export_to_IMACLIM.R")
