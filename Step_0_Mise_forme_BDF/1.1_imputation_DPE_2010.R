@@ -227,14 +227,8 @@ dat=data.frame(
 )
 
 
-print(ggplot(dat,aes(fill=statut,x=cat_DPE,y=DPE))+geom_bar(stat="identity",position="dodge")+ggtitle("Multinomial logit"))
-
-
+# print(ggplot(dat,aes(fill=statut,x=cat_DPE,y=DPE))+geom_bar(stat="identity",position="dodge")+ggtitle("Multinomial logit"))
 
 # SAVE DPE ----------------------------------------------------------------
 menage_DPE<-appariement_menages_DPE %>% select(ident_men,DPE_pred)
 save(menage_DPE,file=paste(M_data,"/Output/Initial format/menage_DPE.RData",sep=""))
-
-# SUCCESS -----------------------------------------------------------------
-
-print("Step 0 : 1.1_imputation_DPE_2010 : SUCCESS")
