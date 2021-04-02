@@ -3,6 +3,7 @@
 Matisse_Loop <- function(step_to_run = 1:5){
 
   AddLogs("MAIN",paste("Running MatisseLoop with steps",paste(step_to_run,collapse = "/"),sep =" "))
+
   ####
   # Step 1
   ####
@@ -27,8 +28,7 @@ Matisse_Loop <- function(step_to_run = 1:5){
     
     source(paste(M_home,"/Step_2_Microsimulation/1.1_Microsimulation.R",sep=""))
     AddLogs("MAIN","Completed step 2.1")
-    
-    
+
     source(paste(M_home,"/Step_2_Microsimulation/2.1_evolution_conso_energie.R",sep=""))
     AddLogs("MAIN","Completed step 2.2")
   }
@@ -45,6 +45,10 @@ Matisse_Loop <- function(step_to_run = 1:5){
     source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/3_1_2_Achat_2010_horizon-1.R",sep=""))
     AddLogs("MAIN","Completed step 3.1.2")
 
+    
+    
+    #C'est ici que ça plante!!!
+    
     source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/3_1_3_Rehab_2010_horizon.R",sep=""))
     AddLogs("MAIN","Completed step 3.1.3")
 
