@@ -170,3 +170,8 @@ save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horiz
 # print("Step 2 : 1_Microsimulation : SUCCESS")
 
 
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(menage_forme,menage_echelle,FC,ThreeME,Elast,Cat,list_A,list_elast_rev,list_elast_prix,Elast_prix,Elast_rev,
+   BUIL_H01_2_2010,POP_TOT_2010,surfhab_hab_2010,BUIL_H01_2_horizon,POP_TOT_horizon,surfhab_hab_horizon))
+gc()
+

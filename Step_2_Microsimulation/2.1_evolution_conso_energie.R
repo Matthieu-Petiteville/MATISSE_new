@@ -58,7 +58,9 @@ for (source in sources){dep_source_verif=paste("dep",source,"verif",sep="_")}
 compute_savings_rate_export(menage_echelle)
 
 
-# SUCCESS -----------------------------------------------------------------
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(sources,menage_echelle,FC,list_source_usage,dep_source_verif))
+gc()
 
-# print("2_2_evolution_conso_energie : SUCCESS")
+
 
