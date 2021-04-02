@@ -7,7 +7,7 @@ M_data <- gsub("\\\\","/",Sys.getenv("MATISSE_DATA"))
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Common/default_values.r",sep=""))
 source(paste(M_home,"/Main/Matisse_Loop.r",sep=""))
-current_log <- CreateLogFile()
+
 
 # Loop on scenarios/horizon/classement/redistribution -------------------------------------------------------
 
@@ -19,10 +19,8 @@ for (scenario in scenario_v){
         #Run the full Matisse_Loop, steps 1 to 5, for Iter=0
         #Logs into current_log
         Iter=0
-        sink(file = current_log,append = TRUE)
-        RunMatisseLoop(1:5)
-        sink()
-        
+        Matisse_Loop(1:5)
+      
       }
     }
   }
