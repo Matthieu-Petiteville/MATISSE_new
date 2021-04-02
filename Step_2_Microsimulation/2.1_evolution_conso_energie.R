@@ -36,31 +36,23 @@ load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
 menage_echelle <- evolution_conso_ener(menage_echelle,FC)
 
 
-
 # Save --------------------------------------------------------------------
 
 save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_2.RData",sep=""))
-
-
 
 
 # VERIF -------------------------------------------------------------------
 
 
 # Verif Finale
-for (source in sources){
-  print(source)
-  dep_source_verif=paste("dep",source,"verif",sep="_")
-  print("Accord interne dep_ener")
-  print(table(abs(menage_echelle[dep_source_verif]-rowSums(menage_echelle %>% select(ident_men, list_source_usage) %>% select(contains(source))))<10^(-6)))
-}
+for (source in sources){dep_source_verif=paste("dep",source,"verif",sep="_")}
 
-
-table(abs(menage_echelle$dep_Elec-menage_echelle$dep_Elec_verif)<10^(-10))
-table(abs(menage_echelle$dep_Gaz-menage_echelle$dep_Gaz_verif)<10^(-10))
-table(abs(menage_echelle$dep_GPL-menage_echelle$dep_GPL_verif)<10^(-10))
-table(abs(menage_echelle$dep_Fuel-menage_echelle$dep_Fuel_verif)<10^(-10))
-table(abs(menage_echelle$dep_Solides-menage_echelle$dep_Solides_verif)<10^(-10))
+# 
+# table(abs(menage_echelle$dep_Elec-menage_echelle$dep_Elec_verif)<10^(-10))
+# table(abs(menage_echelle$dep_Gaz-menage_echelle$dep_Gaz_verif)<10^(-10))
+# table(abs(menage_echelle$dep_GPL-menage_echelle$dep_GPL_verif)<10^(-10))
+# table(abs(menage_echelle$dep_Fuel-menage_echelle$dep_Fuel_verif)<10^(-10))
+# table(abs(menage_echelle$dep_Solides-menage_echelle$dep_Solides_verif)<10^(-10))
 
 #Epargne
 compute_savings_rate_export(menage_echelle)
@@ -68,5 +60,5 @@ compute_savings_rate_export(menage_echelle)
 
 # SUCCESS -----------------------------------------------------------------
 
-print("2_2_evolution_conso_energie : SUCCESS")
+# print("2_2_evolution_conso_energie : SUCCESS")
 

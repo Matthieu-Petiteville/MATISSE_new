@@ -325,10 +325,10 @@ menage_echelle <-
 
 # NOUVELLES CLASSES DPE ---------------------------------------------------
 
-table(menage_echelle$DPE_dep)
-table(menage_echelle$classe_arr)
-
-
+# table(menage_echelle$DPE_dep)
+# table(menage_echelle$classe_arr)
+# 
+# 
 
 
 # ALTERATION CONSO ENERGIE ------------------------------------------------
@@ -338,7 +338,7 @@ for (dep in LETTERS[2:7]){
   for (arr in LETTERS[1:2]){ #NB :à partir de 2020 on ne construit que des classes A et B (arrêt des classes C en 2019)
     # classe arrivée
     if(dep>arr){
-      print(paste('dep is ',dep," , arr is ",arr,sep=""))
+      # print(paste('dep is ',dep," , arr is ",arr,sep=""))
 
       # Coefficient de gain énergétique (multiplié par 1/2 pour centrer les consommations des constructions de fin et de début d'année)
       rate_gain_ener<-as.numeric(
@@ -518,5 +518,5 @@ compute_savings_rate_export(menage_echelle_1)
 
 # SUCCESS -----------------------------------------------------------------
 
-print("3_1_1_Achat_horizon : SUCCESS")
+# print("3_1_1_Achat_horizon : SUCCESS")
 

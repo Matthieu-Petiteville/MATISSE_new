@@ -2,7 +2,6 @@
 # Library -----------------------------------------------------------------
 library(tidyverse)
 
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 #function
 source(paste(M_home,"/Step_2_Microsimulation/1.2_fonction_microsimulation.R",sep=""))
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
@@ -84,7 +83,7 @@ menage_echelle<-
 
 # APPEL Fonction MICROSIMULATION des DEPENSES -----------------------------
 
-menage_echelle<-microsimulation_depenses(menage_echelle,menage_forme,FC)
+menage_echelle <- microsimulation_depenses(menage_echelle,menage_forme,FC)
 
 
 # Mise à l'échelle des surfaces -------------------------------------------
@@ -162,12 +161,12 @@ save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horiz
 
 # Epargne -----------------------------------------------------------------
 
-print(compute_savings_rate_export(menage_echelle))
-print(compute_share_export(menage_echelle))
-
+# print(compute_savings_rate_export(menage_echelle))
+# print(compute_share_export(menage_echelle))
+# 
 
 # Success -----------------------------------------------------------------
 
-print("Step 2 : 1_Microsimulation : SUCCESS")
+# print("Step 2 : 1_Microsimulation : SUCCESS")
 
 

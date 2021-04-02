@@ -221,7 +221,7 @@ ident_r<-c()
 # rénovations thermiques, nous avons corrigé la bdd des gros travaux de rénovations en Step_0.4
 for (Y in 2011:(horizon-1)){
 # for (Y in 2010:2023){
-  print(Y)
+  # print(Y)
   ident_r<-c()
   
   # remise à 0 du principal de la dette année après année
@@ -517,8 +517,8 @@ rm(i,sum,stock_m2_trans)
 
 # Parts Budgétaires -------------------------------------------------------
 
-print(compute_share_export(menage_echelle_32))
-print(compute_savings_rate_export(menage_echelle_32))  
+# print(compute_share_export(menage_echelle_32))
+# print(compute_savings_rate_export(menage_echelle_32))  
 
 
 
@@ -586,7 +586,7 @@ save(menage_echelle_32, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",h
 
 # SUCCESS -----------------------------------------------------------------
 
-print("3_1_2_Achat_2010_horizon -1 : SUCCESS")
+# print("3_1_2_Achat_2010_horizon -1 : SUCCESS")
 # 
 # 
 # # load("2010/depmen.RData")

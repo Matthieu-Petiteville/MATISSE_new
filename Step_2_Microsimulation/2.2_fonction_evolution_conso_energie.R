@@ -12,10 +12,7 @@ evolution_conso_ener<-function(menage_echelle,FC){
   # Verif préliminaire entre dep_Elec_verif et les composantes par usage
   ###
   for (source in sources){
-    print(source)
     dep_source_verif=paste("dep",source,"verif",sep="_")
-    print(table(abs(menage_echelle[dep_source_verif]-rowSums(menage_echelle %>% select(ident_men, list_source_usage) %>% select(contains(source))))<10^(-6))
-    )
   }
   
   

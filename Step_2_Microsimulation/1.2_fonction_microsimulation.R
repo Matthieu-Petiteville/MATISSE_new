@@ -23,7 +23,6 @@ microsimulation_depenses<-function(menage_echelle,menage_forme,FC){
   
   for (i in 1:14){
     k=list_dep[i]
-    print(k)
     if(i<10){
       menage_echelle[paste("share_A0",i,sep="")]<-menage_echelle[k]/menage_echelle$Rcons_bis
   }else{ 
@@ -41,7 +40,7 @@ microsimulation_depenses<-function(menage_echelle,menage_forme,FC){
   menage_echelle$TC_RDB_nominal <- (menage_echelle$RDB - menage_forme$RDB)/menage_forme$RDB
   
   ### test
-  1+as.numeric(menage_echelle %>% summarise(weighted.mean(TC_RDB_nominal,na.rm=T)))
+  # 1+as.numeric(menage_echelle %>% summarise(weighted.mean(TC_RDB_nominal,na.rm=T)))
   # [1]  2.402514
   # FC$rdb
   # [1] 2.375752
@@ -102,7 +101,6 @@ microsimulation_depenses<-function(menage_echelle,menage_forme,FC){
   while(iter & nb_iter_RDB<61){
     sauv_menage_echelle<-menage_echelle
     nb_iter_RDB=nb_iter_RDB+1
-    print(nb_iter_RDB)
     list_dep_autres_ener=c("dep_GPL","dep_Fuel","dep_Urbain", "dep_Solides")
     
     
@@ -259,7 +257,6 @@ microsimulation_depenses<-function(menage_echelle,menage_forme,FC){
     # indice du max
     # i_max<-which.max(tol)
     # (menage_echelle %>% select(ident_men))[i_max,]
-    print(max(tol,na.rm=T))
     if(max(tol,na.rm=T)>10^-3){iter=TRUE} else {iter=FALSE}
     
     # TESTER PLUS => 10^-6

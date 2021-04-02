@@ -271,8 +271,8 @@ Ventil_solde <- function(solde,menage,step){
     tol=abs((menage_bis$RDB_reel-sauv_menage$RDB_reel)/sauv_menage$RDB_reel)
     
     
-    max(tol,na.rm=T)
-    print(max(tol,na.rm=T))
+    # max(tol,na.rm=T)
+    # print(max(tol,na.rm=T))
     if(max(tol,na.rm=T)>10^-6){iter=TRUE} else {iter=FALSE}
     
   }
@@ -281,7 +281,7 @@ Ventil_solde <- function(solde,menage,step){
   
   # RETURN ------------------------------------------------------------------
   
-  print(paste("nb_iter_RDB: ",nb_iter_RDB))    
+  # print(paste("nb_iter_RDB: ",nb_iter_RDB))    
   return(menage_bis %>% select(colnames(menage)))
   
   

@@ -29,17 +29,7 @@ menage_echelle <- mise_echelle_revenu(FC,menage_forme,Iter)
 
 save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_1_1.RData",sep=""))
 
-
-
-
 # Next Step ---------------------------------------------------------------
-
 # Rétrocession de la taxe carbone
-
-# SUCCESS -----------------------------------------------------------------
-
-print("Step 1 : 1_Mise_echelle_revenus : SUCCESS")
-
-
 
 
