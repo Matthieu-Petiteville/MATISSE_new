@@ -43,8 +43,8 @@ menage_echelle <- retrocession_carbon_tax(TCO,TCO_tot,menage_echelle)
 save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep=""))
 
 
-# Success -----------------------------------------------------------------
-
-print("Step 1 : 2_retrocession_carbon_tax : SUCCESS")
+# Clean -------------------------------------------------------------------
+rm(menage_echelle,menage_forme,IMACLIM,EMS)
+gc()
 
 

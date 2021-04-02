@@ -1,6 +1,5 @@
 
 # LIBRARY -----------------------------------------------------------------
-
 library(tidyverse)
 source(paste(M_home,"/Common/tools.R",sep=""))
 
@@ -8,7 +7,6 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 
 
 ## MICRO
-
 load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
 source(paste(M_home,"/Step_1_Mise_echelle/1.2_fonction_mise_echelle_revenus.R",sep=""))
 
@@ -32,4 +30,9 @@ save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horiz
 # Next Step ---------------------------------------------------------------
 # Rétrocession de la taxe carbone
 
+
+
+# Clean -------------------------------------------------------------------
+rm(menage_forme,IMACLIM,FC,ThreeME,Iter,menage_echelle)
+gc()
 

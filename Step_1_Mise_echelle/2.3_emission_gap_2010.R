@@ -82,3 +82,8 @@ facteur_tuu0 <- as.numeric(men_tuu_0/ems_uc_tot)
 # 3.32953
 
 
+# Clean -------------------------------------------------------------------
+rm(menage_forme,EMS)
+gc()
+
+
