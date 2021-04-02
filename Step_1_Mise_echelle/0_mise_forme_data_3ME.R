@@ -40,8 +40,6 @@ IMACLIM<-
   output_macro  %>%
   separate(col="year_model",into=c("year","model"),sep="_")
 
-rm(output_macro)
-
 save(IMACLIM,file=  paste(M_data , "/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
 
 
@@ -89,9 +87,6 @@ save(FC,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scena
 EMS<-read_excel(path=paste(M_data,"/IMACLIM/EMS.xlsx",sep=""),range=paste(scenario,"!B1:AF5",sep=""),col_names=T)
 save(EMS,file=paste(M_data,"/Output/Projet_ADEME/",scenario,"/EMS.RData",sep=""))
 
-
-
-# SUCCESS -----------------------------------------------------------------
-
-print("Step 1 : 0_import_data_macro : SUCCESS")
-
+# Clean -------------------------------------------------------------------
+rm(scen,ThreeME,output_macro,IMACLIM,FC,EMS)
+gc()
