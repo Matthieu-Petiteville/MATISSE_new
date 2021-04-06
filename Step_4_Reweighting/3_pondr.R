@@ -3,9 +3,13 @@
 
 # pondR <- function(Iter,m2VP){
   
-#Comment 06/05/2019 : en faisant tourner le code sans les contraintes INSEE ni le taux d'épargne, on obtient des résultats tels qu'attendus (pas de ménage qui tombe à une pondération nulle), 25 minutes pour faire tourner l'algorithme. 
-# a faire : vérifier que les agrégats INSEE ne sont pas trop loin des agrégats à respecter, s'ils sont proches c'est embêtant, cela veut dire que les contraintes INSEE sont trop fortes pour respecter les contraintes macro. 
+#Comment 06/05/2019 : en faisant tourner le code sans les contraintes INSEE ni le taux d'épargne, on obtient des résultats tels qu'attendus
+#(pas de ménage qui tombe à une pondération nulle), 25 minutes pour faire tourner l'algorithme. 
+# a faire : vérifier que les agrégats INSEE ne sont pas trop loin des agrégats à respecter, s'ils sont proches c'est embêtant, 
+#cela veut dire que les contraintes INSEE sont trop fortes pour respecter les contraintes macro. 
 # Iter=1
+
+
   # LIBRARIES ---------------------------------------------------------------
   
   library(tidyverse)
@@ -16,14 +20,12 @@
   Iter=0
  
   # DATA --------------------------------------------------------------------
-  setwd("D:/CIRED/Projet_Ademe/MATISSE")
-  load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_contraintes.RData",sep=""))
-  load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/pond_init.RData",sep=""))
-  load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_echelle.RData",sep=""))
-  load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/agreg_best.RData",sep=""))
-
-  
-  load("Step_0_Mise_forme_BDF/Output/menage_forme.RData")
+  # setwd("D:/CIRED/Projet_Ademe/MATISSE")
+  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_contraintes.RData",sep=""))
+  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/pond_init.RData",sep=""))
+  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_echelle.RData",sep=""))
+  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/agreg_best.RData",sep=""))
+  load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
 
   
 
@@ -53,31 +55,18 @@
   #-------------------------------------------------------------------------------
   # (A) BASE DE DONNEE
   data<-menage_contraintes %>% select(-ident_men)
-  dim(data)
-  typeof(data)
   ones<-cbind(rep(1,dim(data)[1]))
-  dim(ones)
   data<-as.matrix(cbind(ones,data))
-  dim(data)
-  typeof(data)
-  
+
   # (W) POIDS INITIAUX
   pond_init <- as.matrix(pond_init)
-  dim(pond_init)
-  typeof(pond_init)
   # (S) AGREGAT INITIAUX
   Amat <- t(data)
-  dim(Amat)
   agreg_init <- (Amat %*% pond_init)
-  dim(agreg_init)
-  typeof(agreg_init)
-  typeof(Amat)
-  
+
   # (T) AGREGAT A RESPECTER
   agreg_best <- t(agreg_best)
-  dim(agreg_best)
-  typeof(agreg_best)
-  
+
   
   #-------------------------------------------------------------------------------
   #             Transformation
@@ -99,22 +88,15 @@
   
   # test
   # View(cbind(rownames(agreg_init),rownames(agreg_best)))
-  View(cbind("Init"=agreg_init, "Best"=agreg_best,"Way to go"=bvec/agreg_init))
+  # View(cbind("Init"=t(agreg_init), "Best"=agreg_best,"Way to go"=bvec/t(agreg_init)))
 
   # (uvec) CONTRAINTE D INEGALITE 
   uvec <- -1 * pond_init
   
   A<-cbind(t(Amat),diag(n))
   b<-rbind(bvec,-pond_init)
-  
-  
-  dim(Vmat)
-  dim(b)
-  dim(A)
-  dim(dvec)
-  
-  
-  
+
+    
   #-------------------------------------------------------------------------------
   #             Solveur
   #-------------------------------------------------------------------------------
@@ -122,7 +104,8 @@
   print(strptime(Sys.time(),format="%Y-%m-%d %H:%M:%S"))
   # Start the clock!
   ptm <- proc.time()
-  sol<-solve.QP(Vmat,dvec,A,b,meq=length(agreg_best))
+  memory.limit(40000)
+    sol<-solve.QP(Vmat,dvec,A,b,meq=length(agreg_best))
 
   # Stop the clock
   print(proc.time() - ptm)
@@ -132,7 +115,11 @@
   
   print(paste("Repondation : DONE (",(proc.time() - ptm)[3]/60," min)",sep=""))
   diff_pond<-sol$solution
-  save(diff_pond,file=paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/diff_pond.RData",sep=""))
+  save(diff_pond,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/diff_pond.RData",sep=""))
+  
+  
+  
+  
   
   #-------------------------------------------------------------------------------
   #             Output
@@ -149,7 +136,7 @@
   
   # sauvegarde
   save(pond_final, file = 
-         paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/pond_final.RData",sep=""))
+         paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/pond_final.RData",sep=""))
 
   # save(pond_init,file=
   #        paste("2025/Iteration_",Iter,"/Output/erreur2/pond_init_erreur2.RData",sep=""))
@@ -190,14 +177,14 @@
   
   # sauvegarde
   save(agreg_final, file = 
-         paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.RData",sep=""))
+         paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.RData",sep=""))
 
   save(menage_echelle,file = 
-         paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle.RData",sep=""))
+         paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle.RData",sep=""))
 
   
   write.csv2(t(agreg_final),file = 
-               paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.csv",sep=""))
+               paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.csv",sep=""))
   
   
   print(
@@ -210,15 +197,15 @@
 
 # Export pond_final pour optimisations suivantes --------------------------
 
-  if(!file.exists(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep=""))){
+  if(!file.exists(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep=""))){
     
     # Save pond
     pond_final_heuristique<-pond_final
     save(pond_final_heuristique, file = 
-           paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep=""))
+           paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep=""))
     
     # Write wich scenario it comes from
-    sink(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/READ_ME_pond_final_heuristique_",scenario,"_",horizon,".txt",sep=""))
+    sink(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/READ_ME_pond_final_heuristique_",scenario,"_",horizon,".txt",sep=""))
     cat(paste("Scenario : ",paste(scenario,horizon,scenario_classement, redistribution,sep=" - "),sep=""))
     cat("\n")
     cat(as.character(strptime(Sys.time(),format="%Y-%m-%d %H:%M:%S")))

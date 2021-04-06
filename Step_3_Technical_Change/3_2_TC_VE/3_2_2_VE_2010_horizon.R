@@ -4,7 +4,6 @@
 library(tidyverse)
 library(FinancialMath)
 library(readxl)
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 
 # SOURCE ------------------------------------------------------------------
 
@@ -18,6 +17,7 @@ source(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/3_2_1_VE_classement_hori
 # DATA --------------------------------------------------------------------
 
 load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
 
 # Paramètre de ventilation du volume de vente des Véhicules particuliers aux privés ou entreprises (flotte)
 # Issu des données fournies par l'Ademe (source autoactu.com), régression par Franck Nadaud sur données 2005-2019
@@ -161,7 +161,7 @@ menages_insolvables_suppr=c()
 
 for (Y in 2011:horizon){
 # for (Y in 2011:2034){
-  print(Y)
+  # print(Y)
   
   sauv_menage_echelle_annee_precedente<-menage_echelle
   
@@ -829,19 +829,26 @@ menage_echelle_TC_VE<-menage_echelle_VE
 save(menage_echelle_TC_VE, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE.RData",sep=""))
 
 
-
 menage_echelle <- menage_echelle_TC_VE %>% select(-typmen5,-
 percent_pkm_eligible,-potentiel_VE,-VE_rank_pess,- VE_rank_opt,-VE_rank,-solde_dette,-solde_elec,-solde_carb,-solde_veh)
 save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_echelle.RData",sep=""))
 
 
-compute_share_export(menage_echelle_TC_VE)
-compute_savings_rate_export(menage_echelle_TC_VE)
+# compute_share_export(menage_echelle_TC_VE)
+# compute_savings_rate_export(menage_echelle_TC_VE)
+
+
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(auto,auto_elec,Bonus_malus_net,Bonus_VE_tot,forcage_vkm,km_auto_sum,max_recvoi,menage,menage_echelle,menage_echelle_TC_DPE,menage_echelle_VE,
+  menage_temp,menages_insolvables,menages_insolvables_suppr,sauv_int,sauv_menage_echelle_annee_precedente,sauv_menages_insolvables,solde,table_solv_year,
+  table_solv_year_ind,ThreeME,ventes_VP, FC, menage_echelle_dom,menage_echelle_TC_VE))
+gc()
+
 
 
 # SUCCESS -----------------------------------------------------------------
 
-print("3_2_2_VE_2010_horizon : SUCCESS")
+# print("3_2_2_VE_2010_horizon : SUCCESS")
 
 
 
@@ -852,16 +859,16 @@ print("3_2_2_VE_2010_horizon : SUCCESS")
 # Question : à combien limiter la solvabilité ex-ante en sélection des ménages pour éviter que ceux ci ne soient sur-endettés à la fin ?
 
 #ménages surdenttés
-menage_echelle %>% filter(year_VE>0)%>%filter(solv>=0.33 & solv<999)%>%select(ident_men,year_VE,solv,RDB,solde_int, solde_princ) #=> 0 après traitement (voir proposition plus bas)
+# menage_echelle %>% filter(year_VE>0)%>%filter(solv>=0.33 & solv<999)%>%select(ident_men,year_VE,solv,RDB,solde_int, solde_princ) #=> 0 après traitement (voir proposition plus bas)
 
 
 #Moyenne année après année de l'ajout d'endettement pour les ménages proprio rénovant
-table_solv_year_filter<-as.data.frame(table_solv_year)%>%filter(V1>=2030)
-mean(table_solv_year_filter[-1,2]) #=> 0.001951428 #24/07/2020 : en imposant solv<=0.33 on obtient un endettement additionnel de 0.2% => d'où limite à 32.8% d'endettement pour solvabilité ex-ante. Les 15 cas hors limites voient leur achat de VE annulé. 
+# table_solv_year_filter<-as.data.frame(table_solv_year)%>%filter(V1>=2030)
+# mean(table_solv_year_filter[-1,2]) #=> 0.001951428 #24/07/2020 : en imposant solv<=0.33 on obtient un endettement additionnel de 0.2% => d'où limite à 32.8% d'endettement pour solvabilité ex-ante. Les 15 cas hors limites voient leur achat de VE annulé. 
 
 
 # Contrôle des ménages supprimés pour cause de solvabilité au cours du code
-menages_insolvables_suppr
+# menages_insolvables_suppr
 
 
 

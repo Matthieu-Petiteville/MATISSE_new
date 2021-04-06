@@ -16,15 +16,14 @@ load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_clas
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
 load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+coeff_dep_ems<-read_csv(paste(M_data,"/IMACLIM/coeff_dep_ems.csv",sep=""))
+load(paste(M_data,"/Data/Data_interne/coeff_ems_2010.RData",sep=""))
 
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
-
-
-
 
 
 # DONNEES MANUELLES -------------------------------------------------------
@@ -545,7 +544,6 @@ rm(i,sum,stock_m2_trans)
 
 save(menage_echelle_32, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_32.RData",sep=""))
 
-
 # 
 # 
 # # Suppression des bases ---------------------------------------------------
@@ -584,30 +582,9 @@ save(menage_echelle_32, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",h
 # 
 # 
 
-# SUCCESS -----------------------------------------------------------------
-
-# print("3_1_2_Achat_2010_horizon -1 : SUCCESS")
-# 
-# 
-# # load("2010/depmen.RData")
-# # 
-# # IM<-menage_echelle %>% filter(NEUF)%>% select(ident_men)
-# # 
-# # Prix<-
-# #   depmen %>% 
-# #   select(ident_men,prixrp_d,surfhab_d) %>% 
-# #   filter(ident_men %in% IM$ident_men) %>% 
-# #   mutate(prix_2=prixrp_d/surfhab_d) %>%
-# #   mutate_when(is.na(prix_2),list(prix_2=0))
-# # 
-# # dim(Prix)
-# # 
-# # head(Prix$surfhab_d)
-# # head(Prix$prixrp_d)
-# # table(is.na(Prix$prixrp_d)) #=> Tous des NA
-# # 
-# # Prix %>% summarise(mean(prix_2))
-# 
-# # rm(depmen)
-# 
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(coeff_dep_ems,coeff_ems_2010,conso_moy_dep,DPE_A,DPE_B,menage_echelle,menage_echelle_32,
+                  menage_echelle_31,ThreeME,FC,A,Mat_gain_ener,menage_ener_dom,sauv_int,solde))
+gc()
+  
 

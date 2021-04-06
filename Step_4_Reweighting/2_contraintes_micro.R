@@ -85,8 +85,14 @@ save(menage_contraintes,file=
        paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_contraintes.RData",sep=""))
 save(pond_init,file=
        paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/pond_init.RData",sep=""))
+
+
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(dummies_dpe_horizon,menage_calibr_2010,menage_contraintes,menage_echelle,pond_init))
+gc()
+
 # save(menage_echelle,file=
        # paste("2025/Iteration_",Iter,"/Input/menage_echelle.RData",sep=""))
 # }
-print("Repondération : 2_contraintes_micro : SUCCESS")
+# print("Repondération : 2_contraintes_micro : SUCCESS")
 

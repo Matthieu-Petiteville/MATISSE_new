@@ -447,9 +447,13 @@ list_contraintes_menage<-
     "typmen51","typmen52","typmen53","typmen54" )
 
 
-print("Repondération : 1_contraintes_macro : SUCCESS")
+# print("Repondération : 1_contraintes_macro : SUCCESS")
 
 
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(agreg_best,Calage,Calage_relatif,contraintes,contraintes_calage,FC_pondmen,IMACLIM,individu,individu_bis, men_INSEE, menage_calibr_2010,
+   menage_forme,Stock_list,Stock_VP,ThreeME,Ventes,ventes_VP))
+gc()
 
 
 

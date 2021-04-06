@@ -6,7 +6,6 @@
 library(tidyverse)
 library(readxl)
 library(plyr)
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 source(paste(M_home,"/Common/tools.R",sep=""))
 
 
@@ -16,15 +15,12 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 # Base appariée BDF-ENTD
 load(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/appariement_bdf_entd.RData",sep=""))
 
-
 # Bases étapes précédentes (Step 3.1)
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_DPE.RData",sep=""))
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
 
-
 ## BDF
 auto<-as.data.frame(read_excel(paste(M_data,"/Data/BDF_2010/AUTOMOBILE.xlsx",sep="")),stringsAsFactors=F)
-
 
 
 # PREPARATION DATA --------------------------------------------------------
@@ -43,27 +39,12 @@ auto_elec<-
 
 
 
-
-
-
-
 # test de sensibilité ? 
 # Tester avec 100% ? de kilomètres éligibles ? 
 # si pas de différence 80/100% => on peut faire sauter le lien bdf-entd
 
 
 #justifier la barrière de kilomètre éligible
-
-
-
-
-
-
-
-
-
-
-
 
 
 # APPARIEMENT BDD ------------------------------------------------
@@ -366,6 +347,6 @@ Bonus_VE_horizon<-as.numeric(ThreeME %>%
 
 # SUCCESS -----------------------------------------------------------------
 
-print("3_2_1_VE_classement_horizon : SUCCESS")
-
+# print("3_2_1_VE_classement_horizon : SUCCESS")
+# 
 

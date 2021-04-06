@@ -971,20 +971,30 @@ save(menage_echelle_33, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",h
 
 
 
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(coeff_dep_ems,coeff_ems_2010,conso_moy_dep,Cost_m2,Dette_bailleur_prive,FC,Hausses_loyer,ident_rehab,
+                    Mat_gain_ener,menage_echelle,menage_echelle_32,menage_echelle_33,menage_ener_dom,menages_insolvables,menages_insolvables_suppr,
+                    order,sauv_avant_reventil,sauv_int,sauv_int_vent,sauv_menage_echelle_annee_precedente,sauv_menages_insolvables,
+                    solde,Solde_Ener_tot, table_order_value,table_solv_year,table_solv_year_ind,ThreeME))
+gc()
+
 
 
 
 # EPARGNE & PARTS BUDGETAIRES ---------------------------------------------
-
-
-print(compute_share_export(menage_echelle_33))
-print(compute_savings_rate_export(menage_echelle_33))
-
+# 
+# 
+# print(compute_share_export(menage_echelle_33))
+# print(compute_savings_rate_export(menage_echelle_33))
+# 
 
 # SUCCESS -----------------------------------------------------------------
 
+# 
+# print("3_1_3_Rehab_2010_horizon : SUCCESS")
+# 
 
-print("3_1_3_Rehab_2010_horizon : SUCCESS")
+
 
 
 
@@ -1010,14 +1020,14 @@ print("3_1_3_Rehab_2010_horizon : SUCCESS")
 
 
 # ENERGIE -----------------------------------------------------------------
-
-table(abs(menage_echelle_33$dep_Elec-menage_echelle_33$dep_Elec_verif)<10^(-10))
-table(abs(menage_echelle_33$dep_Gaz-menage_echelle_33$dep_Gaz_verif)<10^(-10))
-table(abs(menage_echelle_33$dep_GPL-menage_echelle_33$dep_GPL_verif)<10^(-10))
-table(abs(menage_echelle_33$dep_Fuel-menage_echelle_33$dep_Fuel_verif)<10^(-10))
-table(abs(menage_echelle_33$dep_Solides-menage_echelle_33$dep_Solides_verif)<10^(-10))
-
-
+# 
+# table(abs(menage_echelle_33$dep_Elec-menage_echelle_33$dep_Elec_verif)<10^(-10))
+# table(abs(menage_echelle_33$dep_Gaz-menage_echelle_33$dep_Gaz_verif)<10^(-10))
+# table(abs(menage_echelle_33$dep_GPL-menage_echelle_33$dep_GPL_verif)<10^(-10))
+# table(abs(menage_echelle_33$dep_Fuel-menage_echelle_33$dep_Fuel_verif)<10^(-10))
+# table(abs(menage_echelle_33$dep_Solides-menage_echelle_33$dep_Solides_verif)<10^(-10))
+# 
+# 
 
 
 # TESTS -------------------------------------------------------------------

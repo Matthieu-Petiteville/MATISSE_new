@@ -17,6 +17,7 @@ source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
+load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
 
 
 load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33.RData",sep=""))
@@ -252,22 +253,21 @@ menage_echelle_34<-
 
 # Verif Finale
 for (source in sources){
-  print(source)
   dep_source_verif=paste("dep",source,"verif",sep="_")
   menage_echelle_34[dep_source_verif]<-rowSums(menage_echelle_34 %>% select(ident_men, list_source_usage) %>% select(contains(source)))
 }
 
 
-
-
-table(abs(menage_echelle_34$dep_Elec-menage_echelle_34$dep_Elec_verif)<10^(-10))
-table(abs(menage_echelle_34$dep_Gaz-menage_echelle_34$dep_Gaz_verif)<10^(-10))
-table(abs(menage_echelle_34$dep_GPL-menage_echelle_34$dep_GPL_verif)<10^(-10))
-table(abs(menage_echelle_34$dep_Fuel-menage_echelle_34$dep_Fuel_verif)<10^(-10))
-table(abs(menage_echelle_34$dep_Solides-menage_echelle_34$dep_Solides_verif)<10^(-10))
-
-
-
+# 
+# 
+# table(abs(menage_echelle_34$dep_Elec-menage_echelle_34$dep_Elec_verif)<10^(-10))
+# table(abs(menage_echelle_34$dep_Gaz-menage_echelle_34$dep_Gaz_verif)<10^(-10))
+# table(abs(menage_echelle_34$dep_GPL-menage_echelle_34$dep_GPL_verif)<10^(-10))
+# table(abs(menage_echelle_34$dep_Fuel-menage_echelle_34$dep_Fuel_verif)<10^(-10))
+# table(abs(menage_echelle_34$dep_Solides-menage_echelle_34$dep_Solides_verif)<10^(-10))
+# 
+# 
+# 
 
 
 # Ecraser colonnes surnuméraires ------------------------------------------
@@ -291,17 +291,24 @@ save(menage_echelle_TC_DPE, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"
 
 
 
+
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(dummies_classe_men,FC,menage_echelle,menage_echelle_33,menage_echelle_34,menage_echelle_TC_DPE,menage_ener_dom,prix_classe,
+   prix_classe_horizon,prix_classe_mat,prix_menages_horizon,prix_menages_horizon_bis,sauv_avant_reventil,solde))
+gc()
+
+
 # Test --------------------------------------------------------------------
-
-print(compute_share_export(menage_echelle_34))
-print(compute_savings_rate_export(menage_echelle_34))
-
-
+# 
+# print(compute_share_export(menage_echelle_34))
+# print(compute_savings_rate_export(menage_echelle_34))
+# 
+# 
 
 # SUCCESS -----------------------------------------------------------------
 
 
-print("3_1_4 Bascule A : SUCCESS")
+# print("3_1_4 Bascule A : SUCCESS")
 
 
 
