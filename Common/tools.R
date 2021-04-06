@@ -47,3 +47,45 @@ CreateLogFile <- function(){
 AddLogs <- function(LogType,LogTxt){
   print(paste(Sys.time(),paste("[",paste(scenario,horizon,scenario_classement,redistribution,sep="/"),"]",sep=""),LogType,LogTxt,sep=";"))
 }
+
+#Add line to StepTracker
+AddLineToStepTracker <- function(step_done){
+  
+  step_tracker_file <- paste(M_data,"/Logs/StepTracker.csv",sep="")
+  step_tracker_line = data.frame(TimeStamp = as.character(Sys.time()),scenario = scenario,horizon = horizon,scenario_classement = scenario_classement,
+                                 redistribution = redistribution,step_done = step_done)
+  
+  if(file.exists(step_tracker_file)){
+    step_tracker <- read.csv(step_tracker_file)
+    step_tracker <- rbind(step_tracker,step_tracker_line)
+  }else{
+    step_tracker = step_tracker_line  
+  }
+  
+  write.csv(step_tracker,step_tracker_file,row.names = FALSE,quote = FALSE)
+
+}
+
+#Checks if line is already in step tracker, the file that records all steps already run
+iSLineInStepTracker <- function(step_to_check){
+
+  library(tidyverse)
+  scenario_var <- scenario
+  horizon_var <- horizon
+  class_var <- scenario_classement
+  redis_var <- redistribution
+  
+  step_tracker_file <- paste(M_data,"/Logs/StepTracker.csv",sep="")
+  if(!file.exists(step_tracker_file)){return(FALSE)}
+  step_tracker <- read.csv(step_tracker_file)
+  test_step <- step_tracker %>%
+    filter(scenario == scenario_var,horizon == horizon_var,
+           scenario_classement == class_var , redistribution == redis_var ,
+           step_done == step_to_check)
+  
+  if(nrow(test_step)>0){return(TRUE)}else{return(FALSE)}
+  
+}
+
+#
+
