@@ -10,7 +10,6 @@ source(paste(M_home,"/Main/Matisse_Loop.r",sep=""))
 
 
 # Loop on scenarios/horizon/classement/redistribution -------------------------------------------------------
-
 for (scenario in scenario_v){
   for (horizon in horizon_v){
     for (scenario_classement in scenario_classement_v){
@@ -19,7 +18,7 @@ for (scenario in scenario_v){
         #Run the full Matisse_Loop, steps 1 to 5, for Iter=0
         #Logs into current_log
         Iter=0
-        Matisse_Loop(1:5)
+        Matisse_Loop(step_to_run =  1, ForceRerun = FALSE)
       
       }
     }
@@ -28,3 +27,12 @@ for (scenario in scenario_v){
 
 
 
+StandardValues4Test <- function(){
+
+#Sets up default values for the 4 parameters of Matisse to allow a 'defaut' run
+scenario <- scenario_v[1]
+horizon <- horizon_v[1]
+scenario_classement <- scenario_classement_v[1]
+redistribution <- redistribution_v[1]
+
+}
