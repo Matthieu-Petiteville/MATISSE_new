@@ -449,7 +449,6 @@ solde<-menage_echelle %>%
 # dim(menage_echelle %>% filter(year_neuf==horizon)%>% select(ident_men))
 
 
-sauv<-menage_echelle
 
 menage_echelle_31<-Ventil_solde(solde,menage_echelle,step="REHAB")
 
@@ -481,12 +480,12 @@ menage_echelle_31<-
 
 
 # Test
-table(abs(menage_echelle_31$dep_Elec_verif-menage_echelle_31$dep_Elec)<10^(-9))
-table((menage_echelle_31$dep_Gaz-menage_echelle_31$dep_Gaz_verif)<10^(-9))
-table((menage_echelle_31$dep_Fuel-menage_echelle_31$dep_Fuel_verif)<10^(-9))
-table((menage_echelle_31$dep_GPL-menage_echelle_31$dep_GPL_verifrif)<10^(-9))
-table((menage_echelle_31$dep_Urbain-menage_echelle_31$dep_Urbain_verif)<10^(-9))
-table((menage_echelle_31$dep_Solides-menage_echelle_31$dep_Solides_verif)<10^(-9))
+# table(abs(menage_echelle_31$dep_Elec_verif-menage_echelle_31$dep_Elec)<10^(-9))
+# table((menage_echelle_31$dep_Gaz-menage_echelle_31$dep_Gaz_verif)<10^(-9))
+# table((menage_echelle_31$dep_Fuel-menage_echelle_31$dep_Fuel_verif)<10^(-9))
+# table((menage_echelle_31$dep_GPL-menage_echelle_31$dep_GPL_verifrif)<10^(-9))
+# table((menage_echelle_31$dep_Urbain-menage_echelle_31$dep_Urbain_verif)<10^(-9))
+# table((menage_echelle_31$dep_Solides-menage_echelle_31$dep_Solides_verif)<10^(-9))
 # Les problèmes c'est les valeurs négatives.
 
 # View(menage_echelle_31%>%filter((Elec-dep_Elec)>10^(-9))%>% select(ident_men,contains("Elec")))
@@ -514,9 +513,8 @@ compute_savings_rate_export(menage_echelle_1)
 
 
 
-
-
-# SUCCESS -----------------------------------------------------------------
-
-# print("3_1_1_Achat_horizon : SUCCESS")
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(coeff_dep_ems,coeff_ems_2010,ThreeME,list_source_usage,menage_echelle,FC,
+                    menage_echelle_1,menage_echelle_31,menage_ener_dom,ident_accedants,Mat_gain_ener,sauv,solde))
+gc()
 
