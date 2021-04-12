@@ -19,18 +19,18 @@ if(scenario=="ssTCO"){S="scen AMS ss TCO"}
 if(scenario=="ssRES"){S="scen AMS ss residentiel"}
 if(scenario=="ssVE"){ S="scen AMS ss VE"}
 
-suppressWarnings(scen<-read_excel(path=paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep=""),sheet=S))
+suppressWarnings(scen<-read_excel(path=MatisseFiles$sortie_3me_xl,sheet=S))
 
 ThreeME<- scen %>% select(-Def)%>% gather(key=year, value=value, -c(1))
-save(ThreeME, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+save(ThreeME, file=MatisseFiles$Threeme_rd)
 
 # IMACLIM -----------------------------------------------------------------
 
 # VARIABLES MACRO
 if(scenario_classement=="ssrec"){
-  output_macro<-read_excel(path = paste(M_data , "/IMACLIM/Output_macro_code_iter_0_ssrec.xlsx",sep=""),sheet=scenario,skip = 1)
+  output_macro<-read_excel(path = MatisseFiles$output_macro_code_iter_0_ssrec_xl,sheet=scenario,skip = 1)
 } else {
-  output_macro<-read_excel(path = paste(M_data , "/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=scenario,skip = 1)
+  output_macro<-read_excel(path = MatisseFiles$output_macro_code_iter_0_xl,sheet=scenario,skip = 1)
 }
 output_macro <-
   output_macro %>%
@@ -40,7 +40,7 @@ IMACLIM<-
   output_macro  %>%
   separate(col="year_model",into=c("year","model"),sep="_")
 
-save(IMACLIM,file=  paste(M_data , "/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
+save(IMACLIM,file=  MatisseFiles$IMACLIM_rd)
 
 
 
@@ -78,14 +78,15 @@ FC <- FC %>%
   mutate(value=as.numeric(value)) %>%
   spread(key=Variable,value=value) 
 
-save(FC,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+save(FC,file=MatisseFiles$FC_2010_horizon_rd)
 
 
 
 # Emissions ---------------------------------------------------------------
 
-EMS<-read_excel(path=paste(M_data,"/IMACLIM/EMS.xlsx",sep=""),range=paste(scenario,"!B1:AF5",sep=""),col_names=T)
-save(EMS,file=paste(M_data,"/Output/Projet_ADEME/",scenario,"/EMS.RData",sep=""))
+EMS<-read_excel(path=MatisseFiles$EMS_xl,range=paste(scenario,"!B1:AF5",sep=""),col_names=T)
+save(EMS,file=MatisseFiles$EMS_scen_rd)
+
 
 # Clean -------------------------------------------------------------------
 rm(scen,ThreeME,output_macro,IMACLIM,FC,EMS)

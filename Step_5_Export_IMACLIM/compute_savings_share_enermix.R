@@ -184,11 +184,10 @@ energie_mix<-function(menage,FC){
   
   # IMPORT DATA -------------------------------------------------------------
   
-  # setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
-  load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
+  load(MatisseFiles$source_usage_rd)
   
   # Import des prix d'énergie par classe de ménage : en €/MWh
-  prix_classe <- read.csv2(paste(M_data,"/Data/BDFE_delauretis/Prix_energie_par_classe.csv",sep=""), header = TRUE, sep = ";",dec = ".", fill = TRUE)
+  prix_classe <- read.csv2(MatisseFiles$prix_class_csv, header = TRUE, sep = ";",dec = ".", fill = TRUE)
   
   # PREPARATION DONNEES PRIX ENERGIE ----------------------------------------
 
@@ -402,7 +401,7 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
 
 # Data --------------------------------------------------------------------
 
-  load(paste(M_data,"/Output/Initial format/menage_forme_4.RData",sep=""))
+  load(MatisseFiles$menage_forme_4_rd)
   try(
     detach("package:plyr"), 
     silent=T
@@ -419,7 +418,7 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
   if(Iter>0){
     #attention décalage avec Output_macro_code => skip first line lors de l'enregistrement
     IP_A02<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"13",sep=""),col_names = F))
-    
+
     IP_A03<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"14",sep=""),col_names = F))
     
     IP_A04<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"15",sep=""),col_names = F))
@@ -428,13 +427,14 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
   }
   
   if(Iter==0){
-    IP_A02<-as.numeric(read_excel(paste(M_data,"/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"14",sep=""),col_names = F))
     
-    IP_A03<-as.numeric(read_excel(paste(M_data,"/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"15",sep=""),col_names = F))
+    IP_A02<-as.numeric(read_excel(MatisseFiles$output_macro_code_iter_0_xl,sheet=s,range=paste(X,"14",sep=""),col_names = F))
     
-    IP_A04<-as.numeric(read_excel(paste(M_data,"/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"16",sep=""),col_names = F))
+    IP_A03<-as.numeric(read_excel(MatisseFiles$output_macro_code_iter_0_xl,sheet=s,range=paste(X,"15",sep=""),col_names = F))
     
-    IP_A07<-as.numeric(read_excel(paste(M_data,"/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"19",sep=""),col_names = F))
+    IP_A04<-as.numeric(read_excel(MatisseFiles$output_macro_code_iter_0_xl,sheet=s,range=paste(X,"16",sep=""),col_names = F))
+    
+    IP_A07<-as.numeric(read_excel(MatisseFiles$output_macro_code_iter_0_xl,sheet=s,range=paste(X,"19",sep=""),col_names = F))
   }
   
   

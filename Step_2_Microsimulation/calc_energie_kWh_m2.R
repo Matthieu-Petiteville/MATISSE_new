@@ -19,16 +19,12 @@ energie_dom_surf<-function(menage){
 
 # IMPORT DATA -------------------------------------------------------------
 
-# setwd("D:/Stage_Petiteville/Projet_Ademe/Publication/From_F4_to_ZNE/Code_data_F4_ZNE/")
-# load("2025/dep_ener_2025.RData")
-
-# load("2025/menage_echelle_2025.RData")
-
-  load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
+  load(MatisseFiles$source_usage_rd)
   
 
 # Import des prix d'énergie par classe de ménage : en €/MWh
-prix_classe <- read.csv2(paste(M_data,"/Data/BDFE_delauretis/Prix_energie_par_classe.csv",sep=""), header = TRUE, sep = ";",dec = ".", fill = TRUE)
+prix_classe <- read.csv2(MatisseFiles$prix_class_csv, header = TRUE, sep = ";",dec = ".", fill = TRUE)
+
 
 #Importer taux de croissance des prix et des revenus
 # load(paste(horizon,"/TC_prix_2010_",horizon,".RData",sep=""))
@@ -263,9 +259,6 @@ menage %>% summarise(weighted.mean(x=ener_dom_surf,w=pondmen,na.rm=T)) #MWh
 menage_ener_dom<-menage %>% select(ident_men,ener_dom_surf,ener_dom)
 
 return(menage_ener_dom)
-
-
-# save(menage_2025,file="2025/menage_2025.RData")
 
 
 # SUCCESS -----------------------------------------------------------------

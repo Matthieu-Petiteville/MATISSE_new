@@ -4,14 +4,13 @@
 # LIBRARIES ---------------------------------------------------------------
 
 library(tidyverse)
+source(paste(M_home,"/Common/tools.R",sep=""))
 
 # DATA --------------------------------------------------------------------
 
 # setwd("D:/CIRED/Projet_Ademe")
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_calibr_2010.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_echelle.RData",sep=""))
-source(paste(M_home,"/Common/tools.R",sep=""))
-
+load(MatisseFiles$menage_calibr_2010_final_rd)
+load(MatisseFiles$menage_echelle_rd)
 
 # Ajout Data DPE ----------------------------------------------------------
 
@@ -81,10 +80,8 @@ pond_init <-
 
 # SAVE FILES --------------------------------------------------------------
 
-save(menage_contraintes,file=
-       paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_contraintes.RData",sep=""))
-save(pond_init,file=
-       paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/pond_init.RData",sep=""))
+save(menage_contraintes , file = MatisseFiles$menage_contraintes_rd)
+save(pond_init , file = MatisseFiles$pond_init_rd)
 
 
 # Clean -------------------------------------------------------------------

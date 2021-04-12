@@ -4,12 +4,12 @@
 library(tidyverse)
 library(readxl)
 
-# DATA --------------------------------------------------------------------
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+# DATA --------------------------------------------------------------------
+
+load(MatisseFiles$menage_echelle_final_rd)
+load(MatisseFiles$FC_2010_horizon_rd)
 
 
 # Compute  ----------------------------------------------------------------
@@ -23,8 +23,8 @@ evol_energie<-compute_evol_energie(menage_echelle,scenario,horizon,scenario_clas
 
 # Import Technical Change variables ---------------------------------------
 
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Cout_bailleur_public.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/sBCE.RData",sep=""))
+load(MatisseFiles$cout_baill_pub_rd)
+load(MatisseFiles$sBCE_rd)
 
 
 # EXPORT ------------------------------------------------------------------
@@ -60,7 +60,7 @@ export <-  t(data.frame(
   "Renovation_BS"=Cout_bailleur_public))
 
 
-write.csv(export,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/export_Iter_0.csv",sep=""))
+write.csv(export,file=MatisseFiles$export_iter_0_csv)
 menage_iteration<-menage_echelle
-save(menage_iteration,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_iteration.RData",sep=""))
+save(menage_iteration,file=MatisseFiles$menage_iteration_rd)
 

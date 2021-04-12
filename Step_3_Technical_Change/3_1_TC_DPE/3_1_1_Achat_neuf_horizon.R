@@ -6,30 +6,30 @@
 # LIBRARIES ---------------------------------------------------------------
 library(tidyverse)
 library(ggplot2)
-source(paste(M_home,"/Common/tools.R",sep=""))
 
+source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
-
-coeff_dep_ems<-read_csv(paste(M_data,"/IMACLIM/coeff_dep_ems.csv",sep=""))
-load(paste(M_data,"/Data/Data_interne/coeff_ems_2010.RData",sep=""))
-TCO<-as.numeric(read_excel(path=paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/","Optimiste","/","ssrec","/IMACLIM_3ME.xlsx",sep=""),range="C103",col_names=F))*10^6
-# TCO ne dépend pas de la rétrocession, c'est du calibrage
-
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/calc_ems.R",sep=""))
 
 
 # DATA --------------------------------------------------------------------
+#TCO
+coeff_dep_ems<-read_csv(MatisseFiles$coeff_dep_ems_csv)
+load(MatisseFiles$coeff_ems_2010_rd)
+TCO<-as.numeric(read_excel(path=MatisseFiles$IMACLIM_3ME_scen_horiz_xl,range="C103",col_names=F))*10^6
+# TCO ne dépend pas de la rétrocession, c'est du calibrage
 
 # Donnes ThreeME : m2 et valeurs d'achats de logement neufs trajectoire
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
-load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
+load(MatisseFiles$Threeme_rd)
+load(MatisseFiles$source_usage_rd)
+
 
 #horizon
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_2.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
+load(MatisseFiles$menage_echelle_2_rd)
+load(MatisseFiles$FC_2010_horizon_rd)
 
 
 list_dep=c("agriculture",
@@ -498,10 +498,7 @@ menage_echelle_31<-
 # SAVE --------------------------------------------------------------------
 
 
-save(menage_echelle_31, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_31.RData",sep=""))
-
-
-
+save(menage_echelle_31, file=MatisseFiles$menage_echelle_31_rd)
 
 #TEST share
 compute_share_export(menage_echelle_31)

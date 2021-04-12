@@ -2,8 +2,8 @@ evolution_conso_ener<-function(menage_echelle,FC){
   
   
   # Importer les noms des variables existantes (Elec_clim et pas Solides_clim)
-  load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
-  
+  load(MatisseFiles$source_usage_rd)
+
   ## Source ##
   sources=c("Elec", "Gaz", "GPL", "Fuel", "Solides", "Urbain")
   

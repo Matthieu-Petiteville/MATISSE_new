@@ -15,9 +15,8 @@ library(matrixStats)
 
 # Data --------------------------------------------------------------------
 
-
-load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/EMS.RData",sep=""))
+load(MatisseFiles$menage_forme_rd)
+load(MatisseFiles$EMS_scen_rd)
 EMS<-EMS %>% gather(key=year,value=emission,-1)%>%filter(!Var=="EMS_HH_2")
 
 

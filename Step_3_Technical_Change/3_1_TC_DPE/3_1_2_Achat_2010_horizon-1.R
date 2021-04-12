@@ -8,22 +8,20 @@
 library(tidyverse)
 library(dplyr)
 
-# DATA --------------------------------------------------------------------
-
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
-
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_31.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
-load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
-coeff_dep_ems<-read_csv(paste(M_data,"/IMACLIM/coeff_dep_ems.csv",sep=""))
-load(paste(M_data,"/Data/Data_interne/coeff_ems_2010.RData",sep=""))
-
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
+
+# DATA --------------------------------------------------------------------
+
+load(MatisseFiles$menage_echelle_31_rd)
+load(MatisseFiles$FC_2010_horizon_rd)
+load(MatisseFiles$source_usage_rd)
+load(MatisseFiles$Threeme_rd)
+load(MatisseFiles$coeff_ems_2010_rd)
+coeff_dep_ems <- read_csv(MatisseFiles$coeff_dep_ems_csv)
 
 
 # DONNEES MANUELLES -------------------------------------------------------
@@ -219,9 +217,8 @@ ident_r<-c()
 # Le parc DPE a été calé sur les volumes 2010, les nouvelles constructions de cette année là ont déjà été prises en compte. Ce ne sera en revanche pas le cas des 
 # rénovations thermiques, nous avons corrigé la bdd des gros travaux de rénovations en Step_0.4
 for (Y in 2011:(horizon-1)){
-# for (Y in 2010:2023){
-  # print(Y)
-  ident_r<-c()
+
+    ident_r<-c()
   
   # remise à 0 du principal de la dette année après année
   # menage_echelle <- menage_echelle %>% mutate(principal_dette=0)
@@ -373,15 +370,12 @@ for (Y in 2011:(horizon-1)){
         
         }
         }
-  # print(compute_share_export(menage_echelle))
     }
   
   
 rm(i,sum,stock_m2_trans)
 
-# menage_echelle <- menage_echelle %>% select(-solde_int_prov,-solde_princ_prov)
   sauv_int<-menage_echelle
-# menage_echelle<-sauv_int
 
     #Vérif OK
   # for (Y in seq(2011,horizon-1)){
@@ -542,7 +536,8 @@ rm(i,sum,stock_m2_trans)
 
 
 
-save(menage_echelle_32, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_32.RData",sep=""))
+save(menage_echelle_32, file = MatisseFiles$menage_echelle_32_rd )
+
 
 # 
 # 

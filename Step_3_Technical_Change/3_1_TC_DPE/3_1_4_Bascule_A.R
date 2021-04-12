@@ -8,27 +8,20 @@ library(decisionSupport)
 library(readxl)
 library(car)
 
-# DATA --------------------------------------------------------------------
-
-
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
 
-
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33.RData",sep=""))
-load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
-# Import des prix d'énergie par classe de ménage : en €/MWh
-
-prix_classe <- read.csv2(paste(M_data,"/Data/BDFE_delauretis/Prix_energie_par_classe.csv",sep=""), header = TRUE, sep = ";",dec = ".", fill = TRUE)
+# DATA --------------------------------------------------------------------
 
 #Importer taux de croissance des prix et des revenus
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
-
+load(MatisseFiles$FC_2010_horizon_rd)
+load(MatisseFiles$menage_echelle_33_rd)
+load(MatisseFiles$source_usage_rd)
+# Import des prix d'énergie par classe de ménage : en €/MWh
+prix_classe <- read.csv2(MatisseFiles$prix_class_csv, header = TRUE, sep = ";",dec = ".", fill = TRUE)
 
 sources=c("Elec","Gaz","Fuel","GPL","Urbain","Solides")
 dep_sources=paste("dep",sources,sep="_")
@@ -232,12 +225,7 @@ menage_echelle <-
 
 
 sauv_avant_reventil<-menage_echelle
-
-# source("Technical_change/Econometrie_solde_budg_Logement.R")
-# # source("Technical_change/Econometrie_solde_budg_bouclage_autres.R")
-
 menage_echelle_34<-Ventil_solde(solde,menage_echelle,step="REHAB")
-
 menage_echelle_34 <- menage_echelle %>% select(colnames(menage_echelle_33))
 
 menage_ener_dom<-energie_dom_surf(menage_echelle_34)
@@ -285,11 +273,8 @@ for (source in sources){
 
 # Export ------------------------------------------------------------------
 
-
 menage_echelle_TC_DPE<-menage_echelle_34
-save(menage_echelle_TC_DPE, file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_DPE.RData",sep=""))
-
-
+save(menage_echelle_TC_DPE, file=MatisseFiles$menage_echelle_TC_DPE_rd)
 
 
 # Clean -------------------------------------------------------------------

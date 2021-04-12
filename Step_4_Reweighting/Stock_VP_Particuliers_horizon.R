@@ -8,10 +8,9 @@ library(tidyverse)
 
 # Data --------------------------------------------------------------------
 
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
-ventes_VP <- read_excel(path=paste(M_data,"/Data/ThreeME/Ventes_VP.xlsx",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
-load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
+ventes_VP <- read_excel(path=MatisseFiles$ventes_vp_xl)
+load(MatisseFiles$Threeme_rd)
+load(MatisseFiles$menage_forme_rd)
 
 Ventes <- 
   ThreeME %>%

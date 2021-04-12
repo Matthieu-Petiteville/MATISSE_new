@@ -6,9 +6,9 @@ calc_ems<-function(menage,FC){
   # sc="Optimiste"
   
   
-  coeff_dep_ems<-read_csv(paste(M_data,"/IMACLIM/coeff_dep_ems.csv",sep=""))
-  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
-  load(paste(M_data,"/Data/Data_interne/coeff_ems_2010.RData",sep=""))
+  coeff_dep_ems<-read_csv(MatisseFiles$coeff_dep_ems_csv)
+  load(MatisseFiles$FC_2010_horizon_rd)
+  load(MatisseFiles$coeff_ems_2010_rd)
   
   
   FC_coeff <- 
@@ -37,8 +37,7 @@ calc_ems<-function(menage,FC){
            ems_Gaz=TCO_Gaz/TCO)%>%
     mutate(ems_tot_chauff_ecs=ems_CL+ems_Oil+ems_Gaz)
   
-  # return(menage %>% select(ident_men,ems_tot_chauff_ecs))
-  
+
   rm(coeff_dep_ems,FC,coeff_ems_2010)
   return(menage$ems_tot_chauff_ecs)
   

@@ -10,24 +10,21 @@
 # Iter=1
 
 
-  # LIBRARIES ---------------------------------------------------------------
-  
-  library(tidyverse)
-  library(ggplot2)
-  library(dplyr)
-  library(quadprog)
-  
-  Iter=0
- 
-  # DATA --------------------------------------------------------------------
-  # setwd("D:/CIRED/Projet_Ademe/MATISSE")
-  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_contraintes.RData",sep=""))
-  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/pond_init.RData",sep=""))
-  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_echelle.RData",sep=""))
-  load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/agreg_best.RData",sep=""))
-  load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
+# LIBRARIES ---------------------------------------------------------------
 
-  
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(quadprog)
+
+Iter=0
+
+# DATA --------------------------------------------------------------------
+load(MatisseFiles$menage_contraintes_rd)
+load(MatisseFiles$pond_init_rd)
+load(MatisseFiles$menage_echelle_rd)
+load(MatisseFiles$agreg_best_rd)
+load(MatisseFiles$menage_forme_rd)
 
 # Pond_init issues autre scenario ------------------------------------------
 # 
@@ -116,12 +113,9 @@
   
   print(paste("Repondation : DONE (",(proc.time() - ptm)[3]/60," min)",sep=""))
   diff_pond<-sol$solution
-  save(diff_pond,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/diff_pond.RData",sep=""))
+  save(diff_pond,file=MatisseFiles$diff_pond_rd)
   
-  
-  
-  
-  
+
   #-------------------------------------------------------------------------------
   #             Output
   #-------------------------------------------------------------------------------
@@ -136,8 +130,7 @@
   print(sol$solution[1:5])
   
   # sauvegarde
-  save(pond_final, file = 
-         paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/pond_final.RData",sep=""))
+  save(pond_final, file = MatisseFiles$pond_final_rd)
 
   # save(pond_init,file=
   #        paste("2025/Iteration_",Iter,"/Output/erreur2/pond_init_erreur2.RData",sep=""))
@@ -177,15 +170,9 @@
     mutate(pondmen = pond_final)
   
   # sauvegarde
-  save(agreg_final, file = 
-         paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.RData",sep=""))
-
-  save(menage_echelle,file = 
-         paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle.RData",sep=""))
-
-  
-  write.csv2(t(agreg_final),file = 
-               paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.csv",sep=""))
+  save(agreg_final, file = MatisseFiles$agreg_final_rd)
+  save(menage_echelle,file = MatisseFiles$menage_echelle_final_rd)
+  write.csv2(t(agreg_final),file = MatisseFiles$agreg_final_csv               )
   
   
   print(
@@ -198,15 +185,14 @@
 
 # Export pond_final pour optimisations suivantes --------------------------
 
-  if(!file.exists(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep=""))){
+  if(!file.exists(MatisseFiles$pond_final_heurist_scen_horiz_rd)){
     
     # Save pond
     pond_final_heuristique<-pond_final
-    save(pond_final_heuristique, file = 
-           paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep=""))
-    
+    save(pond_final_heuristique, file = MatisseFiles$pond_final_heurist_scen_horiz_rd)
+
     # Write wich scenario it comes from
-    sink(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/READ_ME_pond_final_heuristique_",scenario,"_",horizon,".txt",sep=""))
+    sink(MatisseFiles$pond_final_heurist_scen_horiz_txt)
     cat(paste("Scenario : ",paste(scenario,horizon,scenario_classement, redistribution,sep=" - "),sep=""))
     cat("\n")
     cat(as.character(strptime(Sys.time(),format="%Y-%m-%d %H:%M:%S")))

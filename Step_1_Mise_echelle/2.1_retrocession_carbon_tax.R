@@ -8,10 +8,10 @@ source(paste(M_home,"/Step_1_Mise_echelle/2.2_fonction_retrocession_carbon_tax.R
 
 # DATA --------------------------------------------------------------------
 
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_1_1.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/EMS.RData",sep=""))
-load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
+load(MatisseFiles$menage_echelle_1_1_rd)
+load(MatisseFiles$IMACLIM_rd)
+load(MatisseFiles$EMS_scen_rd)
+load(MatisseFiles$menage_forme_rd)
 
 # pour gagner du temps : 
 facteur_dec1 <-  2.201544
@@ -40,7 +40,7 @@ menage_echelle <- retrocession_carbon_tax(TCO,TCO_tot,menage_echelle)
 
 # Save --------------------------------------------------------------------
 
-save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep=""))
+save(menage_echelle,file=MatisseFiles$menage_echelle_1_rd)
 
 
 # Clean -------------------------------------------------------------------

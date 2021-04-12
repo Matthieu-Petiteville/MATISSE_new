@@ -12,22 +12,21 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 
 ## Menages
 # 2010
-load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
+load(MatisseFiles$menage_forme_rd)
 # mise à l'échelle
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep=""))
+load(MatisseFiles$menage_echelle_1_rd)
 
 ## MACRO
 # FC
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
-
+load(MatisseFiles$FC_2010_horizon_rd)
 # ThreeME
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
-
+load(MatisseFiles$Threeme_rd)
 
 
 # ELASTICITES -------------------------------------------------------------
 # Importer élasticités prix et revenus de chaque TYPO x DECILE
-load(paste(M_data,"/Data/Econometrie_demande/elasticite_demande.RData",sep="")) #Elast
+load(MatisseFiles$elast_rd) #Elast
+
 
 # Nom de tous les catégories de "A01" à "A014")
 Cat<-names(FC)[1:14]
@@ -131,8 +130,7 @@ surfhab_hab_horizon<-BUIL_H01_2_horizon/POP_TOT_horizon
 
 FC$surface<-surfhab_hab_horizon/surfhab_hab_2010
 
-save(FC,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
-
+save(FC,file=MatisseFiles$FC_2010_horizon_rd)
 
 menage_echelle <- 
   menage_echelle %>%
@@ -156,7 +154,7 @@ menage_echelle <-
 
 # Save --------------------------------------------------------------------
 
-save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_2_1.RData",sep=""))
+save(menage_echelle,file=MatisseFiles$menage_echelle_2_1_rd)
 
 
 # Epargne -----------------------------------------------------------------

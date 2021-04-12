@@ -16,19 +16,17 @@
 library(dplyr)
 library(reshape2)
 library(tidyverse)
-sources=c("Elec", "Gaz", "GPL", "Fuel", "Solides", "Urbain")
-
-
-# DONNEES -----------------------------------------------------------------
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE")
 source(paste(M_home,"/Step_2_Microsimulation/2.2_fonction_evolution_conso_energie.R",sep=""))
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 
+
+# DONNEES -----------------------------------------------------------------
+sources=c("Elec", "Gaz", "GPL", "Fuel", "Solides", "Urbain")
 # Menage_echelle micro-simulation 
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_2_1.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""))
-load(paste(M_data,"/Data/Data_interne/list_source_usage.RData",sep=""))
+load(MatisseFiles$menage_echelle_2_1_rd)
+load(MatisseFiles$FC_2010_horizon_rd)
+load(MatisseFiles$source_usage_rd)
 
 
 # APPEL FONCTION Evolution Conso Energie ----------------------------------
@@ -38,7 +36,7 @@ menage_echelle <- evolution_conso_ener(menage_echelle,FC)
 
 # Save --------------------------------------------------------------------
 
-save(menage_echelle,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_2.RData",sep=""))
+save(menage_echelle,file=MatisseFiles$menage_echelle_2_rd)
 
 
 # VERIF -------------------------------------------------------------------

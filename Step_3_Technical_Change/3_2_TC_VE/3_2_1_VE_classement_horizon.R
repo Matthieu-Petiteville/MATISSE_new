@@ -16,11 +16,11 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 load(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/appariement_bdf_entd.RData",sep=""))
 
 # Bases étapes précédentes (Step 3.1)
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_DPE.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+load(MatisseFiles$menage_echelle_TC_DPE_rd)
+load(MatisseFiles$Threeme_rd)
 
 ## BDF
-auto<-as.data.frame(read_excel(paste(M_data,"/Data/BDF_2010/AUTOMOBILE.xlsx",sep="")),stringsAsFactors=F)
+auto<-as.data.frame(read_excel(MatisseFiles$auto_bdf_xl),stringsAsFactors=F)
 
 
 # PREPARATION DATA --------------------------------------------------------

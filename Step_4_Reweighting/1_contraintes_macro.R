@@ -6,18 +6,17 @@ library(car)
 library(dplyr)
 library(base)
 
-# DATA --------------------------------------------------------------------
-# setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_4_Reweighting/Stock_VP_Particuliers_horizon.R",sep=""))
 
+# DATA --------------------------------------------------------------------
 
-load(paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
-individu<-read_excel(paste(M_data,"/Data/BDF_2010/individu.xlsx",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""))
+load(MatisseFiles$menage_forme_rd)
+individu<-read_excel(MatisseFiles$indiv_bdf_xl)
+load(MatisseFiles$IMACLIM_rd)
+load(MatisseFiles$Threeme_rd)
 
-ventes_VP <- read_excel(path=paste(M_data,"/Data/ThreeME/Ventes_VP.xlsx",sep=""))
+ventes_VP <- read_excel(path=MatisseFiles$ventes_vp_xl)
 ventil_VP <- as.numeric(ventes_VP %>% filter(Year==horizon)%>%select(Particuliers))
 Stock_VP_Particuliers_horizon<-as.numeric(Stock_list %>% filter(Year==horizon)%>%select(Stock_VP_Particuliers))
 
@@ -188,7 +187,7 @@ contraintes_calage <-Calage_relatif %>% select(Variable,value) %>% spread(key=Va
 
 # Pondmen
 
-men_INSEE <- read_excel(paste(M_data,"/Donnees_brutes/INSEE/INSEE - projection men.xlsx",sep=""),sheet="men")
+men_INSEE <- read_excel(MatisseFiles$insee_proj_men_xl,sheet="men")
 
 
 # Réarranger dans ordre cohérent avec étape 4.2
@@ -213,7 +212,7 @@ FC_pondmen <-
 
 
 # Import des contraintes INSEE pop 2025
-pop_INSEE <- read_excel(paste(M_data,"/Donnees_brutes/INSEE/INSEE - projection pop.xlsx",sep=""),sheet="Pop")
+pop_INSEE <- read_excel(MatisseFiles$insee_proj_pop_xl,sheet="Pop")
 pop_INSEE <- pop_INSEE %>% 
   gather(key=year, value=part_age_sexe, -c(1:2)) %>% mutate(cat_sexe_age=paste("part",Sexe,Age,sep="_"))
 
@@ -224,7 +223,7 @@ pop_INSEE_horizon<- pop_INSEE %>% filter(year==horizon)
 for (k in pop_INSEE_horizon$cat_sexe_age){
   value<-as.numeric(pop_INSEE_horizon %>% filter(cat_sexe_age==k) %>% select(part_age_sexe))
   assign(k,value)}
-save(pop_INSEE,file=paste(M_data,"/Donnees_brutes/INSEE/pop_INSEE.RData",sep=""))
+save(pop_INSEE,file=MatisseFiles$pop_INSEE_rd)
 rm(pop_INSEE,pop_INSEE_horizon)
 
 
@@ -428,10 +427,8 @@ agreg_best <-
 
 
 
-save(agreg_best, file=
-       paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/agreg_best.RData",sep=""))
-save(menage_calibr_2010,file=
-       paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_calibr_2010.RData",sep=""))
+save(agreg_best, file= MatisseFiles$agreg_best_rd)
+save(menage_calibr_2010,file= MatisseFiles$menage_calibr_2010_final_rd)
 
 
 
