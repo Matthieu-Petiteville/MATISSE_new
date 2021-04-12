@@ -8,7 +8,7 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Common/default_values.r",sep=""))
 source(paste(M_home,"/Main/Matisse_Loop.r",sep=""))
 source(paste(M_home,"/Parallelize/ParallelizeMatisse.r",sep=""))
-MaxRscript = 4
+MaxRscript = 3
 
 CurrentRScript = 0
 # Loop on scenarios/horizon/classement/redistribution -------------------------------------------------------
@@ -32,7 +32,12 @@ for (scenario in scenario_v){
         #Logs into current_log
         Iter=0
         AddLogs("PARAL","Running script for step 1")
-        Parallelize_Matisse_Loop(step_to_run =  2, ForceRerun = FALSE)
+        step_to_run = c()
+        for(step_it in 1:3){
+          if(iSLineInStepTracker(step_it))
+            step_to_run = c(step_to_run,step_it)
+        }
+       Parallelize_Matisse_Loop(step_to_run =  step_to_run, ForceRerun = FALSE)
 
       }
     }
