@@ -37,6 +37,7 @@ Matisse_Loop <- function(step_to_run = 1:5, ForceRerun = FALSE){
   
       source(paste(M_home,"/Step_2_Microsimulation/2.1_evolution_conso_energie.R",sep=""))
       AddLogs("MAIN","Completed step 2.2")
+      AddLineToStepTracker(2)
     }else{
       AddLogs("MAIN","Not running step 2 : it's already in StepTracker and ForceRerun is FALSE")
     }
@@ -63,6 +64,7 @@ Matisse_Loop <- function(step_to_run = 1:5, ForceRerun = FALSE){
       
       source(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/3_2_2_VE_2010_horizon.R",sep=""))
       AddLogs("MAIN","Completed step 3.2")
+      AddLineToStepTracker(3)
     }else{
       AddLogs("MAIN","Not running step 3 : it's already in StepTracker and ForceRerun is FALSE")
     }
@@ -84,6 +86,7 @@ Matisse_Loop <- function(step_to_run = 1:5, ForceRerun = FALSE){
   
       source(paste(M_home,"/Step_4_Reweighting/3_pondr.R",sep=""))
       AddLogs("MAIN","Completed step 4.3")
+      AddLineToStepTracker(4)
     }else{
       AddLogs("MAIN","Not running step 4 : it's already in StepTracker and ForceRerun is FALSE")
     }
@@ -98,6 +101,7 @@ Matisse_Loop <- function(step_to_run = 1:5, ForceRerun = FALSE){
   
       source(paste(M_home,"/Step_5_export_IMACLIM/1_export_to_IMACLIM.R",sep=""))
       AddLogs("MAIN","Completed step 5")
+      AddLineToStepTracker(5)
     }else{
       AddLogs("MAIN","Not running step 5 : it's already in StepTracker and ForceRerun is FALSE")
     }
