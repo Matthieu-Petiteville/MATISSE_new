@@ -34,6 +34,9 @@ CreateFolder <- function(folder_name){
   if(!dir.exists(folder_name)){dir.create(folder_name)}
 }
 
+
+# Logs --------------------------------------------------------------------
+
 #Create log file if it doesn't exist
 CreateLogFile <- function(){
     file_name <- paste(M_data,"/Logs/","log_",Sys.Date(),".log",sep="") 
@@ -48,12 +51,17 @@ AddLogs <- function(LogType,LogTxt){
   print(paste(Sys.time(),paste("[",paste(scenario,horizon,scenario_classement,redistribution,sep="/"),"]",sep=""),LogType,LogTxt,sep=";"))
 }
 
+
+
+
+# StepTracker -------------------------------------------------------------
+
 #Add line to StepTracker
 AddLineToStepTracker <- function(step_done){
   
   step_tracker_file <- paste(M_data,"/Logs/StepTracker.csv",sep="")
   step_tracker_line = data.frame(TimeStamp = as.character(Sys.time()),scenario = scenario,horizon = horizon,scenario_classement = scenario_classement,
-                                 redistribution = redistribution,step_done = step_done)
+                                 redistribution = redistribution,iteration = Iter, step_done = step_done)
   
   if(file.exists(step_tracker_file)){
     step_tracker <- read.csv(step_tracker_file)
@@ -81,11 +89,30 @@ iSLineInStepTracker <- function(step_to_check){
   test_step <- step_tracker %>%
     filter(scenario == scenario_var,horizon == horizon_var,
            scenario_classement == class_var , redistribution == redis_var ,
-           step_done == step_to_check)
+           iteration == Iter, step_done == step_to_check)
   
   if(nrow(test_step)>0){return(TRUE)}else{return(FALSE)}
   
 }
 
-#
+#Shows the StepTracker with the current set of params
+ShowStepTracker <- function(){
+  
+  scenario_var <- scenario
+  horizon_var <- horizon
+  class_var <- scenario_classement
+  redis_var <- redistribution
+  
+  step_tracker_file <- paste(M_data,"/Logs/StepTracker.csv",sep="")
+  if(!file.exists(step_tracker_file)){return(FALSE)}
+  step_tracker <- read.csv(step_tracker_file)
+  
+  step_tracker <- step_tracker %>%
+    filter(scenario == scenario_var,horizon == horizon_var,
+           scenario_classement == class_var , redistribution == redis_var,
+           iteration == Iter)
+  
+  print(step_tracker)
+  
+}
 
