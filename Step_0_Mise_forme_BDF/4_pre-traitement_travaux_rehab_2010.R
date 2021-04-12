@@ -23,7 +23,6 @@
 
 library(tidyverse)
 library(readxl)
-# fonction permettant de changer les valeurs de certains rangs seulement (une merveille !)
 source(paste(M_home,"/Common/tools.R",sep=""))
 
 
@@ -31,14 +30,14 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 
 
 # menage_forme
-load(paste(M_data,"/Output/Initial format/menage_forme_3.RData",sep=""))
+load(MatisseFiles$menage_forme_3_rd)
 
 # ThreeME
-suppressWarnings(scen<-read_excel(path=paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep=""),sheet="scen AMS"))
+suppressWarnings(scen<-read_excel(path= MatisseFiles$sortie_3me_xl ,sheet="scen AMS"))
 ThreeME<- scen %>% select(-Def)%>% gather(key=year, value=value, -c(1))%>%filter(year==2010)
   
 #C05
-c05 <- read.csv2(paste(M_data,"/Data/BDF_2010/c05.csv",sep=""))
+c05 <- read.csv2(MatisseFiles$c05_bdf_csv)
 
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
@@ -417,8 +416,8 @@ rm(Gros_travaux_2010)
   
 menage_forme<-menage_forme %>% select(-GT_REHAB,-GT_RENO)
 
-save(menage_forme,file=paste(M_data,"/Output/Initial format/menage_forme_4.RData",sep=""))
-save(menage_forme,file=paste(M_data,"/Output/Initial format/menage_forme.RData",sep=""))
+save(menage_forme,file=MatisseFiles$menage_forme_4_rd)
+save(menage_forme,file=MatisseFiles$menage_forme_rd)
 
 compute_savings_rate_export(menage_forme) #0.1055916
 compute_share_export(menage_forme)

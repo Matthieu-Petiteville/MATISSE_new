@@ -14,29 +14,29 @@ library(readxl)
 # CHARGER STOCK DPE ---------------------------------------------------------------
 
 #Stock de DPE en 2010 pour caler les variables agrégées => dpe_stock_2010
-suppressWarnings(scen <- read_excel(path=paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep=""),sheet="scen AMS"))
+suppressWarnings(scen <- read_excel(path = MatisseFiles$sortie_3me_xl , sheet="scen AMS"))
 
 
 # LOAD DONNEES BDF -------------------------------------------------------------
 
 # Base INSEE menage
 menage<-
-  read.csv(paste(M_data,"/Data/BDF_2010/menage.csv",sep=""),
-           header=TRUE,
-           sep=";",
-           dec=".",
+  read.csv(MatisseFiles$menage_csv ,
+           header=TRUE ,
+           sep=";" ,
+           dec="." ,
            stringsAsFactors = FALSE)
 
 depmen<-
-  read.csv(paste(M_data,"/Data/BDF_2010/depmen.csv",sep=""),
-           header=TRUE,
-           sep=";",
-           dec=".",
+  read.csv(MatisseFiles$depmen_bdf_csv ,
+           header=TRUE ,
+           sep=";" ,
+           dec="." ,
            stringsAsFactors = FALSE)
 
 
 # load menage_calibr_2010 avec ménages pré_selectionnés
-load(paste(M_data,"/Data/BDFE_delauretis/menage_calibr_2010.RData",sep=""))
+load(MatisseFiles$menage_calibr_2010_rd)
 
 
 
@@ -60,7 +60,7 @@ dpe_stock_2010<- dpe_stock_2010 %>%
   mutate(DPE= str_replace_all(Var, pattern="BUIL_H01_C",replacement="")) %>% 
   mutate(DPE= str_replace_all(DPE, patter="_2",replacement=""))
 
-save(dpe_stock_2010,file=paste(M_data,"/Output/Initial format/dpe_stock_2010.RData",sep=""))
+save(dpe_stock_2010 , file = MatisseFiles$dpe_stock_2010_rd)
 
 
 
@@ -227,8 +227,6 @@ dat=data.frame(
 )
 
 
-# print(ggplot(dat,aes(fill=statut,x=cat_DPE,y=DPE))+geom_bar(stat="identity",position="dodge")+ggtitle("Multinomial logit"))
-
 # SAVE DPE ----------------------------------------------------------------
 menage_DPE<-appariement_menages_DPE %>% select(ident_men,DPE_pred)
-save(menage_DPE,file=paste(M_data,"/Output/Initial format/menage_DPE.RData",sep=""))
+save(menage_DPE , file = MatisseFiles$menage_dpe_rd)

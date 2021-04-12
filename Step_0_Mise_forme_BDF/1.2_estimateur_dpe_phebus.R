@@ -14,7 +14,7 @@ library(plyr)
 library(cowplot)
 library(stringr)
 
-Phebus <-read.table(paste(M_data,"/Data/PHEBUS/Clode_dpe_energie_decideur_revenu.csv",sep=""),header=TRUE,sep=";",dec=".")
+Phebus <-read.table(MatisseFiles$phebus_csv , header=TRUE , sep=";" , dec=".")
 
 ######################################"
 # PREPARATION DES DONNEES -------------------------------------------------
@@ -105,8 +105,7 @@ suppressWarnings(while(C>0 & iter<6){
   dim(data_regresseurs2)
   dim(list_exclus)
   dim(ind_sup)
-  # dpe_pca = PCA(data_regresseurs, ind.sup=ind_sup,scale.unit=TRUE, quanti.sup=c(8),ncp=7, graph=T) 
-  
+
   
   #pour les passages suivants le premier
   if(!init==1){
@@ -139,17 +138,11 @@ suppressWarnings(while(C>0 & iter<6){
   
   #on ne filtre les individus que sur trois premières dimensions
   for (dim in c("Dim.1","Dim.2","Dim.3")){
-    # print("dim(data_regresseurs2)")
-    # print(dim(data_regresseurs2))
-    # print("dim(list_exclus)")
-    # print(dim(list_exclus))
     m=apply(dpe_pca2[dim],2,mean)
     #on définit 5 fois la moyenne comme sensibilité
     m<-4*as.numeric(m)
     list_exclus<-rbind(list_exclus,data_regresseurs2[which(data_regresseurs2[dim]>=m),])
     data_regresseurs2<-data_regresseurs2[which(data_regresseurs2[dim]<m),]
-    # dim(list_exclus)
-    # dim(dpe_pca2)
   }
   # C désigne le nombre d'exclus lors de la dernière itérations sur les deux premières dimensions
   C=dim(list_exclus)
@@ -161,11 +154,8 @@ suppressWarnings(while(C>0 & iter<6){
 })
 
 
-# data_regresseurs2
-
 #Tracé du diagramme de corrélation
 dim(data_regresseurs2)
-# corrplot(dpe_pca$var$cos2, is.corr=FALSE)
 
 #traçons le diagramme de Cattel. Un coude dans le diagramme de Cattel indique le nombre de variables qu'il faut choisir pour la régression.
 plot(dpe_pca$eig[,2],type="l") # answer: 2

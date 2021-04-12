@@ -9,29 +9,28 @@
 library(tidyverse)
 library(readxl)
 library(car)
-# library(dplyr)
 library(reshape2)
 
 
 # Load --------------------------------------------------------------------
 
 #Donnees Brutes BDF 2010
-menage <- as.data.frame(read_excel(paste(M_data,"/Data/BDF_2010/menage.xlsx",sep="")),stringsAsFactors=F)
-individu <- read_excel(paste(M_data,"/Data/BDF_2010/individu.xlsx",sep=""))
-c05 <- read_csv2(paste(M_data,"/Data/BDF_2010/c05.csv",sep=""))
-depmen <- read_csv2(paste(M_data,"/Data/BDF_2010/depmen.csv",sep=""))
+menage <- as.data.frame(read_excel(MatisseFiles$menage_bdf_xl) , stringsAsFactors=F)
+individu <- read_excel(MatisseFiles$indiv_bdf_xl)
+c05 <- read_csv2(MatisseFiles$c05_bdf_csv)
+depmen <- read_csv2(MatisseFiles$depmen_bdf_csv)
 
 # Typologie de vulnérabilité
-typo_vuln <- read_excel(paste(M_data,"/Data/Econometrie_demande/datacp_typovuln_bdf_2011.xlsx",sep=""),sheet="identmen")
+typo_vuln <- read_excel(MatisseFiles$typovuln_xl , sheet="identmen")
 
 
 #BDFE S. De Lauretis
-load(paste(M_data,"/Data/BDFE_delauretis/appmen_depensesactiv_2010.RData",sep=""))
+load(MatisseFiles$appmen_depact_2010_rd)
 appmen_depensesactiv_2010<-appmen_depensesactiv
 rm(appmen_depensesactiv)
 
 # Output étape précédente, estimation des DPE
-load(paste(M_data,"/Output/Initial format/menage_DPE.RData",sep=""))
+load(MatisseFiles$menage_dpe_rd)
 
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
@@ -55,9 +54,6 @@ c05 <- c05[which(c05$ident_men %in% menage$ident_men),]
 # Selection des ménages dans base individus
 individu$ident_men <-  as.numeric(individu$ident_men)
 individu <- individu[which(individu$ident_men %in% menage$ident_men),]
-
-
-
 
 
 # RECODER VARIABLES ---------------------------------------------------------------
@@ -194,56 +190,11 @@ rm(auto)
 
 
 
-# # CORRECTIONS PRERETRAITES -----------------------------------------------------------------
-
-#Rectification des revenus retraites et chômages => on veut compter les pré-retraites dans la retraite et pas dans le chômage (voir rapport Ademe + notes S. de Lauretis 26/08/16)). Impact de 1% à la hausse sur les retraites, de 0.4% à la baisse pour le chômage. 
-# Avant : retraites =242136420105 & chomage=27820988729 => tot=269957408834
-# Après : retraites =244380111489 & chomage=27712787464 => tot=272092898953
-# => pose des problèmes de somme plus tard, processus pas clair, hérité des codes de S. De Lauretis, on laisse tomber. 
-
-# 
-# menage_forme[which(menage$nbchomeurs == 0 & menage$nbretraites > 0), "retraites"] <-
-#   menage[which(menage$nbchomeurs == 0 & menage$nbretraites > 0), "chomage"] +
-#   menage[which(menage$nbchomeurs == 0 & menage$nbretraites > 0), "retraites"]
-# 
-# 
-# menage_forme[which(menage$nbchomeurs > 0 & menage$nbretraites == 0), c("chomage","retraites")] <-
-#   menage[which(menage$nbchomeurs > 0 & menage$nbretraites == 0), c("chomage","retraites")]
-# 
-# 
-# menage_forme[which(menage$nbchomeurs == 0 & menage$nbretraites == 0), c("chomage","retraites")] <-
-#   menage[which(menage$nbchomeurs == 0 & menage$nbretraites == 0), c("chomage","retraites")] # chomeurs ayant repris l'activité dans l'année !?
-# 
-# 
-# menage_forme[which(menage$nbchomeurs > 0 & menage$nbretraites > 0), c("chomage","retraites")] <-
-#   menage[which(menage$nbchomeurs > 0 & menage$nbretraites > 0), c("chomage","retraites")]
-# 
-# # cas particulier
-# menage_forme[which(menage$nbchomeurs > 0 & menage$nbretraites > 0 &
-#                      menage$retraites == 0 & menage$chomage > 0), "chomage"] <-
-#   with(menage[which(menage$nbchomeurs > 0 & menage$nbretraites > 0 &
-#                       menage$retraites == 0 & menage$chomage > 0), ],
-#        chomage * nbchomeurs/(nbchomeurs + nbretraites)
-#   )
-# 
-# menage_forme[which(menage$nbchomeurs > 0 & menage$nbretraites > 0 &
-#                      menage$retraites == 0 & menage$chomage > 0), "retraites"] <-
-#   with(menage[which(menage$nbchomeurs > 0 & menage$nbretraites > 0 &
-#                       menage$retraites == 0 & menage$chomage > 0), ],
-#        chomage * nbretraites/(nbchomeurs + nbretraites)
-#   )
-
-
-
-
-
-
 # REVENUS -----------------------------------------------------------------
 
 #categories de revenus definies dans excel
-def_rev<- 
-  read_excel(paste(M_data,"/Data/Nomenclature_CIRED_ADEME/Definition_revenus.xlsx",sep=""))
-# View(def_rev)
+def_rev<- read_excel(MatisseFiles$def_rev_xl)
+
 
 # Revenus de l'activité salariale et/ou independante + revenus de l'étranger
 menage_forme$rev_activites <-
@@ -332,10 +283,7 @@ menage_forme$dep_Solides <- rowSums(appmen_depensesactiv_2010[grep("Solides_", n
 
 # MISE FORME DEPENSES - Nomenclature ADEME ---------------------------------------------------------
 
-Nomenclature_ADEME_COICOP <-
-  read_excel(paste(M_data,"/Data/Nomenclature_CIRED_ADEME/Nomenclature_coicop_threeme.xlsx",sep=""))
-
-
+Nomenclature_ADEME_COICOP <-  read_excel(MatisseFiles$nom_coicop_3me_xl)
 
 #A01
 menage_forme$agriculture <- 
@@ -466,7 +414,7 @@ rm(nbactoccup,nbchomeurs,nbretraites,Nomenclature_ADEME_COICOP,def_rev,individu,
 
 # Save --------------------------------------------------------------------
 
-save(menage_forme,file=paste(M_data,"/Output/Initial format/menage_forme_2.RData",sep=""))
+save(menage_forme,file=MatisseFiles$menage_forme_2_rd)
 
 
 

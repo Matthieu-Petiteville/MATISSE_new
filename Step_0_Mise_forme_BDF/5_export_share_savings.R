@@ -1,8 +1,7 @@
 # Source ------------------------------------------------------------------
 
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
-load(paste(M_data,"/Output/Initial format/menage_forme_4.RData",sep=""))
-
+load(MatisseFiles$menage_forme_4_rd)
 
 # Compute -----------------------------------------------------------------
 
@@ -13,6 +12,6 @@ ener_mix_2010<-energie_mix(menage_forme,FC=NA)
 
 # Save --------------------------------------------------------------------
 
-save(savings_rate_2010,file=paste(M_data,"/Output/Initial format/savings_rate_2010.RData",sep="")) 
-save(share_2010,file=paste(M_data,"/Output/Initial format/share_2010.RData",sep=""))
-save(ener_mix_2010,file=paste(M_data,"/Output/Initial format/ener_mix_2010.RData",sep=""))
+save(savings_rate_2010,file=MatisseFiles$savings_rate_2010_rd) 
+save(share_2010,file=MatisseFiles$share_2010_rd)
+save(ener_mix_2010,file=MatisseFiles$ener_mix_2010_rd)
