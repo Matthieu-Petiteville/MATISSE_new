@@ -86,9 +86,9 @@
   # (bvec) CONTRAINTE D EGALITE (valeurs de départ)
   bvec <- agreg_best - agreg_init
   
-  # test
+  # test (permet de comparer les tables cible et de départ avec une distance en % way to go)
   # View(cbind(rownames(agreg_init),rownames(agreg_best)))
-  # View(cbind("Init"=t(agreg_init), "Best"=agreg_best,"Way to go"=bvec/t(agreg_init)))
+  # View(cbind("Init"=agreg_init, "Best"=agreg_best,"Way to go"=bvec/agreg_init))
 
   # (uvec) CONTRAINTE D INEGALITE 
   uvec <- -1 * pond_init
@@ -104,8 +104,9 @@
   print(strptime(Sys.time(),format="%Y-%m-%d %H:%M:%S"))
   # Start the clock!
   ptm <- proc.time()
+  #For memory issues
   memory.limit(40000)
-    sol<-solve.QP(Vmat,dvec,A,b,meq=length(agreg_best))
+  sol<-solve.QP(Vmat,dvec,A,b,meq=length(agreg_best))
 
   # Stop the clock
   print(proc.time() - ptm)
