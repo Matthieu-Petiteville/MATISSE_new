@@ -33,6 +33,6 @@ save(menage_echelle,file=MatisseFiles$menage_echelle_1_1_rd)
 
 
 # Clean -------------------------------------------------------------------
-rm(menage_forme,IMACLIM,FC,ThreeME,Iter,menage_echelle)
+rm(menage_forme,IMACLIM,FC,ThreeME,menage_echelle)
 gc()
 
