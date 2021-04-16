@@ -33,12 +33,12 @@ source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep
 # DATA --------------------------------------------------------------------
 
 ## MICRO
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter_last,"/Output/menage_iteration.RData",sep=""))
-save(menage_iteration,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_iteration.RData",sep=""))
+load(MatisseFiles$menage_iteration_iterlast_rd)
+save(menage_iteration,file=MatisseFiles$menage_iteration_iter_rd)
 menage_iter_last<-menage_iteration
 
 ## MACRO
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/IMACLIM.RData",sep=""))
+load(MatisseFiles$IMACLIM_iter_rd)
 
 
 # CROISSANCE MARGINALE : FC -----------------------------------------------
@@ -81,9 +81,7 @@ FC <- FC %>%
   spread(key=Variable,value=value) 
 
 #Save
-save(FC,file=
-       paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/FC_",horizon,"_marge.RData",sep="")
-)
+save(FC,file= MatisseFiles$FC_horiz_marge_rd)
 
 
 
@@ -151,9 +149,7 @@ menage_iteration <- evolution_conso_ener(menage_iteration,FC)
 
 # Save files --------------------------------------------------------------
 
-save(menage_iteration,file=
-       paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_iteration.RData",sep="")
-)
+save(menage_iteration,file= MatisseFiles$menage_iteration_iter_rd)
 
 
 
@@ -174,8 +170,9 @@ ener_mix<-energie_mix(menage_iteration,FC=FC)
 evol_energie<-compute_evol_energie(menage_iteration,scenario,horizon,scenario_classement,redistribution,Iter)
 
 
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Cout_bailleur_public.RData",sep=""))
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Subvention_rehab.RData",sep=""))
+load(MatisseFiles$cout_baill_pub_rd)
+
+load(MatisseFiles$sub_rehab_rd)
 
 sBCE<-as.numeric(Subvention/(Subvention+menage_iteration%>%summarise(sum(pondmen*BTP))))
 Cout_bailleur_public<-as.numeric(Cout_bailleur_public)
@@ -225,11 +222,11 @@ print("Wait")
 # print("End Wait")
 
 # SAVE --------------------------------------------------------------------
-excel_file_name <- paste(M_data,"/IMACLIM/Input_macro.csv",sep="")
+excel_file_name <- MatisseFiles$input_macro_csv
 file.remove(excel_file_name)
 data.table::fwrite(exp_df,file=excel_file_name,dec=".",sep=";",col.names = F,row.names = F)
-write.csv(exp,file=paste(M_data,"/IMACLIM/Input_macro_check.csv",sep=""))
-write.csv(export,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/export_Iter_",Iter,".csv",sep=""))
+write.csv(exp,file=MatisseFiles$input_macro_check_csv)
+write.csv(export,file=MatisseFiles$export_iter_csv)
 
 # SUCCESS -----------------------------------------------------------------
 

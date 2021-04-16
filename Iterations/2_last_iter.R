@@ -24,13 +24,12 @@ horizon=as.numeric(horizon)
 # Output_macro_code -------------------------------------------------------
 
 # Read
-output_macro<-read_excel(path = paste(M_data,"/IMACLIM/Output_macro_code.xlsx",sep=""),skip=1,sheet=scenario)
+output_macro<-read_excel(path = MatisseFiles$output_macro_code_xl,skip=1,sheet=scenario)
 
 # Remove previous file
-excel_file_name <- paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep="") 
-if(file.exists(excel_file_name)){file.remove(excel_file_name)}
+if(file.exists(MatisseFiles$output_macro_iter_xl)){file.remove(MatisseFiles$output_macro_iter_xl)}
 # Write
-write_xlsx(output_macro,path=excel_file_name)
+write_xlsx(output_macro,path=MatisseFiles$output_macro_iter_xl)
 
 # Traitement
 output_macro <-
@@ -74,37 +73,37 @@ FC <-
 
 print(FC)
 # Save
-save(FC,file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_",Iter,"/Input/FC_2010_",as.character(horizon),".RData",sep=""))
+save(FC,file=MatisseFiles$FC_horizon_iter_rd)
+
 
 
 # Output_micro ------------------------------------------------------------
 
 # Read
-output_micro<-read_excel(path = paste(M_data,"/IMACLIM/Output_micro.xlsx",sep=""),sheet=paste(scenario,horizon,sep=""))
+output_micro<-read_excel(path = MatisseFiles$output_micro_xl,sheet=paste(scenario,horizon,sep=""))
+
 # Remove previous file
-excel_file_name <- paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/Output_micro_iter",Iter,".xlsx",sep="")
-if(file.exists(excel_file_name)){file.remove(excel_file_name)}
+if(file.exists(MatisseFiles$output_micro_iter_xl)){file.remove(MatisseFiles$output_micro_iter_xl)}
 # Write
-write_xlsx(output_micro,path=excel_file_name)
+write_xlsx(output_micro,path=MatisseFiles$output_micro_iter_xl)
 
 
 
 # IMACLIM.xlsx ------------------------------------------------------------
 
 if(redistribution=="ssrec"){
-  imaclim_xl<-read_excel(path = paste(M_data,"/IMACLIM/IMACLIM 3ME_ssrec.xlsm",sep=""),sheet="Model")
+  imaclim_xl<-read_excel(path = MatisseFiles$IMACLIM_3ME_ssrec_xl,sheet="Model")
 }else{
-  imaclim_xl<-read_excel(path = paste(M_data,"/IMACLIM/IMACLIM 3ME.xlsm",sep=""),sheet="Model")
+  imaclim_xl<-read_excel(path = MatisseFiles$IMACLIM_3ME_xl,sheet="Model")
 }
-excel_file_name <- paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/IMACLIM_3ME_iter",Iter,".xlsx",sep="")
-if (file.exists(excel_file_name)){file.remove(excel_file_name)}
-write_xlsx(imaclim_xl,path=excel_file_name)
+if (file.exists(MatisseFiles$IMACLIM_iter_xl)){file.remove(MatisseFiles$IMACLIM_iter_xl)}
+write_xlsx(imaclim_xl,path=MatisseFiles$IMACLIM_iter_xl)
 
 
 # NOMBRE d'ITERATIONS -----------------------------------------------------
 
 #Nb iterations
-Nb_iter<-read_excel(path=paste(M_data,"/IMACLIM/Iterations_scenarios.xlsx",sep=""))
+Nb_iter<-read_excel(path=MatisseFiles$iterations_scen_xl)
 Nb_iter<-
   Nb_iter %>% 
   mutate_when(Scenario==scenario & 
@@ -115,55 +114,52 @@ Nb_iter<-
 
 # Iteration_scenarios_n-1
 # sécurité pour garder trace de Iterations_scenarios du scénario précédent en cas de bug
-excel_file_name <- paste(M_data,"/IMACLIM/Iterations_scenarios_n-1.xlsx",sep="")
-if(file.exists(excel_file_name)){
-  file.remove(excel_file_name)}
-file.rename(from=paste(M_data,"/IMACLIM/Iterations_scenarios.xlsx",sep=""),to=excel_file_name)
+if(file.exists(MatisseFiles$iterations_scen_n_1_xl)){file.remove(MatisseFiles$iterations_scen_n_1_xl)}
+file.rename(from=MatisseFiles$iterations_scen_xl,to=MatisseFiles$iterations_scen_n_1_xl)
 
 
 # Write
-write_xlsx(Nb_iter,path=paste(M_data,"/IMACLIM/Iterations_scenarios.xlsx",sep=""))
-write_xlsx(Nb_iter,path=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Iterations_scenarios.xlsx",sep=""))        
-
+write_xlsx(Nb_iter,path=MatisseFiles$iterations_scen_xl)
+write_xlsx(Nb_iter,path=MatisseFiles$iterations_scen_iter_xl)        
 
 # RESULTS -----------------------------------------------------------------
 
 #Results
-unlink(paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,sep=""),force=T)
+unlink(MatisseFiles$folder_params,force=T)
 
 ### Output_micro
 # Read
-output_micro<-read_excel(path = paste(M_data,"/IMACLIM/Output_micro.xlsx",sep=""),sheet=paste(scenario,horizon,sep=""))
+output_micro<-read_excel(path = MatisseFiles$output_micro_xl,sheet=paste(scenario,horizon,sep=""))
 # Remove previous file
-excel_file_name <- paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Output_micro.xlsx",sep="")
-if(file.exists(excel_file_name)){file.remove(excel_file_name)}
+if(file.exists(MatisseFiles$output_micro_params_xl)){file.remove(MatisseFiles$output_micro_params_xl)}
 # Write
-write_xlsx(output_micro,path=excel_file_name)
+write_xlsx(output_micro,path=MatisseFiles$output_micro_params_xl)
 
 
 ### IMACLIM
 # Read
 if(redistribution=="ssrec"){
-  imaclim_xl<-read_excel(path = paste(M_data,"/IMACLIM/IMACLIM 3ME_ssrec.xlsm",sep=""),sheet="Model")
+  imaclim_xl<-read_excel(path = MatisseFiles$IMACLIM_3ME_ssrec_xl,sheet="Model")
 }else{
-  imaclim_xl<-read_excel(path = paste(M_data,"/IMACLIM/IMACLIM 3ME.xlsm",sep=""),sheet="Model")}
+  imaclim_xl<-read_excel(path = MatisseFiles$IMACLIM_3ME_xl,sheet="Model")
+}
+
 # Remove previous file
-excel_file_name <- paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/IMACLIM_3ME.xlsx",sep="")
-if(file.exists(excel_file_name)){file.remove(excel_file_name)}
+if(file.exists(MatisseFiles$IMACLIM_params_xl)){file.remove(MatisseFiles$IMACLIM_params_xl)}
 # Write
-write_xlsx(imaclim_xl,path=excel_file_name)
+write_xlsx(imaclim_xl,path=MatisseFiles$IMACLIM_params_xl)
 
 ### Output_macro
-output_macro<-read_excel(path = paste(M_data,"/IMACLIM/Output_macro_code.xlsx",sep=""),skip=1,sheet=scenario)
+output_macro<-read_excel(path = MatisseFiles$output_macro_code_xl,skip=1,sheet=scenario)
 # Remove previous file
-excel_file_name <- paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Output_macro_code.xlsx",sep="")
-if(file.exists(excel_file_name)){file.remove(excel_file_name)}
+
+
+if(file.exists(MatisseFiles$output_macro_params_xl)){file.remove(MatisseFiles$output_macro_params_xl)}
 # Write
-write_xlsx(output_macro,path=excel_file_name)
+write_xlsx(output_macro,path=MatisseFiles$output_macro_params_xl)
 
 
 ## Menage_iteration
-load(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_iteration.RData",sep=""))
-
-save(menage_iteration,file=paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/menage_iteration.RData",sep=""))
+load(MatisseFiles$menage_iteration_iter_rd)
+save(menage_iteration,file=MatisseFiles$menage_iteration_params_rd)
 

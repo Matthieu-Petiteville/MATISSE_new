@@ -17,6 +17,10 @@ for (scenario in scenario_v){
     for (scenario_classement in scenario_classement_v){
       for (redistribution in redistribution_v){
         
+        
+        #Reglage des folders
+        initializeMatisseFiles()
+        
         CleanParallelizeFolder()
         CurrentRScript <- CountActiveRScripts()
         
@@ -32,12 +36,17 @@ for (scenario in scenario_v){
         #Logs into current_log
         Iter=0
         AddLogs("PARAL","Running script for step 1")
-        step_to_run = c()
-        for(step_it in 1:3){
-          if(iSLineInStepTracker(step_it))
-            step_to_run = c(step_to_run,step_it)
+        step_to_run = c(1,2,3)
+        if(!ForceRerun){
+          for(step_it in step_to_run){
+            if(iSLineInStepTracker(step_it))
+              step_to_run = step_to_run[which(step_to_run != step_it)]
+          }
         }
-       Parallelize_Matisse_Loop(step_to_run =  step_to_run, ForceRerun = FALSE)
+        
+        if(length(step_to_run)>0){
+          Parallelize_Matisse_Loop(step_to_run =  step_to_run, ForceRerun = ForceRerun)
+        }
 
       }
     }

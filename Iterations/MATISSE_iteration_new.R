@@ -11,11 +11,8 @@
 library(data.table)
 library(readxl)
 library(writexl)
-source(paste(Sys.getenv("MATISSE_HOME"),"/MATISSE_init.r",sep=""))
 
-# PARAMETRES ITERATION ----------------------------------------------------
-
-
+Iter_last=ifelse(Iter==0,0,Iter-1)
 
 # ITERATION_0 -------------------------------------------------------------
 
@@ -23,18 +20,18 @@ if(Iter==0){
   
   print(paste(scenario,horizon, scenario_classement,redistribution,sep=" & "))
   print("Iter 0")
-  Input_macro<-read.csv(file=paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/export_Iter_0.csv",sep=""))
-  file.remove(paste(M_data,"/IMACLIM/Input_macro.csv",sep=""))
-  data.table::fwrite(Input_macro,file=paste(M_data,"/IMACLIM/Input_macro.csv",sep=""),dec=".",sep=";",col.names = F)
+  Input_macro <- read.csv(file= MatisseFiles$export_iter_0_csv)
+  file.remove(MatisseFiles$input_macro_csv)
+  data.table::fwrite(Input_macro,file=MatisseFiles$input_macro_csv,dec=".",sep=";",col.names = F)
 
   
   if(redistribution=="ssrec"){
-    imaclim_xl<-read_excel(path = paste(M_data,"/IMACLIM/IMACLIM 3ME_ssrec.xlsm",sep=""),sheet="Model")
+    imaclim_xl<-read_excel(path = MatisseFiles$IMACLIM_3ME_ssrec_xl,sheet="Model")
   }else{
-    imaclim_xl<-read_excel(path = paste(M_data,"/IMACLIM/IMACLIM 3ME.xlsm",sep=""),sheet="Model")
+    imaclim_xl<-read_excel(path = MatisseFiles$IMACLIM_3ME_xl,sheet="Model")
   }
   
-  excel_file_name <- paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/IMACLIM_3ME_iter",Iter,".xlsx",sep="")
+  excel_file_name <- MatisseFiles$IMACLIM_iter_xl
   if (file.exists(excel_file_name)){file.remove(excel_file_name)}
   write_xlsx(imaclim_xl,path=excel_file_name)
 
@@ -42,6 +39,7 @@ if(Iter==0){
 
 
 }else{
+  
   # ITERATION 1 et suivantes ------------------------------------------------
   print(paste(scenario,horizon, scenario_classement,redistribution,sep=" & "))
   print(paste("ITER number : ",Iter,sep=" "))

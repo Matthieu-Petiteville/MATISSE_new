@@ -4,6 +4,7 @@
 # Launch ------------------------------------------------------------------
 M_home <- gsub("\\\\","/",Sys.getenv("MATISSE_HOME"))
 M_data <- gsub("\\\\","/",Sys.getenv("MATISSE_DATA"))
+M_analysis <- gsub("\\\\","/",Sys.getenv("MATISSE_ANALYSIS"))
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Common/default_values.r",sep=""))
 source(paste(M_home,"/Main/Matisse_Loop.r",sep=""))
@@ -11,13 +12,16 @@ source(paste(M_home,"/Main/Matisse_Loop.r",sep=""))
 
 # Loop on scenarios/horizon/classement/redistribution -------------------------------------------------------
 Iter=0
-step_to_run = c(1,2,3)
-ForceRerun = FALSE
+step_to_run = c(4,5)
+ForceRerun = TRUE
 scenario <- "AMS"
 horizon <- 2035
 scenario_classement <- "Median"
 redistribution <- "niveau_vie"
 
+
+#Reglage des folders
+initializeMatisseFiles()
 
 #Run the full Matisse_Loop, steps 1 to 5, for Iter=0
 #Logs into current_log
@@ -28,4 +32,8 @@ if(!ForceRerun){
   }
 }
 
-Matisse_Loop(step_to_run =  step_to_run, ForceRerun = ForceRerun)
+if(length(step_to_run)>0){
+  Matisse_Loop(step_to_run =  step_to_run, ForceRerun = ForceRerun)
+}else{
+  AddLogs("MAIN","No step to run : stopping")
+}

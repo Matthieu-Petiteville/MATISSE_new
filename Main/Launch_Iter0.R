@@ -20,6 +20,9 @@ for (scenario in scenario_v){
     for (scenario_classement in scenario_classement_v){
       for (redistribution in redistribution_v){
         
+        #Reglage des folders
+        initializeMatisseFiles()
+        
         #Run the full Matisse_Loop, steps 1 to 5, for Iter=0
         #Logs into current_log
         if(!ForceRerun){
@@ -29,7 +32,11 @@ for (scenario in scenario_v){
           }
         }
         
-        Matisse_Loop(step_to_run =  step_to_run, ForceRerun = TRUE)
+        if(length(step_to_run)>0){
+          Matisse_Loop(step_to_run =  step_to_run, ForceRerun = ForceRerun)
+        }else{
+          AddLogs("MAIN","No step to run : stopping")
+        }
         
       }
     }
