@@ -21,9 +21,6 @@ Iter<-as.numeric(iter)
 Iter_last=ifelse(Iter==0,0,Iter-1)
 horizon=as.numeric(horizon)
 
-# sink('D:/CIRED/Projet_Ademe/IMACLIM/hello.txt',append=F,type="output")
-# cat(scenario," & ",Iter," & ", Iter_last," & ",horizon)
-# sink(NULL)
 
 if(Iter==0){
   print(paste(scenario,horizon, scenario_classement,redistribution,sep=" & "))
