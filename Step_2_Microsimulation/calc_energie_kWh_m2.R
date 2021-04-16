@@ -256,7 +256,7 @@ menage %>% summarise(weighted.mean(x=ener_dom_surf,w=pondmen,na.rm=T)) #MWh
 #   menage %>%
 #   left_join(dep_source_usage %>% select(ident_men,ener_dom_surf),by="ident_men")
 
-menage_ener_dom<-menage %>% select(ident_men,ener_dom_surf,ener_dom)
+menage_ener_dom<-menage %>% select(ident_men,ener_dom_surf,ener_dom,energie_tot_surf)
 
 return(menage_ener_dom)
 
