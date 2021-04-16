@@ -84,8 +84,8 @@ load(MatisseFiles$menage_forme_rd)
   bvec <- agreg_best - agreg_init
   
   # test (permet de comparer les tables cible et de départ avec une distance en % way to go)
-  # View(cbind(rownames(agreg_init),rownames(agreg_best)))
-  # View(cbind("Init"=agreg_init, "Best"=agreg_best,"Way to go"=bvec/agreg_init))
+  View(cbind(rownames(agreg_init),rownames(agreg_best)))
+  View(cbind("Init"=agreg_init, "Best"=agreg_best,"Way to go"=bvec/agreg_init))
 
   # (uvec) CONTRAINTE D INEGALITE 
   uvec <- -1 * pond_init
@@ -102,7 +102,7 @@ load(MatisseFiles$menage_forme_rd)
   # Start the clock!
   ptm <- proc.time()
   #For memory issues
-  memory.limit(40000)
+  # memory.limit(40000)
   sol<-solve.QP(Vmat,dvec,A,b,meq=length(agreg_best))
 
   # Stop the clock
@@ -199,6 +199,14 @@ load(MatisseFiles$menage_forme_rd)
     sink()
   }
 
+  
+
+# Clean -------------------------------------------------------------------
+  suppressWarnings(rm(A,agreg_best,agreg_final,agreg_init,Amat,b,bvec,data,diff,dvec,ener_mix,evol_energie,export,FC, menage_contraintes,
+                      menage_echelle,menage_forme,menage_iteration,ones,pond, pond_final, pond_final_heuristique, pond_init, savings_rate, share,
+                      sol,uvec, Vmat))
+  gc()
+  
   
   
   
