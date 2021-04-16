@@ -1,3 +1,6 @@
+
+# Chronometre -------------------------------------------------------------
+
 #Basic function starting the chrono for benchmark of solutions
 ChrStart <- function(){
   chrono_timest <<- Sys.time()
@@ -16,6 +19,13 @@ ChrEnd <- function(){
 }
 
 
+
+
+
+
+
+# MutateWhen --------------------------------------------------------------
+
 #Similar to dplyr mutate
 mutate_when <- function(data, ...) {
   dots <- eval(substitute(alist(...)))
@@ -26,13 +36,54 @@ mutate_when <- function(data, ...) {
   }
   data
 }
-# Source ------------------------------------------------------------------
-# https://stackoverflow.com/questions/34096162/dplyr-mutate-replace-on-a-subset-of-rows
+# Source : https://stackoverflow.com/questions/34096162/dplyr-mutate-replace-on-a-subset-of-rows
+
+
+
+
+
+
+# Folder Management -------------------------------------------------------
 
 #Create folder if it doesn't exist, no warning
 CreateFolder <- function(folder_name){
   if(!dir.exists(folder_name)){dir.create(folder_name)}
 }
+
+
+Create_Output_Folders <- function(MainFolder , scen_v , hori_v , scen_class_v , redis_v , iter_v){
+  
+  #Create all folders and path for MATISSE set up and checks
+  CreateFolder(MainFolder)
+  CreateFolder(paste(MainFolder,"/Results",sep=""))
+  
+  for(scenario in scen_v){
+    CreateFolder(paste(MainFolder,"/",scenario,sep=""))
+    CreateFolder(paste(MainFolder,"/Results/",scenario,sep=""))
+    for(horizon in hori_v){
+      CreateFolder(paste(MainFolder,"/",scenario,"/",horizon,sep=""))
+      CreateFolder(paste(MainFolder,"/Results/",scenario,"/",horizon,sep=""))
+      for(scenario_classement in scen_class_v){
+        CreateFolder(paste(MainFolder,"/",scenario,"/",horizon,"/",scenario_classement,sep=""))
+        CreateFolder(paste(MainFolder,"/Results/",scenario,"/",horizon,"/",scenario_classement,sep=""))
+        for(redistribution in redis_v){
+          CreateFolder(paste(MainFolder,"/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,sep=""))
+          CreateFolder(paste(MainFolder,"/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,sep=""))
+          for(Iteration in iter_v){
+            CreateFolder(paste(MainFolder,"/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,sep=""))
+            CreateFolder(paste(MainFolder,"/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,"/Input",sep=""))
+            CreateFolder(paste(MainFolder,"/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iteration,"/Output",sep=""))
+          }
+          CreateFolder(paste(MainFolder,"/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change",sep=""))
+        }
+      }
+    }    
+  }
+  
+  
+}
+
+
 
 
 # Logs --------------------------------------------------------------------
