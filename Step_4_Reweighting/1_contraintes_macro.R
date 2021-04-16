@@ -431,8 +431,6 @@ save(agreg_best, file= MatisseFiles$agreg_best_rd)
 save(menage_calibr_2010,file= MatisseFiles$menage_calibr_2010_final_rd)
 
 
-
-
 list_contraintes_menage<-
   c("vague_1" , "vague_2","vague_3" , "vague_4" , "vague_5" ,
     "agePR_0_29" , "agePR_30_44", "agePR_45_59" , "agePR_60_74" ,
@@ -443,8 +441,6 @@ list_contraintes_menage<-
     "ZEAT_Paris","ZEAT_Nord" , "ZEAT_Est" ,     "ZEAT_Ouest", "ZEAT_SudOuest" , "ZEAT_CentreEst",
     "typmen51","typmen52","typmen53","typmen54" )
 
-
-# print("Repondération : 1_contraintes_macro : SUCCESS")
 
 
 # Clean -------------------------------------------------------------------
