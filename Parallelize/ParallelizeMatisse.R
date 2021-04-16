@@ -22,7 +22,8 @@ Parallelize_Matisse_Loop <- function(step_to_run = 1:5, ForceRerun = FALSE) {
                    paste("horizon <- ",horizon,sep =""),
                    paste("scenario_classement <- ","\"",scenario_classement,"\"",sep=""),
                    paste("redistribution <- ","\"",redistribution,"\"",sep =""),
-                   paste("Iter <- ","\"",Iter ,"\"",sep ="")
+                   paste("Iter <- ","\"",Iter ,"\"",sep =""),
+                   paste("initializeMatisseFiles()")
                    )
   bat_text <- paste(paste(Sys.getenv("R_HOME"),"/bin/Rscript.exe ",script_file,sep=""))
   
