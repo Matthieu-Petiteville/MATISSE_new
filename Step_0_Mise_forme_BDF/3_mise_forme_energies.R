@@ -426,8 +426,7 @@ menage_forme_ener %>%
   dplyr::group_by(DPE_pred)%>%
   summarise("Mwh_m2"=weighted.mean(x=ener_dom_surf,w=pondmen))
 
-menage_forme_ener %>% 
-  dplyr::group_by(DPE_pred)%>%
+menage_forme_ener %>% group_by(DPE_pred)%>%
   summarise("Mwh_m2"=weighted.mean(x=energie_tot_surf,w=pondmen))
 
 
