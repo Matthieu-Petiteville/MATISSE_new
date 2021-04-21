@@ -6,8 +6,8 @@
 
 
 # LIBRARIES ---------------------------------------------------------------
-library(tidyverse)
-library(readxl)
+library(tidyverse , warn.conflicts=F, quietly = T)
+library(readxl, warn.conflicts=F, quietly = T)
 
 
 # ThreeME -----------------------------------------------------------------
@@ -19,8 +19,7 @@ if(scenario=="ssTCO"){S="scen AMS ss TCO"}
 if(scenario=="ssRES"){S="scen AMS ss residentiel"}
 if(scenario=="ssVE"){ S="scen AMS ss VE"}
 
-suppressWarnings(scen<-read_excel(path=MatisseFiles$sortie_3me_xl,sheet=S))
-
+suppressMessages(suppressWarnings(scen<-read_excel(path=MatisseFiles$sortie_3me_xl,sheet=S)))
 ThreeME<- scen %>% select(-Def)%>% gather(key=year, value=value, -c(1))
 save(ThreeME, file=MatisseFiles$Threeme_rd)
 
