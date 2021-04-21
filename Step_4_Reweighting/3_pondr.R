@@ -11,13 +11,11 @@
 
 
 # LIBRARIES ---------------------------------------------------------------
-
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
 library(quadprog)
 
-Iter=0
 
 # DATA --------------------------------------------------------------------
 load(MatisseFiles$menage_contraintes_rd)
@@ -27,22 +25,6 @@ load(MatisseFiles$agreg_best_rd)
 load(MatisseFiles$menage_forme_rd)
 
 # Pond_init issues autre scenario ------------------------------------------
-# 
-#  if(file.exists(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep=""))){
-# 
-#     # load
-#     load(paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep=""))
-# 
-#     # pond_init
-#     pond_init<-pond_final_heuristique
-# 
-#     # Write wich scenario used this pond_heuristique
-# 
-#     cat(paste("\nUsed by Scenario : ",paste(scenario,horizon,scenario_classement, redistribution,sep=" - ")," ; at ",as.character(strptime(Sys.time(),format="%Y-%m-%d %H:%M:%S")),sep=""),
-#         file=paste("D:/CIRED/Projet_Ademe/",scenario,"/",horizon,"/READ_ME_pond_final_heuristique_",scenario,"_",horizon,".txt",sep=""),
-#         append=TRUE)
-# 
-#   }
 
      
 # pond_init<-pond_init*as.numeric(FC_pondmen)
@@ -84,8 +66,8 @@ load(MatisseFiles$menage_forme_rd)
   bvec <- agreg_best - agreg_init
   
   # test (permet de comparer les tables cible et de départ avec une distance en % way to go)
-  View(cbind(rownames(agreg_init),rownames(agreg_best)))
-  View(cbind("Init"=agreg_init, "Best"=agreg_best,"Way to go"=bvec/agreg_init))
+  # View(cbind(rownames(agreg_init),rownames(agreg_best)))
+  # View(cbind("Init"=agreg_init, "Best"=agreg_best,"Way to go"=bvec/agreg_init))
 
   # (uvec) CONTRAINTE D INEGALITE 
   uvec <- -1 * pond_init
@@ -102,7 +84,7 @@ load(MatisseFiles$menage_forme_rd)
   # Start the clock!
   ptm <- proc.time()
   #For memory issues
-  # memory.limit(40000)
+  memory.limit(size = 32000)
   sol<-solve.QP(Vmat,dvec,A,b,meq=length(agreg_best))
 
   # Stop the clock
