@@ -4,35 +4,32 @@
 # Objectif du code : adapter la base BDF et la nomenclature au projet ADEME et THREE_ME, creer des variables calculees
 
 
-# LIBRARY -----------------------------------------------------------------
+# Libraries -----------------------------------------------------------------
 
-library(tidyverse)
-library(readxl)
-library(car)
-library(reshape2)
+suppressMessages(library(tidyverse , warn.conflicts=F , quietly = T))
+suppressMessages(library(readxl , warn.conflicts=F , quietly = T))
+suppressMessages(library(car , warn.conflicts=F , quietly = T))
+suppressMessages(library(reshape2 , warn.conflicts=F , quietly = T))
+source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
-
-# Load --------------------------------------------------------------------
+# Data --------------------------------------------------------------------
 
 #Donnees Brutes BDF 2010
-menage <- as.data.frame(read_excel(MatisseFiles$menage_bdf_xl) , stringsAsFactors=F)
-individu <- read_excel(MatisseFiles$indiv_bdf_xl)
-c05 <- read_csv2(MatisseFiles$c05_bdf_csv)
-depmen <- read_csv2(MatisseFiles$depmen_bdf_csv)
+menage <- suppressWarnings(suppressMessages(as.data.frame(read_excel(MatisseFiles$menage_bdf_xl) , stringsAsFactors=F)))
+individu <- suppressWarnings(suppressMessages(read_excel(MatisseFiles$indiv_bdf_xl)))
+c05 <- suppressMessages(read_csv2(MatisseFiles$c05_bdf_csv))
+depmen <- suppressWarnings(suppressMessages(read_csv2(MatisseFiles$depmen_bdf_csv)))
 
 # Typologie de vulnérabilité
-typo_vuln <- read_excel(MatisseFiles$typovuln_xl , sheet="identmen")
-
+typo_vuln <- suppressMessages(read_excel(MatisseFiles$typovuln_xl , sheet="identmen"))
 
 #BDFE S. De Lauretis
 load(MatisseFiles$appmen_depact_2010_rd)
-appmen_depensesactiv_2010<-appmen_depensesactiv
-rm(appmen_depensesactiv)
+appmen_depensesactiv_2010 <- appmen_depensesactiv
 
 # Output étape précédente, estimation des DPE
 load(MatisseFiles$menage_dpe_rd)
 
-source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
 # Selection ménages -------------------------------------------------------
 
@@ -40,21 +37,19 @@ source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep
 menage <-
   menage %>% 
   filter(zeat>0)
-
 menage$ident_men <- as.numeric(menage$ident_men)
 
 #Selection des ménages présents dans la base appmen de Simona pour bénéficier des données énergies EDF
-menage <- menage[which(menage$ident_men %in% menage_DPE$ident_men),]
-appmen_depensesactiv_2010 <- appmen_depensesactiv_2010[which(appmen_depensesactiv_2010$ident_men %in% menage$ident_men),]
+menage <- menage[which(menage$ident_men %in% menage_DPE$ident_men), ]
+appmen_depensesactiv_2010 <- appmen_depensesactiv_2010[which(appmen_depensesactiv_2010$ident_men %in% menage$ident_men), ]
 
 # Selection des ménages dans base c05 
 c05$ident_men <-  as.numeric(c05$ident_men)
-c05 <- c05[which(c05$ident_men %in% menage$ident_men),]
+c05 <- c05[which(c05$ident_men %in% menage$ident_men), ]
 
 # Selection des ménages dans base individus
-individu$ident_men <-  as.numeric(individu$ident_men)
-individu <- individu[which(individu$ident_men %in% menage$ident_men),]
-
+individu$ident_men <- as.numeric(individu$ident_men)
+individu <- individu[which(individu$ident_men %in% menage$ident_men), ]
 
 # RECODER VARIABLES ---------------------------------------------------------------
 # creation variables type menage corrige, quintile UC et maison individuelle pour recreer classes
@@ -62,58 +57,52 @@ individu <- individu[which(individu$ident_men %in% menage$ident_men),]
 # TYPMEN
 menage <- within(menage, {
   typmen_corr <- ifelse(typmen5 == 1 & agepr <= 65, 1,         
-                        # celib <= 65
-                        ifelse(typmen5 == 1 & agepr > 65, 2,   
-                               # celib > 65
-                               ifelse(typmen5 == 2, 5,                
-                                      # famille monoparentale
-                                      ifelse(typmen5 == 3 & agepr <= 65, 3,  
-                                             # couple sans enfants, <=65
-                                             ifelse(typmen5 == 3 & agepr > 65, 4,   
-                                                    # couple sans enfants, > 65
-                                                    ifelse(typmen5 == 4, 6,                
-                                                           # couple avec enfants
-                                                           ifelse(typmen5 == 5 & nenfants > 0, 6, 
-                                                                  # mÃ©nages complexes : 6,3 ou 4
-                                                                  ifelse(typmen5 == 5 & nenfants == 0 & agepr <= 65, 3,
-                                                                         ifelse(typmen5 == 5 & nenfants == 0 & agepr > 65, 4,
-                                                                                NA
-                                                                         )))))))))
+                  # celib <= 65
+                  ifelse(typmen5 == 1 & agepr > 65, 2,   
+                  # celib > 65
+                  ifelse(typmen5 == 2, 5,                
+                  # famille monoparentale
+                  ifelse(typmen5 == 3 & agepr <= 65, 3,  
+                  # couple sans enfants, <=65
+                  ifelse(typmen5 == 3 & agepr > 65, 4,   
+                  # couple sans enfants, > 65
+                  ifelse(typmen5 == 4, 6,                
+                  # couple avec enfants
+                  ifelse(typmen5 == 5 & nenfants > 0, 6, 
+                  # ménages complexes : 6,3 ou 4
+                  ifelse(typmen5 == 5 & nenfants == 0 & agepr <= 65, 3,
+                  ifelse(typmen5 == 5 & nenfants == 0 & agepr > 65, 4, NA
+                 )))))))))
 })
 
 
-# QUINTILE UC
-
+# Quintiles uc
 menage$quintileuc <- car::recode(menage$decuc2," 1:2 = 1 ; 3:4 = 2 ; 5:6 = 3 ; 7:8 = 4 ; 9:10 = 5 ")
-
 
 # TYPLOG / MI
 menage$MI_corr <- car::recode(menage$typlog, "1:2 = 1 ; 3:6 = 0")
 
 
-
-
-
-
-
-
-
-
-# AGREGER VARIABLES INDIVIDUS ---------------------------------------------
+# Agreger variables individus ---------------------------------------------
 
 #A partir de la table individus, calcul du nombre de retraités, de chômeurs => l'objectif est de corriger les donnes de la table menage dont les variables nactifs et nactoccup ne sont pas fiables (nombre negatif de chomeurs en les sommant)
+nbactoccup <- 
+  individu %>% 
+  filter(situa<=2) %>%
+  group_by(ident_men) %>%
+  summarise("nbactoccup"=n())
+nbchomeurs <- 
+  individu %>%
+  filter(situa==4) %>%
+  group_by(ident_men) %>%
+  summarise("nbchomeurs"=n())
+nbretraites <- 
+  individu %>% 
+  filter(situa==5) %>% 
+  group_by(ident_men) %>%
+  summarise("nbretraites"=n())
 
-nbactoccup <- individu %>% filter(situa<=2)%>% group_by(ident_men)%>%summarise("nbactoccup"=n())
-nbchomeurs <- individu %>% filter(situa==4)%>% group_by(ident_men)%>%summarise("nbchomeurs"=n())
-nbretraites<- individu %>% filter(situa==5)%>% group_by(ident_men)%>%summarise("nbretraites"=n())
-
-
-
-  
-
-
-
-# CREATION MENAGE_FORME ---------------------------------------------------
+# Creation menage_forme ---------------------------------------------------
 # menage_forme regroupe l'essentiel des variables utilisées dans la suite du code
 # On utilise decuc2 car défini sur la france métropolitaine. 
 # DECUC2 :Décile de revenu par unité de consommation - Calculé sur la France métropolitaine 
@@ -122,45 +111,46 @@ nbretraites<- individu %>% filter(situa==5)%>% group_by(ident_men)%>%summarise("
 
 menage_forme <-
   menage %>% 
-  select(ident_men, pondmen, quintileuc,typmen_corr,typmen5,MI_corr,npers,coeffuc,chomage,retraites,decuc2,tuu,agepr,codcspr,zeat,salaires,revindep,rev_etranger) %>%
+  select(ident_men, pondmen, quintileuc, typmen_corr, typmen5, MI_corr, npers, coeffuc,
+         chomage, retraites, decuc2, tuu, agepr, codcspr, zeat, salaires, revindep, rev_etranger) %>%
   left_join(nbchomeurs, by="ident_men") %>%
   left_join(nbactoccup, by="ident_men") %>%
   left_join(nbretraites, by="ident_men") %>%
-  left_join(depmen %>% select(ident_men,surfhab_d,stalog,propri,vag), by="ident_men")%>% 
-  left_join(menage_DPE,by="ident_men")
+  left_join(depmen %>% select(ident_men, surfhab_d, stalog, propri, vag), by="ident_men") %>% 
+  left_join(menage_DPE, by="ident_men")
 
 # Correction nb chomeurs 
 # il existe 2605 ménages dont nbchomeurs est NA mais où il existe des revenus du chômage. 
 menage_forme <- 
   menage_forme %>%
   #npers_identifiés assure qu'on ne compte pas plus de personnes dans le ménage qu'il n'en contient
-  mutate(npers_identifiees=ifelse(is.na(nbchomeurs),0,nbchomeurs)+
-           ifelse(is.na(nbactoccup),0,nbactoccup)+
-           ifelse(is.na(nbretraites),0,nbretraites))%>%
+  mutate(npers_identifiees = ifelse(is.na(nbchomeurs), 0, nbchomeurs) +
+           ifelse(is.na(nbactoccup), 0, nbactoccup) +
+           ifelse(is.na(nbretraites), 0, nbretraites)) %>%
   # #est considéré comme contenant un chomeur, un ménage qui tire des revenus d'une allocation chomage
   # NB : avec le système de pré-retraites ne fonctionne pas => surestime le nombre de chomeurs
   # mutate(nbchomeurs=ifelse(is.na(nbchomeurs) & chomage==0,0,ifelse(is.na(nbchomeurs) & !chomage==0 & (npers-npers_identifiees)>0,1,nbchomeurs)))%>%
   #actifs occupés
-  mutate(nbactoccup=ifelse(is.na(nbactoccup) & (salaires+revindep+rev_etranger)==0,0,ifelse(is.na(nbactoccup) & !((salaires+revindep+rev_etranger)==0)& (npers-npers_identifiees)>0,1,nbactoccup)))%>%
+  mutate(nbactoccup = ifelse(is.na(nbactoccup) & (salaires + revindep + rev_etranger) == 0, 0, 
+                     ifelse(is.na(nbactoccup) & !((salaires + revindep + rev_etranger) == 0) & (npers - npers_identifiees) > 0, 1, nbactoccup))) %>%
   #actifs occupés
-  mutate(nbretraites=ifelse(is.na(nbretraites) & retraites==0,0,ifelse(is.na(nbretraites) & !retraites==0& (npers-npers_identifiees)>0,1,nbretraites)))%>%
+  mutate(nbretraites = ifelse(is.na(nbretraites) & retraites == 0, 0, 
+                              ifelse(is.na(nbretraites) & !retraites == 0 & (npers-npers_identifiees) > 0, 1, nbretraites))) %>%
   # le reste des NA est mis à 0 (signifie que le foyer est "plein", la somme des catégories renseignées suffit à égal npers)
-  mutate(nbchomeurs=ifelse(is.na(nbchomeurs),0,nbchomeurs),
-         nbactoccup=ifelse(is.na(nbactoccup),0,nbactoccup),
-         nbretraites=ifelse(is.na(nbretraites),0,nbretraites))%>%
-  select(-npers_identifiees,-revindep,-salaires,-rev_etranger)
+  mutate(nbchomeurs = ifelse(is.na(nbchomeurs), 0, nbchomeurs),
+         nbactoccup = ifelse(is.na(nbactoccup), 0, nbactoccup),
+         nbretraites = ifelse(is.na(nbretraites), 0, nbretraites)) %>%
+  select(-npers_identifiees, -revindep, -salaires, -rev_etranger)
   
-# ACTIFS
+# Actifs
 menage_forme <- 
   menage_forme %>% 
-  mutate(nbactifs=nbchomeurs + nbactoccup)
-
+  mutate(nbactifs = nbchomeurs + nbactoccup)
 
 
 ### Verif
-menage_forme %>% mutate(nbpers_foyer=nbactifs+nbretraites)%>%mutate(diff_npers=npers-nbpers_foyer)%>%filter(diff_npers<0)%>%summarise(n())
-
-
+menage_forme %>% mutate(nbpers_foyer = nbactifs + nbretraites) %>% 
+  mutate(diff_npers = npers - nbpers_foyer) %>% filter(diff_npers < 0) %>% summarise(n())
 menage_forme %>% summarise(sum(pondmen*nbactoccup))
 menage_forme %>% summarise(sum(pondmen*nbchomeurs))
 menage_forme %>% summarise(sum(pondmen*nbactifs))
@@ -170,84 +160,72 @@ menage_forme %>% summarise(sum(pondmen*nbretraites))
 
 
 #correction de la surface du ménage 8925 (surfhab_d=NA, surfhab=60)
-surf_8925 <- as.numeric(depmen %>% filter(ident_men==8925)%>%select(surfhab))
-menage_forme <- menage_forme %>% mutate(surfhab_d=ifelse(ident_men==8925,surf_8925,surfhab_d))
+surf_8925 <- as.numeric(depmen %>% filter(ident_men == 8925) %>% select(surfhab))
+menage_forme <- menage_forme %>% mutate(surfhab_d = ifelse(ident_men == 8925, surf_8925, surfhab_d))
 
 # calcul nombre inactifs
-menage_forme$nbinact <- 
-  menage_forme$npers - 
-  menage_forme$nbretraites - 
-  menage_forme$nbactifs
+menage_forme$nbinact <- menage_forme$npers - menage_forme$nbretraites - menage_forme$nbactifs
 
 
 # Rajout nombre de véhicule 
-auto<-read_excel(paste(M_data,"/Data/BDF_2010/AUTOMOBILE.xlsx",sep=""),sheet="AUTO_METROPOLE") #uniquement AUTOMOBILE
+auto <- suppressWarnings(read_excel(paste(M_data,"/Data/BDF_2010/AUTOMOBILE.xlsx",sep=""),sheet="AUTO_METROPOLE")) #uniquement AUTOMOBILE
 menage_forme <-
   menage_forme %>%
-  left_join(auto %>% select(ident_men, nbvehic) %>% distinct(),by="ident_men")
-rm(auto)
-
-
+  left_join(auto %>% select(ident_men, nbvehic) %>% distinct(),by = "ident_men")
 
 
 # REVENUS -----------------------------------------------------------------
 
 #categories de revenus definies dans excel
-def_rev<- read_excel(MatisseFiles$def_rev_xl)
-
+def_rev<- suppressWarnings(read_excel(MatisseFiles$def_rev_xl))
 
 # Revenus de l'activité salariale et/ou independante + revenus de l'étranger
-menage_forme$rev_activites <-
-  rowSums(menage[intersect(names(menage),def_rev[which(def_rev$REV_CAT=="REVACT"),]$rev)])
+menage_forme$rev_activites <- rowSums(menage[intersect(names(menage), def_rev[which(def_rev$REV_CAT=="REVACT"), ]$rev)])
 
 # Revenus de l'activité salariale et/ou independante SANS revenus de l'étranger 
-menage_forme$rev_activites_sans_etranger <- 
-  rowSums(menage[c("salaires","revindep")])
-
+menage_forme$rev_activites_sans_etranger <- rowSums(menage[c("salaires", "revindep")])
 
 # Revenus de l'étranger (inclus dans revact)
-menage_forme$rev_etranger <- 
-  rowSums(menage[intersect(names(menage),def_rev[which(def_rev$REV_CAT=="REVETRANGER"),]$rev)])
+menage_forme$rev_etranger <- rowSums(menage[intersect(names(menage), def_rev[which(def_rev$REV_CAT=="REVETRANGER"), ]$rev)])
 
 # Revenus exceptionnels
-menage_forme$rev_exceptionnel <- rowSums(menage[intersect(names(menage),def_rev[which(def_rev$REV_CAT=="REVEXC"),]$rev)])
+menage_forme$rev_exceptionnel <- rowSums(menage[intersect(names(menage), def_rev[which(def_rev$REV_CAT=="REVEXC"), ]$rev)])
 
 # Revenus du patrimoine
-menage_forme$rev_patrimoine <- rowSums(menage[intersect(names(menage),def_rev[which(def_rev$REV_CAT=="REVPAT"),]$rev)])
+menage_forme$rev_patrimoine <- rowSums(menage[intersect(names(menage), def_rev[which(def_rev$REV_CAT=="REVPAT"), ]$rev)])
 
 # Revenus sociaux (tous)
-menage_forme$rev_sociaux <- rowSums(menage[intersect(names(menage),def_rev[which(def_rev$REV_CAT=="REVSOC"),]$rev)])
+menage_forme$rev_sociaux <- rowSums(menage[intersect(names(menage), def_rev[which(def_rev$REV_CAT=="REVSOC"), ]$rev)])
 
 # Revenus sociaux (excl chômage pour calage)
-menage_forme$rev_sociaux_autres <- rowSums(menage[intersect(names(menage),def_rev[which(def_rev$REV_CAT=="REVSOC_AUTRES"),]$rev)])
+menage_forme$rev_sociaux_autres <- rowSums(menage[intersect(names(menage), def_rev[which(def_rev$REV_CAT=="REVSOC_AUTRES"), ]$rev)])
 
 # Revenus pour le RDB, revenus réguliers, rentrant dans le revenu disponible brut. rev700
-menage_forme$rev700<-menage$rev700 #Sommes reçues régulièrement d'un autre ménage (qui doit les verser obligatoirement)
-menage_forme$rev701<-menage$rev701 #Sommes reçues régulièrement d'un autre ménage (qui les verse librement)
-menage_forme$rev999<-menage$rev999 #Autres ressources
+menage_forme$rev700 <- menage$rev700 #Sommes reçues régulièrement d'un autre ménage (qui doit les verser obligatoirement)
+menage_forme$rev701 <- menage$rev701 #Sommes reçues régulièrement d'un autre ménage (qui les verse librement)
+menage_forme$rev999 <- menage$rev999 #Autres ressources
 # Revenus pour le RDB_macro (RDB_new)
-menage_forme$rev801<-menage$rev801 #Loyers imputés (pour les propriétaires et logés gratuitement)
-menage_forme$rev800<-menage$rev800 #Vente de logements, terrains, garages => sert dans calcul épargne 2010
-menage_forme$rev850<-menage$rev850 #Vente de véhicule
+menage_forme$rev801 <- menage$rev801 #Loyers imputés (pour les propriétaires et logés gratuitement)
+menage_forme$rev800 <- menage$rev800 #Vente de logements, terrains, garages => sert dans calcul épargne 2010
+menage_forme$rev850 <- menage$rev850 #Vente de véhicule
 menage_forme$rev60x <-
-  menage$rev601+ #Gains aux jeux de hasard
-  menage$rev602+ #Sommes versées par une compagnie d’assurance
-  menage$rev603+ #Dommages et intérêts
-  menage$rev604+ #Indemnités de licenciement, primes de départ
-  menage$rev605+ #Prime à l’amélioration de l’habitat
-  menage$rev606+ #Déblocage de participation, vente d’actions,  d’obligations
+  menage$rev601 + #Gains aux jeux de hasard
+  menage$rev602 + #Sommes versées par une compagnie d’assurance
+  menage$rev603 + #Dommages et intérêts
+  menage$rev604 + #Indemnités de licenciement, primes de départ
+  menage$rev605 + #Prime à l’amélioration de l’habitat
+  menage$rev606 + #Déblocage de participation, vente d’actions,  d’obligations
   menage$rev699 #Autres ressources exceptionnelles
   #NB : on ne compte pas le rev600, héritages et donc qui sont des transferts entre ménages.
 # Revenus locatif pour TC_DPE 3.3
-menage_forme$rev504<-menage$rev504 #Vente de véhicule
+menage_forme$rev504 <- menage$rev504 #Vente de véhicule
 #on rajoute la colonne correspondant au recyclage d'une partie des revenus de la taxe carbone dans les scénarios. 
-menage_forme$rev_TCO<-0
+menage_forme$rev_TCO <-0
 
 # #Revenus totaux 
 # # (revact + revsoc + revpat + rev700 +rev 701 + rev 999)
-menage_forme$RDBAI <- rowSums(menage_forme[c("rev_activites","rev_patrimoine","rev_sociaux","rev700","rev701","rev999","rev_TCO")])
-
-
+menage_forme$RDBAI <- rowSums(menage_forme[c("rev_activites", "rev_patrimoine", 
+                                             "rev_sociaux", "rev700", "rev701", "rev999","rev_TCO")])
 
 
 # MISE EN FORME DEPENSES ENERGIE --------------------------------------------------------
@@ -267,23 +245,15 @@ menage_forme$dep_Elec <- rowSums(appmen_depensesactiv_2010[grep("Elec_", names(a
 menage_forme$dep_Gaz <- rowSums(appmen_depensesactiv_2010[grep("Gaz_", names(appmen_depensesactiv_2010))])
 #A04
 menage_forme$dep_GPL <- rowSums(appmen_depensesactiv_2010[grep("GPL_", names(appmen_depensesactiv_2010))])
-menage_forme$dep_Fuel <-rowSums(appmen_depensesactiv_2010[grep("Fuel_", names(appmen_depensesactiv_2010))])
+menage_forme$dep_Fuel <- rowSums(appmen_depensesactiv_2010[grep("Fuel_", names(appmen_depensesactiv_2010))])
 menage_forme$dep_Urbain <- rowSums(appmen_depensesactiv_2010[grep("Urbain_", names(appmen_depensesactiv_2010))])
 menage_forme$dep_Solides <- rowSums(appmen_depensesactiv_2010[grep("Solides_", names(appmen_depensesactiv_2010))]) 
 
 
-# sources=c("Elec","Gaz","Urbain","Solides","GPL","Fuel")
-# dep_sources=paste("dep",sources,sep="_")
-# Variable calculée
-# menage_forme$dep_energie_logement <- rowSums(menage_forme[dep_sources])
 
+# Mise en forme des dépenses - Nomenclature ADEME ---------------------------------------------------------
 
-
-
-
-# MISE FORME DEPENSES - Nomenclature ADEME ---------------------------------------------------------
-
-Nomenclature_ADEME_COICOP <-  read_excel(MatisseFiles$nom_coicop_3me_xl)
+Nomenclature_ADEME_COICOP <-  suppressWarnings(read_excel(MatisseFiles$nom_coicop_3me_xl))
 
 #A01
 menage_forme$agriculture <- 
@@ -309,7 +279,8 @@ menage_forme$transp_rail_air <-
   rowSums(c05[intersect(names(c05),Nomenclature_ADEME_COICOP[which(Nomenclature_ADEME_COICOP$ADEME=="A08"),]$COICOP_2011)])
 
 #A09
-menage_forme$transp_routes_eau <- rowSums(c05[intersect(names(c05),Nomenclature_ADEME_COICOP[which(Nomenclature_ADEME_COICOP$ADEME=="A09"),]$COICOP_2011)])
+menage_forme$transp_routes_eau <- 
+  rowSums(c05[intersect(names(c05),Nomenclature_ADEME_COICOP[which(Nomenclature_ADEME_COICOP$ADEME=="A09"),]$COICOP_2011)])
 
 #A10
 menage_forme$loisirs_com <- 
@@ -341,14 +312,14 @@ menage_forme$Hors_budget <-
 # 13211 Remboursements de prêts pour la résidence principale (yc garage et dépendance)
 # 13221 Remboursements des autres prêts immobiliers (résidence secondaire et autre logement yc dépendance)
 # 13511 Remboursements de crédits à la consommation (voiture, gros travaux, biens durables)
-menage_forme<-
-  menage_forme%>%
-  left_join(c05%>%select(c13711,c13211,c13221,c13511,ident_men),by="ident_men")
+menage_forme <-
+  menage_forme %>%
+  left_join(c05 %>% select(c13711, c13211, c13221, c13511, ident_men), by = "ident_men")
 
 ### test
-menage_forme_bis<-
-  menage_forme%>%
-  left_join(c05%>%select(c02311,c12811,c13211,c13221,c13511,c13611,c13722,c12911,ident_men),by="ident_men")
+menage_forme_bis <-
+  menage_forme %>%
+  left_join(c05 %>% select(c02311, c12811, c13211, c13221, c13511, c13611, c13722, c12911, ident_men), by = "ident_men")
 
 ###
 
@@ -376,45 +347,44 @@ menage_forme$impot_revenu <-
 menage_forme$AID <- rowSums(c05[c("c13111","c13121","c13151","c13161")])
 
 # Revenu Brut Disponible (RDB) 
-menage_forme$RDB <- menage_forme$RDBAI - rowSums(menage_forme[c("impot_revenu","AID")])
+menage_forme$RDB <- menage_forme$RDBAI - rowSums(menage_forme[c("impot_revenu", "AID")])
 
 # Taux d'imposition
-menage_forme$taux_IR<-ifelse(menage_forme$RDB==0,0,
-  menage_forme$impot_revenu/menage_forme$RDBAI)
-menage_forme$taux_AID<-ifelse(menage_forme$RDB==0,0,
-  menage_forme$AID/menage_forme$RDBAI)
-# (menage_forme$RDB==0,0,  menage_forme$AID/menage_forme$RDBAI)
-# 
+menage_forme$taux_IR <- ifelse(menage_forme$RDB == 0, 0, menage_forme$impot_revenu/menage_forme$RDBAI)
+menage_forme$taux_AID <- ifelse(menage_forme$RDB == 0, 0, menage_forme$AID/menage_forme$RDBAI)
 
 
 
-
-# TYPOLOGIE VULNERABILITE -------------------------------------------------
+# Typologie vulnérabilités -------------------------------------------------
 # Rajout des typologies de vulnérabilité dans la base menage_forme
-
-
-typo_vuln <- typo_vuln %>% 
+typo_vuln <- 
+  typo_vuln %>% 
   separate(col="IDENTMEN", into=c("year","ident_men"),sep="2011")
-typo_vuln$ident_men<-as.numeric(typo_vuln$ident_men)
+typo_vuln$ident_men <- as.numeric(typo_vuln$ident_men)
 
-# SELECTION MENAGES
-typo_vuln_bis<- typo_vuln %>% filter(ident_men %in% menage_forme$ident_men)
+# Selection des ménages
+typo_vuln_bis <- 
+  typo_vuln %>% 
+  filter(ident_men %in% menage_forme$ident_men)
 # rajout typo
-menage_forme<-menage_forme%>% left_join(.,typo_vuln_bis[c("ident_men","typo2010f")],by="ident_men")
-rm(typo_vuln,typo_vuln_bis)
-
-
-
-
-# Suppression des bases superflues ----------------------------------------
-
-rm(nbactoccup,nbchomeurs,nbretraites,Nomenclature_ADEME_COICOP,def_rev,individu,menage_DPE)
-
+menage_forme <-
+  menage_forme %>%
+  left_join(., typo_vuln_bis[c("ident_men", "typo2010f")], by = "ident_men")
 
 
 # Save --------------------------------------------------------------------
 
-save(menage_forme,file=MatisseFiles$menage_forme_2_rd)
+save(menage_forme, file = MatisseFiles$menage_forme_2_rd)
+
+# Clean ----------------------------------------
+
+suppressWarnings(rm(nbactoccup, nbchomeurs, nbretraites, Nomenclature_ADEME_COICOP, auto, 
+                    def_rev, individu, menage_DPE, appmen_depensesactiv, menage_forme, 
+                    typo_vuln,typo_vuln_bis, appmen_depensesactiv_2010, c05, depmen, 
+                    menage, menage_forme_bis, surf_8925))
+gc()
+
+
 
 
 

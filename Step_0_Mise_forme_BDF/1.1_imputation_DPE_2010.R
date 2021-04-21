@@ -5,64 +5,42 @@
 # (1.2_estimateur_DPE_phebus)
 
 
-# LIBRARIES  ----------------------------------------------------------------
+# Libraries  ----------------------------------------------------------------
 
-library(tidyverse)
-library(car)
-library(readxl)
+suppressMessages(library(tidyverse , warn.conflicts=F , quietly = T))
+suppressMessages(library(car , warn.conflicts=F , quietly = T))
+suppressMessages(library(readxl, warn.conflicts=F , quietly = T))
 
-# CHARGER STOCK DPE ---------------------------------------------------------------
+# Data ---------------------------------------------------------------
 
 #Stock de DPE en 2010 pour caler les variables agrégées => dpe_stock_2010
-suppressWarnings(scen <- read_excel(path = MatisseFiles$sortie_3me_xl , sheet="scen AMS"))
-
-
-# LOAD DONNEES BDF -------------------------------------------------------------
+suppressMessages(suppressWarnings(scen <- read_excel(path = MatisseFiles$sortie_3me_xl , sheet="scen AMS")))
 
 # Base INSEE menage
-menage<-
-  read.csv(MatisseFiles$menage_csv ,
-           header=TRUE ,
-           sep=";" ,
-           dec="." ,
-           stringsAsFactors = FALSE)
-
-depmen<-
-  read.csv(MatisseFiles$depmen_bdf_csv ,
-           header=TRUE ,
-           sep=";" ,
-           dec="." ,
-           stringsAsFactors = FALSE)
-
+menage <- read.csv(MatisseFiles$menage_csv , header=TRUE , sep=";" , dec="." , stringsAsFactors = FALSE)
+depmen <- read.csv(MatisseFiles$depmen_bdf_csv , header=TRUE , sep=";" , dec="." , stringsAsFactors = FALSE)
 
 # load menage_calibr_2010 avec ménages pré_selectionnés
 load(MatisseFiles$menage_calibr_2010_rd)
 
-
-
 # Traitement ThreeME ------------------------------------------------------
-ThreeME<- scen %>% select(-Def)%>% gather(key=year, value=value, -c(1))%>%filter(year==2010)
+ThreeME <- 
+  scen %>% 
+  select(-Def) %>% 
+  gather(key=year , value=value , -c(1)) %>%
+  filter(year==2010)
 
-
-#VARIABLES
-dpe_stock_2010<- ThreeME %>% 
-  filter(Var %in% 
-           c("BUIL_H01_CA_2" , "BUIL_H01_CB_2" , "BUIL_H01_CC_2" , 
-             "BUIL_H01_CD_2" , "BUIL_H01_CE_2" , "BUIL_H01_CF_2" , "BUIL_H01_CG_2"))
-
-#CONVERT DATAFRAME 
-# (7 obs, 3 variables)
+#Données DPE 3ME
+dpe_stock_2010 <- 
+  ThreeME %>% 
+  filter(Var %in% c("BUIL_H01_CA_2" , "BUIL_H01_CB_2" , "BUIL_H01_CC_2" , "BUIL_H01_CD_2" , "BUIL_H01_CE_2" , "BUIL_H01_CF_2" , "BUIL_H01_CG_2"))
 dpe_stock_2010 <- as.data.frame(dpe_stock_2010)
 
-
 #Extraire nom de la classe de DPE
-dpe_stock_2010<- dpe_stock_2010 %>% 
+dpe_stock_2010 <- 
+  dpe_stock_2010 %>% 
   mutate(DPE= str_replace_all(Var, pattern="BUIL_H01_C",replacement="")) %>% 
   mutate(DPE= str_replace_all(DPE, patter="_2",replacement=""))
-
-save(dpe_stock_2010 , file = MatisseFiles$dpe_stock_2010_rd)
-
-
 
 # ESTIMATEUR DPE SUR DONNEES SOCIO-ECO ----------------------------------------------------------
 
@@ -70,37 +48,28 @@ save(dpe_stock_2010 , file = MatisseFiles$dpe_stock_2010_rd)
 # list 27 paramètres
 source(paste(M_home , "/Step_0_Mise_forme_BDF/1.2_estimateur_dpe_phebus.R", sep=""))
 
-
-
 # CREER BASE DE DONNEES --------------------------------------------------
 
 #appariement entre la base ménage (variables explicatives) et la nouvelle estimation de DPE 
-appariement_menages_DPE<-
+appariement_menages_DPE <- 
   menage %>% 
   select(ident_men,typlog,tuu,decuc2)
 
-
-pond<-
+pond <-
   menage_calibr_2010 %>% 
   select(ident_men,pondmen)
-
-rm(menage_calibr_2010)
 
 depmen <- 
   depmen %>% 
   select(ident_men, stalog,sourcp,ancons,surfhab_d)
 
-appariement_menages_DPE<- 
+appariement_menages_DPE <- 
   pond %>% 
   left_join(.,appariement_menages_DPE, by="ident_men") %>% 
   left_join(.,depmen, by="ident_men")
 
 #pour équivalence variables Phébus/BDF se référer au document "2018-09-26 Mapping données Phébus x BDF.odt"
 # BATI_PERIODE + ESTOC + Revenu_Insee_quintile + EHST + RP_TAILLE_UU + is_elec + MI
-
-
-
-
 
 # RECODAGE DES VARIABLES --------------------------------------------------
 
@@ -109,63 +78,64 @@ appariement_menages_DPE<-
 ## ANCONS
 appariement_menages_DPE$BATI_PERIODE<- car::recode(appariement_menages_DPE$ancons, "1 = 1 ; 2:3=2 ; 4:6=3 ; 7:8=4 ; 9:10=5")
 
-
 ## STALOG
 appariement_menages_DPE$ESTOC<- car::recode(appariement_menages_DPE$stalog, "1:2 = 1 ; 3=2 ; 4:5=3 ; 6=4")
 
 ## DECU1
 appariement_menages_DPE <- appariement_menages_DPE%>%rename(replace=c("decuc2"="Revenu_Insee_quintile"))
 
-
 ## Surfhab_d
 appariement_menages_DPE$EHST <- appariement_menages_DPE$surfhab_d
-appariement_menages_DPE[which(appariement_menages_DPE$EHST==999),"EHST"]<-0
-appariement_menages_DPE[which(is.na(appariement_menages_DPE$EHST)),"EHST"]<-0
+appariement_menages_DPE[which(appariement_menages_DPE$EHST==999) , "EHST"] <- 0
+appariement_menages_DPE[which(is.na(appariement_menages_DPE$EHST)) , "EHST"] <- 0
 
 ## MI_corr 
-appariement_menages_DPE$MI <- car::recode(appariement_menages_DPE$typlog,"1:2=1 ; 3:6=0")
-
+appariement_menages_DPE$MI <- car::recode(appariement_menages_DPE$typlog ,"1:2=1 ; 3:6=0")
 
 ## TUU (menage)
 appariement_menages_DPE$RP_TAILLE_UU <- as.numeric(appariement_menages_DPE$tuu)
 
-
 ## sourcp
 appariement_menages_DPE$is_elec <- appariement_menages_DPE$sourcp
-appariement_menages_DPE[which(appariement_menages_DPE$is_elec>1),"is_elec"]<-0
-appariement_menages_DPE[which(is.na(appariement_menages_DPE$is_elec)),"is_elec"]<-0
+appariement_menages_DPE[which(appariement_menages_DPE$is_elec>1),"is_elec"] <- 0
+appariement_menages_DPE[which(is.na(appariement_menages_DPE$is_elec)),"is_elec"] <- 0
 
 # select col
-appariement_menages_DPE<-appariement_menages_DPE %>% select(ident_men, pondmen, BATI_PERIODE,ESTOC,Revenu_Insee_quintile,EHST,MI, RP_TAILLE_UU,is_elec)
+appariement_menages_DPE <-
+  appariement_menages_DPE %>%
+  select(ident_men, pondmen, BATI_PERIODE,ESTOC,Revenu_Insee_quintile,EHST,MI, RP_TAILLE_UU,is_elec)
 
 
 # Estimation --------------------------------------------------------------
 
 # estime la probabilité d'appartenance de chaque ménage à chaque classe DPE
-pred <- predict(
-  estm_dpe_acp,
-  appariement_menages_DPE,
-  type="probs",
-  na.pass=TRUE)
+pred <- predict(estm_dpe_acp , appariement_menages_DPE , type="probs" , na.pass=TRUE)
+colnames(pred) <- c("A","B","C","D","E","F","G")
+appariement_menages_DPE[c("A","B","C","D","E","F","G")] <- pred
+appariement_menages_DPE$DPE_pred <- 19
 
 
-colnames(pred)<-c("A","B","C","D","E","F","G")
-
-appariement_menages_DPE[c("A","B","C","D","E","F","G")]<-pred
-appariement_menages_DPE$DPE_pred<-19
-
-
-
-# STOCKS M2 ---------------------------------------------------------------
+# Stocks m2 ---------------------------------------------------------------
 
 # Mise à l'échelle des stocks de m2
-stock_m2_bdf <- appariement_menages_DPE %>% summarise(sum(EHST*pondmen))
-stock_m2_threeME<- dpe_stock_2010 %>% summarise(sum(value))
-dpe_stock_2010_3ME<- dpe_stock_2010 %>% mutate(value=value*as.numeric(stock_m2_bdf/stock_m2_threeME))
+stock_m2_bdf <- 
+  appariement_menages_DPE %>%
+  summarise(sum(EHST*pondmen))
+
+stock_m2_threeME <- 
+  dpe_stock_2010 %>%
+  summarise(sum(value))
+
+dpe_stock_2010_3ME <- 
+  dpe_stock_2010 %>%
+  mutate(value=value*as.numeric(stock_m2_bdf/stock_m2_threeME))
 
 #verification, ratio=1
-stock_m2_threeME2<- dpe_stock_2010_3ME %>% summarise(sum(value))
-stock_m2_bdf/stock_m2_threeME2
+stock_m2_threeME2 <- 
+  dpe_stock_2010_3ME %>%
+  summarise(sum(value))
+
+# stock_m2_bdf/stock_m2_threeME2
 
 
 # ATTRIBUTION DPE ---------------------------------------------------------
@@ -174,13 +144,12 @@ stock_m2_bdf/stock_m2_threeME2
 # On les x ménages les plus probablement dans la classe considérée pour atteindre le stock de m2 de cette classe dans ThreeME. 
 # les ménages déjà sélectionnées se voient attribuer une probabilité de -1 d'appartenance à toutes les DPE pour les exclure du choix.
 for (i in LETTERS[1:7]){
-  count=0
-  while(count<dpe_stock_2010_3ME %>% filter(DPE==i) %>% select(value)){
-    indice=which.max(appariement_menages_DPE[,i])
-    appariement_menages_DPE$DPE_pred[indice]<-i
-    appariement_menages_DPE[indice,
-                            LETTERS[1:7]]<- -1
-    count=count+appariement_menages_DPE$EHST[indice]*appariement_menages_DPE$pondmen[indice]
+  count = 0
+  while(count < dpe_stock_2010_3ME %>% filter(DPE==i) %>% select(value)){
+    indice = which.max(appariement_menages_DPE[,i])
+    appariement_menages_DPE$DPE_pred[indice] <- i
+    appariement_menages_DPE[indice,LETTERS[1:7]] <- -1
+    count = count + appariement_menages_DPE$EHST[indice] * appariement_menages_DPE$pondmen[indice]
   }
 }
 
@@ -204,8 +173,6 @@ for (i in LETTERS[1:7]){
 
 
 # Vérification graphique : Distribution des DPE
-
-
 detach('package:plyr')
 list_dpe_pred<- 
   appariement_menages_DPE %>% 
@@ -214,19 +181,23 @@ list_dpe_pred<-
   summarise(sum(surf_pond))
 colnames(list_dpe_pred)<-c("DPE_pred","surf_pond")
 
-
-
 dat=data.frame(
-  "cat_DPE"=rep(c("A" , "B" , "C" , "D" , "E" , "F" , "G"),2),
-  
-  "DPE"=c(dpe_stock_2010$value,
-          list_dpe_pred$surf_pond),
-  
-  "statut"=c(rep("DPE_réel",7),
-             rep("DPE_pred",7))
-)
+  "cat_DPE"=rep(c("A" , "B" , "C" , "D" , "E" , "F" , "G") , 2) ,
+  "DPE"=c(dpe_stock_2010$value , list_dpe_pred$surf_pond) ,
+  "statut"=c(rep("DPE_réel" , 7) , rep("DPE_pred" , 7)))
 
+menage_DPE <- 
+  appariement_menages_DPE %>%
+  select(ident_men,DPE_pred)
 
-# SAVE DPE ----------------------------------------------------------------
-menage_DPE<-appariement_menages_DPE %>% select(ident_men,DPE_pred)
+# Save --------------------------------------------------------------------
+
+save(dpe_stock_2010 , file = MatisseFiles$dpe_stock_2010_rd)
 save(menage_DPE , file = MatisseFiles$menage_dpe_rd)
+
+# Clean -------------------------------------------------------------------
+suppressWarnings(rm(appariement_menages_DPE, dat, depmen, dpe_stock_2010, dpe_stock_2010_3ME,
+                    estm_dpe_acp, list_dpe_pred, menage, menage_DPE, pond, pred, scen, 
+                    stock_m2_bdf, stock_m2_threeME, stock_m2_threeME2, ThreeME, count, 
+                    i, indice, menage_calibr_2010))
+gc()
