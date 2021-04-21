@@ -5,9 +5,9 @@ library(readxl)
 library(car)
 library(dplyr)
 library(base)
-
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_4_Reweighting/Stock_VP_Particuliers_horizon.R",sep=""))
+if(any(grepl("package:plyr", search()))) detach("package:plyr") else message("plyr not loaded")
 
 # DATA --------------------------------------------------------------------
 
