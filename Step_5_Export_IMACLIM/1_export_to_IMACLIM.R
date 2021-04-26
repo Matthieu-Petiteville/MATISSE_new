@@ -64,3 +64,6 @@ write.csv(export,file=MatisseFiles$export_iter_0_csv)
 menage_iteration<-menage_echelle
 save(menage_iteration,file=MatisseFiles$menage_iteration_rd)
 
+suppressWarnings((rm(menage_iteration, menage_echelle, FC, export)))
+gc()
+

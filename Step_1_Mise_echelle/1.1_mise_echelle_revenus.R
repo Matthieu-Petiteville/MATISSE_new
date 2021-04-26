@@ -1,38 +1,28 @@
-
-# LIBRARY -----------------------------------------------------------------
-library(tidyverse)
-source(paste(M_home,"/Common/tools.R",sep=""))
-
-# DATA --------------------------------------------------------------------
+#Objectif : calculer la première version de menage_echelle, qui est la version mise à 
+#l'échelle de l'horizon de menage_forme, via la fonction mise_echelle_revenu
 
 
-## MICRO
+# Libraries -----------------------------------------------------------------
+
+suppressMessages(library(tidyverse , warn.conflicts=F , quietly = T))
+source(paste(M_home, "/Common/tools.R", sep = ""))
+source(paste(M_home, "/Step_1_Mise_echelle/1.2_fonction_mise_echelle_revenus.R", sep = ""))
+
+# Data --------------------------------------------------------------------
+
 load(MatisseFiles$menage_forme_rd)
-source(paste(M_home,"/Step_1_Mise_echelle/1.2_fonction_mise_echelle_revenus.R",sep=""))
-
-## MACRO
-load(MatisseFiles$IMACLIM_rd)
 load(MatisseFiles$FC_2010_horizon_rd)
-load(MatisseFiles$Threeme_rd)
 
 # Appel Fonction  ---------------------------------------------------------
 
-Iter=0
-menage_echelle <- mise_echelle_revenu(FC,menage_forme,Iter)
-
+menage_echelle <- mise_echelle_revenu(FC, menage_forme)
 
 # Save files --------------------------------------------------------------
 
-save(menage_echelle,file=MatisseFiles$menage_echelle_1_1_rd)
-
-
-
-# Next Step ---------------------------------------------------------------
-# Rétrocession de la taxe carbone
-
+save(menage_echelle, file = MatisseFiles$menage_echelle_1_1_rd)
 
 
 # Clean -------------------------------------------------------------------
-rm(menage_forme,IMACLIM,FC,ThreeME,menage_echelle)
+suppressWarnings(rm(menage_forme, FC, menage_echelle))
 gc()
 
