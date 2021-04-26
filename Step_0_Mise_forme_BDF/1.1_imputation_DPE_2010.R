@@ -1,4 +1,3 @@
-
 # L'objectif de cette fonction est d'estimer une fonction de régression logistique permettant d'estimer les classes 
 # de DPE des ménages de BDF,le résultat se trouve dans menages_DPE, colonne DPE_pred
 # Pas besoin de faire fonctionner un autre code que celui-ci, il se charger de sourcer tous les scripts R qu'il requiert. 
@@ -11,6 +10,7 @@ suppressMessages(library(tidyverse , warn.conflicts=F , quietly = T))
 suppressMessages(library(car , warn.conflicts=F , quietly = T))
 suppressMessages(library(readxl, warn.conflicts=F , quietly = T))
 
+
 # Data ---------------------------------------------------------------
 
 #Stock de DPE en 2010 pour caler les variables agrégées => dpe_stock_2010
@@ -22,6 +22,7 @@ depmen <- read.csv(MatisseFiles$depmen_bdf_csv , header=TRUE , sep=";" , dec="."
 
 # load menage_calibr_2010 avec ménages pré_selectionnés
 load(MatisseFiles$menage_calibr_2010_rd)
+
 
 # Traitement ThreeME ------------------------------------------------------
 ThreeME <- 
@@ -42,11 +43,13 @@ dpe_stock_2010 <-
   mutate(DPE= str_replace_all(Var, pattern="BUIL_H01_C",replacement="")) %>% 
   mutate(DPE= str_replace_all(DPE, patter="_2",replacement=""))
 
+
 # ESTIMATEUR DPE SUR DONNEES SOCIO-ECO ----------------------------------------------------------
 
 # Load estm_dpe_acp, 
 # list 27 paramètres
 source(paste(M_home , "/Step_0_Mise_forme_BDF/1.2_estimateur_dpe_phebus.R", sep=""))
+
 
 # CREER BASE DE DONNEES --------------------------------------------------
 
@@ -70,6 +73,7 @@ appariement_menages_DPE <-
 
 #pour équivalence variables Phébus/BDF se référer au document "2018-09-26 Mapping données Phébus x BDF.odt"
 # BATI_PERIODE + ESTOC + Revenu_Insee_quintile + EHST + RP_TAILLE_UU + is_elec + MI
+
 
 # RECODAGE DES VARIABLES --------------------------------------------------
 

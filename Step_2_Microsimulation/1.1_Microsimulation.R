@@ -1,88 +1,56 @@
 
-# Library -----------------------------------------------------------------
-library(tidyverse)
+# Libraries -----------------------------------------------------------------
 
-#function
+suppressMessages(library(tidyverse , warn.conflicts=F , quietly = T))
 source(paste(M_home,"/Step_2_Microsimulation/1.2_fonction_microsimulation.R",sep=""))
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Common/tools.R",sep=""))
 
 
-# DATA --------------------------------------------------------------------
+# Data --------------------------------------------------------------------
 
-## Menages
-# 2010
 load(MatisseFiles$menage_forme_rd)
-# mise à l'échelle
 load(MatisseFiles$menage_echelle_1_rd)
-
-## MACRO
-# FC
 load(MatisseFiles$FC_2010_horizon_rd)
-# ThreeME
 load(MatisseFiles$Threeme_rd)
+load(MatisseFiles$elast_rd)
 
 
-# ELASTICITES -------------------------------------------------------------
-# Importer élasticités prix et revenus de chaque TYPO x DECILE
-load(MatisseFiles$elast_rd) #Elast
-
+# Extraction des élasticités de Elast --------------------------------------------------------------
 
 # Nom de tous les catégories de "A01" à "A014")
-Cat<-names(FC)[1:14]
-list_A=c()
-for (i in 1:9){list_A=c(list_A,paste("A0",i,sep=""))}
-for (i in 10:14){list_A=c(list_A,paste("A",i,sep=""))}
-# list_A
-list_elast_rev<-paste("elast_rev",list_A,sep="_")
-list_elast_prix<-paste("elast_prix",list_A,sep="_")
-
-
-# Elasticité prix --------------------------------------------------------------
+list_A <- paste("A", formatC(1:14, width = 2, flag = 0), sep="")
+list_elast_rev <- paste("elast_rev",list_A,sep="_")
+list_elast_prix <- paste("elast_prix",list_A,sep="_")
 
 Elast_prix <-
   Elast %>% 
-  filter(typ_elast=="prix") %>% 
-  select(CODADEME,Typo, Decile,elast) %>%
-  dplyr::rename(.,elast_prix=elast) %>%
-  spread(key=CODADEME,value=elast_prix)%>%
-  mutate(Decile=as.numeric(Decile))
-
-colnames(Elast_prix)<-c("Typo","Decile",list_elast_prix) 
-
-
-
-
-
-# Elasticité revenu ------------------------------------------------------------
+  filter(typ_elast == "prix") %>% 
+  select(CODADEME, Typo, Decile, elast) %>%
+  dplyr::rename(., elast_prix = elast) %>%
+  spread(key = CODADEME, value = elast_prix) %>%
+  mutate(Decile = as.numeric(Decile))
+colnames(Elast_prix) <- c("Typo", "Decile", list_elast_prix) 
 
 Elast_rev <-
-  Elast %>% filter(typ_elast=="rev") %>% 
-  mutate(elast_rev=elast) %>%
-  select(CODADEME,Typo, Decile,elast_rev)%>%
-  spread(key=CODADEME,value=elast_rev) %>%
-  mutate(Decile=as.numeric(Decile)) 
+  Elast %>% filter(typ_elast == "rev") %>% 
+  mutate(elast_rev = elast) %>%
+  select(CODADEME, Typo, Decile, elast_rev) %>%
+  spread(key = CODADEME, value = elast_rev) %>%
+  mutate(Decile = as.numeric(Decile)) 
+colnames(Elast_rev) <- c("Typo", "Decile", list_elast_rev) 
 
-colnames(Elast_rev)<-c("Typo","Decile",list_elast_rev) 
-
-
-
-# Elasticités des Ménages -------------------------------------------------
-
+#Ajout des élasticités par ménage en fonction de typo et décile
 menage_echelle$decuc2 <- as.numeric(menage_echelle$decuc2)
-
 menage_echelle<- 
   menage_echelle %>% 
-  left_join(Elast_prix,by=c("typo2010f"="Typo","decuc2"="Decile")) %>%
-  left_join(Elast_rev,by=c("typo2010f"="Typo","decuc2"="Decile")) 
+  left_join(Elast_prix, by = c("typo2010f" = "Typo", "decuc2" = "Decile")) %>%
+  left_join(Elast_rev , by = c("typo2010f" = "Typo", "decuc2" = "Decile")) 
 
 
+# Fonction microsimulation des dépenses -----------------------------
 
-
-
-# APPEL Fonction MICROSIMULATION des DEPENSES -----------------------------
-
-menage_echelle <- microsimulation_depenses(menage_echelle,menage_forme,FC)
+menage_echelle <- microsimulation_depenses(menage_echelle, menage_forme, FC)
 
 
 # Mise à l'échelle des surfaces -------------------------------------------
@@ -169,7 +137,7 @@ save(menage_echelle,file=MatisseFiles$menage_echelle_2_1_rd)
 
 
 # Clean -------------------------------------------------------------------
-suppressWarnings(rm(menage_forme,menage_echelle,FC,ThreeME,Elast,Cat,list_A,list_elast_rev,list_elast_prix,Elast_prix,Elast_rev,
+suppressWarnings(rm(menage_forme,menage_echelle,FC,ThreeME,Elast,list_A,list_elast_rev,list_elast_prix,Elast_prix,Elast_rev,
    BUIL_H01_2_2010,POP_TOT_2010,surfhab_hab_2010,BUIL_H01_2_horizon,POP_TOT_horizon,surfhab_hab_horizon))
 gc()
 

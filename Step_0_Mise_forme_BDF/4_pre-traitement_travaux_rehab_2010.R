@@ -21,82 +21,56 @@
 
 # Libraries ---------------------------------------------------------------
 
-library(tidyverse)
-library(readxl)
+suppressMessages(library(tidyverse, warn.conflicts=F , quietly = T))
+suppressMessages(library(readxl, warn.conflicts=F , quietly = T))
 source(paste(M_home,"/Common/tools.R",sep=""))
-
-
-# DATA --------------------------------------------------------------------
-
-
-# menage_forme
-load(MatisseFiles$menage_forme_3_rd)
-
-# ThreeME
-suppressWarnings(scen<-read_excel(path= MatisseFiles$sortie_3me_xl ,sheet="scen AMS"))
-ThreeME<- scen %>% select(-Def)%>% gather(key=year, value=value, -c(1))%>%filter(year==2010)
-  
-#C05
-c05 <- read.csv2(MatisseFiles$c05_bdf_csv)
-
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
-# PREPARATION DONNEES COUT REHAB THREEME ----------------------------------
+
+# Data --------------------------------------------------------------------
+
+load(MatisseFiles$menage_forme_3_rd)
+suppressMessages(suppressWarnings(scen <- read_excel(path = MatisseFiles$sortie_3me_xl, sheet = "scen AMS")))
+ThreeME <- 
+  scen %>% 
+  select(-Def) %>% 
+  gather(key = year, value = value, -c(1)) %>%
+  filter(year == 2010)
+c05 <- read.csv2(MatisseFiles$c05_bdf_csv)
 
 
-Cost_m2=c()
+# Data cost/m² 3ME ----------------------------------
+
+Cost_m2 <- data.frame(classe_dep = character(), classe_arr = character(), cost_m2 = double(), transition_tot_Meuros = double(), stringsAsFactors = F)
 # travaux de rénovation énergétiques en volume par saut de classe (en M2) Transition de L vers M
 for (dep in LETTERS[1:7]){
   #dep : classe DPE de départ
-  
   for (arr in LETTERS[1:7]){
     # arr : classe DPE d'arrivée
     # On vérifie que la transition est une amélioration (arr "mieux" que dep)
-    
     if(dep>arr){
-      
       #extraction stock m2 passant de M à L en 2010 (ThreeME)
-      stock_m2<-as.numeric(
-        ThreeME %>% 
-          filter(Var==paste("REHAB_H01_C",dep,"_C",arr,"_2",sep="")) %>%
-          select(value)
-      )
+      stock_m2<-as.numeric(ThreeME %>% 
+                          filter(Var == paste("REHAB_H01_C", dep, "_C", arr, "_2", sep="")) %>%
+                          select(value))
       
       #extraction coût des travaux pour passer de M à L en 2010 (ThreeME) en M€
-      stock_euros<-as.numeric(
-        ThreeME %>% 
-          filter(Var==paste("PREHAB_H01_C",dep,"_C",arr,"_2*","REHAB_H01_C",dep,"_C",arr,"_2",sep="")) %>%
-          select(value)
-      )
+      stock_euros<-as.numeric(ThreeME %>% 
+                              filter(Var==paste("PREHAB_H01_C", dep, "_C", arr, "_2*REHAB_H01_C", dep, "_C", arr, "_2",sep="")) %>%
+                              select(value))
       
       # stock_euros/stock_m2 = coût de la réhabiliation par m2 (en €/m2)
       # Création matrice Cost_m2 : DPE_départ | DPE_arrivée | coût_m2 | coût_total_transition
-      Cost_m2=rbind(Cost_m2,c(dep,arr,stock_euros/stock_m2*(10^6),stock_euros))
+      Cost_m2 <- rbind(Cost_m2, data.frame(classe_dep = dep, classe_arr = arr, cost_m2 = stock_euros / stock_m2 * (10^6), transition_tot_Meuros = stock_euros))
     }
   }
 }
 
-colnames(Cost_m2)<-
-  c(
-    "classe_dep",
-    "classe_arr",
-    "cost_m2",
-    "transition_tot_Meuros"
-  )
-# convertir en data.frame
-Cost_m2<-as.data.frame(Cost_m2,stringsAsFactors=F)
+# Data gros travaux ---------------------------------------------
 
-
-
-
-
-# Préparation données ménages ---------------------------------------------
-
-
-# Création de ménage_GT_2010
-menage_GT_2010<-
+menage_GT_2010 <-
   menage_forme %>% 
-  select(ident_men, pondmen,surfhab_d,DPE_pred) 
+  select(ident_men, pondmen, surfhab_d, DPE_pred) 
 
 # Sélection des ménages ayant réalisé des gros travaux en 2010 (résidence principale ou secondaire)
   # c13411 : Gros travaux pour la résidence principale yc matériaux de construction de gros oeuvre et de gros équipementsencastrés dans le bâti
@@ -105,11 +79,11 @@ menage_GT_2010<-
 c13_2010_GT<- 
   c05 %>% 
   filter(ident_men %in% menage_forme$ident_men) %>%
-  filter(c13411+c13421>0) %>% 
-  select(c13411,c13421,ident_men)%>% 
-  mutate(GT=c13411+c13421) %>% 
-  left_join(menage_GT_2010,by="ident_men")%>% 
-  mutate(GT_m2=GT/surfhab_d) #gros travaux par m2
+  filter(c13411 + c13421 > 0) %>% 
+  select(c13411, c13421, ident_men) %>% 
+  mutate(GT = c13411 + c13421) %>% 
+  left_join(menage_GT_2010, by = "ident_men") %>% 
+  mutate(GT_m2 = GT / surfhab_d) #gros travaux par m2
 
 
 # CLASSEMENT DES MENAGES PAR GT AU M2 PAR DPE -----------------------------
@@ -119,7 +93,7 @@ c13_2010_GT<-
 c13_2010_GT<-
   c13_2010_GT %>% 
   group_by(DPE_pred) %>% 
-  dplyr::mutate(GT_rank =row_number(-GT_m2)) %>%  # les plus gros travaux au m2 en premiers
+  dplyr::mutate(GT_rank = row_number(-GT_m2)) %>%  # les plus gros travaux au m2 en premiers
   ungroup()
 
 # verif
@@ -129,73 +103,55 @@ c13_2010_GT<-
 
 # MENAGE REHAB ENERGETIQUE 2010 -------------------------------------------
 
-
-Seuils=c()
+Seuils <- data.frame(dep = character(), arr = character(), haut = double(), bas = double(), stringsAsFactors = F)
 # classe DPE de départ
 for (dep in LETTERS[2:7]){
   
   # restriction de la bdd des ménages à GT>0 tq leur classe DPE == dep, classement selon rang 
   c13_2010_GT_classe <- 
     c13_2010_GT %>% 
-    filter(DPE_pred==dep) %>% 
+    filter(DPE_pred == dep) %>% 
     arrange(GT_rank)
-  
   #création pour chaque DPE de départ d'une matrice donnant le rang des ménages pratiquant une REHAB
   seuil_rank=c()
   
   for (arr in LETTERS[1:7]){
-    
-    if(dep>arr){
-      
-      # print(paste(dep,"vers",arr,sep=" "))
-      
+    if(dep > arr){
       # extraction du prix au m2 de la transition en question : dep -> arr
-      cost_m2_trans <-
-        as.numeric(
-          Cost_m2 %>% 
-            filter(classe_dep==dep) %>% 
-            filter(classe_arr==arr)%>% 
-            select(cost_m2)
-        )
+      cost_m2_trans <- as.numeric(Cost_m2 %>% 
+                                 filter(classe_dep == dep) %>% 
+                                 filter(classe_arr == arr) %>% 
+                                 select(cost_m2))
       
       # seuil_rank indique le dernier ménage pouvant "s'offir" une telle réhabilitation,
       # dont les dépenses en GT par m2 couvrent le coût de la réhabilitation
-      seuil_rank<-c(
-        as.numeric(
-          c13_2010_GT_classe %>% 
-            filter(GT_m2>=cost_m2_trans) %>% 
-            summarise(max(GT_rank))
-        ),
-        seuil_rank
-      )
+      suppressWarnings(seuil_rank <- c(as.numeric(c13_2010_GT_classe %>% 
+                                                  filter(GT_m2 >= cost_m2_trans) %>% 
+                                                  summarise(max(GT_rank))), seuil_rank))
       
       # Si la première valeur de seuil_rank (dernière ajoutée, pour la dernière transition dep-> arr) 
       # est infinie alors cela signifie qu'aucun ménage n'a dépensé assez pour une telle transition
       # le premier ménage éligible est donc le premier (décalage ensuite si réalise une transition plus chère)
-      if(is.infinite(seuil_rank[1])){seuil_rank[1]<-1}
-      
-      
+      if(is.infinite(seuil_rank[1])){seuil_rank[1] <- 1}
+
       # GT_rehab : coût de la réhabiliation acquitée par le ménage et le total représenté par le ménage (pondmen)
       c13_2010_GT_classe <- 
         c13_2010_GT_classe %>% 
-        mutate(GT_rehab=cost_m2_trans*surfhab_d) %>% 
-        mutate(GT_pond_rehab=cost_m2_trans*surfhab_d*pondmen) %>%
-        mutate(GT_pond=GT*pondmen)
+        mutate(GT_rehab = cost_m2_trans * surfhab_d) %>% 
+        mutate(GT_pond_rehab = cost_m2_trans * surfhab_d * pondmen) %>%
+        mutate(GT_pond = GT * pondmen)
       
       # extraction du total macro de la transition dep->arr
-      cost_tot_transition<-
-        as.numeric(
-          Cost_m2 %>% 
-            filter(classe_dep==dep) %>% 
-            filter(classe_arr==arr)%>% 
-            select(transition_tot_Meuros)
-        )
+      cost_tot_transition <- as.numeric(Cost_m2 %>% 
+                                        filter(classe_dep == dep) %>% 
+                                        filter(classe_arr == arr) %>% 
+                                        select(transition_tot_Meuros))
       
       #init
-      sum=0
+      sum_renov <- 0
       #i va désigner le nombre de ménage au dessus du ménage "seuil" de la transition 
       # concerné par la réhabilitation dep->arr
-      i=0
+      i <- 0
       # j désigne le nombre de ménage en dessous du ménage "seuil" de la transition
       # concerné par la réhabilitation
       # Rmq : dans le cas de la transition de G vers les classes les plus hautes, aucun ménage 
@@ -206,24 +162,21 @@ for (dep in LETTERS[2:7]){
       # si on a déjà réalisé des transitions, il faut s'assurer que le seuil pour 
       # la seconde transition est plus élevé que pour la première, sinon, j est 
       # d'autant plus elevé que les transitions déjà effectuées pour ne pas compter deux fois le même ménage
-      j = ifelse(
-        is.na(seuil_rank[2]), # si on veut aller vers A on n'a encore qu'un seuil celui des travaux vers A, on regarde directement sous la limite i
-        1, #donc j=1
-        ifelse(
-          seuil_rank[1]-seuil_rank[2]>0 , # si ce n'est pas une transition vers A, alors seuil_rank indique non plus le seuil théorique de travaux de X vers Y, mais le dernier ménage sélectionné pour la dernière transition, si on n'est pas déjà passé sous la limite alors j=1
-          1,
-          1+seuil_rank[2]-seuil_rank[1] # sinon on rend le premier ménage "disponible" dans la liste.
-        )
-      )
-      
+      j <- ifelse(is.na(seuil_rank[2]), # si on veut aller vers A on n'a encore qu'un seuil celui des travaux vers A, on regarde directement sous la limite i
+                  1, #donc j=1
+                  ifelse(
+                    seuil_rank[1] - seuil_rank[2]>0, # si ce n'est pas une transition vers A, alors seuil_rank indique non plus le seuil théorique de travaux de X vers Y, mais le dernier ménage sélectionné pour la dernière transition, si on n'est pas déjà passé sous la limite alors j=1
+                    1,
+                    1 + seuil_rank[2] - seuil_rank[1] # sinon on rend le premier ménage "disponible" dans la liste.
+                  ))
       j_init <- j
       
       # Tant que le nombre de ménage réhabilitant leur logement ne somme pas au montant macro de dep -> arr
       # et qu'on n'est pas au bout de la liste
-      while(sum<cost_tot_transition & seuil_rank[1]+j<=max(c13_2010_GT_classe$GT_rank)){
+      while(sum_renov < cost_tot_transition & seuil_rank[1] + j <= max(c13_2010_GT_classe$GT_rank)){
         if(
-          ((seuil_rank[1]-i>seuil_rank[2]) ||  (is.na(seuil_rank[2]) & seuil_rank[1]-i >0)) & #cond 1
-          (1-is.na(seuil_rank[1]-i>seuil_rank[2] || (is.na(seuil_rank[2]) & seuil_rank[1]-i >0))) #cond 2
+          ((seuil_rank[1] - i > seuil_rank[2]) ||  (is.na(seuil_rank[2]) & seuil_rank[1] - i > 0)) & #cond 1
+          (1 - is.na(seuil_rank[1] - i > seuil_rank[2] || (is.na(seuil_rank[2]) & seuil_rank[1] - i >0))) #cond 2
         )
           # tant de conditions compliquées : 
           # dans la première on vérifie qu'on 
@@ -236,87 +189,41 @@ for (dep in LETTERS[2:7]){
           # deux premières somment à NA. (NA & 0 = FALSE)
           
         {
-          sum = 
-            sum + 
-            as.numeric(
-              c13_2010_GT_classe %>% 
-                filter(GT_rank==seuil_rank[1]-i) %>%
-                select(GT_pond_rehab)
-            ) /(10^6)
           # somme des montants pondérés des GT_rehab des ménages juste au dessus du seuil. 
-          
-          # print(seuil_rank-i)
-          i=i+1
-          # print(sum)
-        }
-        
-        else {
+          sum_renov <- sum_renov + as.numeric(c13_2010_GT_classe %>% 
+                                 filter(GT_rank==seuil_rank[1]-i) %>%
+                                 select(GT_pond_rehab)) /(10^6)
+          i <- i + 1
+        }else{
           # Si on ne peut plus monter au dessus du seuil, soit qu'on soit arrivé au ménage classé n°1 ou que ces ménages réalisent déjà une réhabilitation 
           # on transitionne des ménages juste en dessous du seuil (qui techniquement ne peuvent pas se permettre ces travaux ...). On ne compte donc plus dans 
           # le total des travaux le montant théorique en fonction de la surface, mais le montant total qu'ils peuvent débourser, soit GT
-          sum = 
-            sum +
-            as.numeric(
-              c13_2010_GT_classe %>% 
-                filter(GT_rank==seuil_rank[1]+j) %>%
-                select(GT_pond)
-            ) / (10^6)
-          
-          # print(seuil_rank[1]+j)
-          j=j+1
-          print(paste(dep," vers ",arr,", cible= ", cost_tot_transition,", sum= ",sum,sep=""))
+          sum_renov <- sum_renov + as.numeric(c13_2010_GT_classe %>% 
+                                 filter(GT_rank == seuil_rank[1] + j) %>%
+                                 select(GT_pond)) / (10^6)
+          j <- j + 1
         }
-        }
-        
-      
-    
+      }
+
       #  le ménage le mieux classé réhabilité au cours de cette boucle est au rang :
-        # si j_init>1 alors c'est qu'on est déjà descendu sous le seuil au cours d'une itération précédente, 
-        # donc qu'a fortiori que i=0, donc que le premier ménage sélectionné est seuil_rank+j_init, si j_init=1 alors 
-        # on rajoute 1 pour compenser le fait qu'on ait itéré i+1 avant de sortir du while(sum<cost_tot_transition) 
-      seuil_haut =
-        seuil_rank[1]-i+j_init
+      # si j_init>1 alors c'est qu'on est déjà descendu sous le seuil au cours d'une itération précédente, 
+      # donc qu'a fortiori que i=0, donc que le premier ménage sélectionné est seuil_rank+j_init, si j_init=1 alors 
+      # on rajoute 1 pour compenser le fait qu'on ait itéré i+1 avant de sortir du while(sum_renov<cost_tot_transition) 
+      seuil_haut <- seuil_rank[1] - i + j_init
       #  le ménage le moins bien classé réhabilité au cours de cette boucle est au rang :
       #  si j==1 alors nous n'avons pas eu besoin d'aller chercher des ménages sous le seuil (sinon j=2)
-      seuil_bas=
-        ifelse(
-          j==1,
-          seuil_rank[1],
-          seuil_rank[1]+j-1 # -1 pour compenser la dernière itération j+1 en sortie de boucle
-        )
-      
+      seuil_bas <- ifelse(j == 1, seuil_rank[1], seuil_rank[1]+j-1) # -1 pour compenser la dernière itération j+1 en sortie de boucle
+
       # si on a eu besoin de passer sous le seuil alors on "baisse" le seuil à la 
       # valeur de seuil_bas pour indiquer à la prochaine boucle ne pas réhabiliter des ménages au dessus de ce seuil
-      if(seuil_bas>seuil_rank[1])
-      {seuil_rank[1]<-seuil_bas}
-      
-      #Print
-      # print(paste(dep,"vers",arr,sep=" "))
-      # print(seuil_haut)
-      # print(seuil_rank[1])
-      # print(seuil_bas)
+      if(seuil_bas > seuil_rank[1]){seuil_rank[1] <- seuil_bas}
       
       # Dans la matrice Seuils on indique que la transition de dep à arr concerne
       # les ménages entre seuil_haut et seuil_bas (inclus)
-      Seuils=
-        rbind(
-          Seuils,
-          c(dep,arr,seuil_haut,seuil_bas)
-        )
-      
+      Seuils <- rbind(Seuils, data.frame(dep = dep, arr = arr, haut = seuil_haut, bas = seuil_bas))
     }
   }
-  
 }
-
-colnames(Seuils)<-c("dep","arr","haut","bas")
-Seuils<-as.data.frame(Seuils,stringsAsFactors=F)
-Seuils
-# Verif
-# de C vers B : seuil bas 53 : 
-c13_2010_GT %>% filter(DPE_pred=="C")%>%filter(GT_rank==53)%>%select(ident_men,GT_m2) #129 €/m2
-as.numeric(Cost_m2 %>% filter(classe_dep=="C") %>% filter(classe_arr=="B")%>% select(cost_m2)) # 127€/m2
-
 
 
 # création variable REHAB, 
@@ -324,16 +231,15 @@ as.numeric(Cost_m2 %>% filter(classe_dep=="C") %>% filter(classe_arr=="B")%>% se
 # REHAB_M2 : prix des réhabilitations le cas échéant
 c13_2010_GT<-
   c13_2010_GT %>% 
-  mutate(REHAB=FALSE) %>% 
-  mutate(REHAB_m2=0)
+  mutate(REHAB = FALSE) %>% 
+  mutate(REHAB_m2 = 0)
 
 
 # on parcourt tous les transitions dep->arr
-for(i in 1:dim(Seuils)[1]){
-  seuil<-Seuils[i,]
-  seuil$bas<-as.numeric(seuil$bas)
-  seuil$haut<-as.numeric(seuil$haut)
-  # print(i)
+for(i in 1:nrow(Seuils)){
+  seuil <- Seuils[i, ]
+  seuil$bas <- as.numeric(seuil$bas)
+  seuil$haut <- as.numeric(seuil$haut)
   c13_2010_GT<-
     c13_2010_GT %>% 
     mutate_when(
@@ -352,25 +258,63 @@ for(i in 1:dim(Seuils)[1]){
 }
 
 # création variable GT_REHAB
-c13_2010_GT <- c13_2010_GT %>% mutate(GT_REHAB=REHAB_m2*surfhab_d)
+c13_2010_GT <- 
+  c13_2010_GT %>% 
+  mutate(GT_REHAB = REHAB_m2 * surfhab_d)
 # si GT_REHAB > GT (quand on rehabilité des ménages sous le seuil) 
 # alors les travaux de réhabiliation correspondent à toute la dépense en GT
-c13_2010_GT[
-  which(c13_2010_GT$GT_REHAB>c13_2010_GT$GT),
-  "GT_REHAB"
-  ] <-
-  c13_2010_GT[
-    which(c13_2010_GT$GT_REHAB>c13_2010_GT$GT),
-    "GT"
-    ]
+c13_2010_GT[which(c13_2010_GT$GT_REHAB > c13_2010_GT$GT), "GT_REHAB"] <-
+  c13_2010_GT[which(c13_2010_GT$GT_REHAB>c13_2010_GT$GT),"GT"]
 
 # Variable GT_RENO : reste des travaux non énergétiques
 c13_2010_GT <- 
   c13_2010_GT %>% 
-  mutate(GT_RENO=GT-GT_REHAB)
+  mutate(GT_RENO = GT - GT_REHAB)
+
+Gros_travaux_2010 <-
+  c13_2010_GT %>%
+  select(ident_men, pondmen, GT_REHAB, GT_RENO)
+
+
+# Update Budgets ----------------------------------------------------------
+
+#Gros_travaux_2010 => 3259 ménages, dont 3002 GT_REHAB==0, 257 GT_REHAB>0
+
+menage_forme <- 
+  menage_forme %>%
+  left_join(Gros_travaux_2010 %>% select(ident_men, GT_REHAB, GT_RENO), by = "ident_men") %>%
+  mutate(GT_REHAB = ifelse(is.na(GT_REHAB), 0, GT_REHAB)) %>%
+  mutate(BTP = BTP - GT_REHAB)
+
+menage_forme <- 
+  menage_forme %>% 
+  select(-GT_REHAB, -GT_RENO)
+
+
+# Save --------------------------------------------------------------------
+
+save(menage_forme, file = MatisseFiles$menage_forme_4_rd)
+save(menage_forme, file = MatisseFiles$menage_forme_rd)
+
+
+
+# Cleaning ----------------------------------------------------------------
+
+suppressWarnings(rm(c13_2010_GT, c13_2010_GT_classe, Cost_m2, menage_GT_2010, Seuils,
+                    seuil, arr, dep, i, seuil_rank, Gros_travaux_2010, c05, menage_forme, 
+                    scen, ThreeME, cost_m2_trans, cost_tot_transition, j, j_init, seuil_bas, 
+                    seuil_haut, stock_euros, stock_m2, sum_renov))
+gc()
+
+# Verification ------------------------------------------------------------
+
+
+# Verif
+# de C vers B : seuil bas 53 : 
+# c13_2010_GT %>% filter(DPE_pred=="C")%>%filter(GT_rank==53)%>%select(ident_men,GT_m2) #129 €/m2
+# as.numeric(Cost_m2 %>% filter(classe_dep=="C") %>% filter(classe_arr=="B")%>% select(cost_m2)) # 127€/m2
 
 # View(arrange(c13_2010_GT,DPE_pred,GT_rank))
-
 
 # c13_2010 <- c13_2010 %>% 
 #   left_join(c13_2010_GT %>%
@@ -384,45 +328,18 @@ c13_2010_GT <-
 #          GT_RENO=c13411+c13421)
 #   )
 
-Gros_travaux_2010 <-
-  c13_2010_GT %>%
-  select(ident_men,pondmen,GT_REHAB,GT_RENO)
-
-#Verif
-Gros_travaux_2010 %>% summarise(sum(pondmen*GT_REHAB)) #8303341510€
-Cost_m2 %>%mutate(transition_tot_Meuros=as.numeric(transition_tot_Meuros))%>% summarise(sum(transition_tot_Meuros))*10^6 #9014923069
-# Rmq : il manque 7.9% du montant total, parce que la classe G ne contenait pas assez de ménages pour remplir les objectifs de ThreeME. Soit 711 millions €. 
-
-rm(c13_2010_GT,c13_2010_GT_classe,Cost_m2,menage_GT_2010,Seuils,seuil,arr,dep,i,seuil_rank)
-
-
-
-
-
-# Update Budgets ----------------------------------------------------------
-
-#Gros_travaux_2010 => 3259 ménages, dont 3002 GT_REHAB==0, 257 GT_REHAB>0
-
-menage_forme <- 
-  menage_forme %>%
-  left_join(Gros_travaux_2010%>%select(ident_men,GT_REHAB,GT_RENO),by="ident_men")%>%
-  mutate(GT_REHAB=ifelse(is.na(GT_REHAB),0,GT_REHAB))%>%
-  mutate(BTP=BTP-GT_REHAB)
-
-rm(Gros_travaux_2010)
+# #Verif
+# Gros_travaux_2010 %>% summarise(sum(pondmen*GT_REHAB)) #8303341510€
+# Cost_m2 %>%mutate(transition_tot_Meuros=as.numeric(transition_tot_Meuros))%>% summarise(sum(transition_tot_Meuros))*10^6 #9014923069
+# # Rmq : il manque 7.9% du montant total, parce que la classe G ne contenait pas assez de ménages pour remplir les objectifs de ThreeME. Soit 711 millions €. 
 
 # TEST : Le reste de BTP doit correspondre à GT_RENO 
-# table(menage_forme %>% filter(!is.na(GT_RENO))%>%mutate(verif=BTP-GT_RENO)%>%select(verif))
-  
-menage_forme<-menage_forme %>% select(-GT_REHAB,-GT_RENO)
+# table(menage_forme %>% 
+#         filter(!is.na(GT_RENO)) %>%
+#         mutate(verif = BTP - GT_RENO) %>%
+#         select(verif))
 
-save(menage_forme,file=MatisseFiles$menage_forme_4_rd)
-save(menage_forme,file=MatisseFiles$menage_forme_rd)
+# compute_savings_rate_export(menage_forme) #0.1055916
+# compute_share_export(menage_forme)
+# energie_mix(menage_forme,FC=NA)
 
-compute_savings_rate_export(menage_forme) #0.1055916
-compute_share_export(menage_forme)
-energie_mix(menage_forme,FC=NA)
-
-# SUCCESS -----------------------------------------------------------------
-
-print("Step_0 : 4_pre-traitement_travaux_rehab_2010 : SUCCESS")

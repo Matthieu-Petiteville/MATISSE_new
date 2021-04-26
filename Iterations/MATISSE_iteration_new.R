@@ -35,6 +35,11 @@ if(Iter==0){
   if (file.exists(excel_file_name)){file.remove(excel_file_name)}
   write_xlsx(imaclim_xl,path=excel_file_name)
 
+	load(MatisseFiles$menage_iteration_rd)
+	save(menage_iteration,file=MatisseFiles$menage_iteration_iter_rd)
+
+	
+	
   print("Fin Iter_0")
 
 

@@ -119,53 +119,11 @@ initializeMatisseFiles <- function(){
     "menage_iteration_params_rd"         = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/menage_iteration.RData",sep=""),
     "FC_horiz_marge_rd"                  = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/FC_",horizon,"_marge.RData",sep=""),
     "input_macro_check_csv"              = paste(M_data,"/IMACLIM/Input_macro_check.csv",sep=""),
-    "export_iter_csv"                    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/export_Iter_",Iter,".csv",sep="")
+    "export_iter_csv"                    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/export_Iter_",Iter,".csv",sep=""),
+    "output_pdf"                         = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Report.pdf",sep="")
   )
 
 } 
-
-refreshMatisseFiles_conditional <- function(){
-
-  
-  MatisseFiles[["IMACLIM_rd"]] =    paste(M_data , "/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep="")
-  MatisseFiles[["Threeme_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep="")
-  MatisseFiles[["FC_2010_horizon_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep="")
-  MatisseFiles[["EMS_scen_rd"]] = paste(M_data,"/Output/Projet_ADEME/",scenario,"/EMS.RData",sep="")
-  MatisseFiles[["menage_echelle_1_1_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_1_1.RData",sep="")
-  MatisseFiles[["menage_echelle_1_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep="")
-  MatisseFiles[["menage_echelle_2_1_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_2_1.RData",sep="")
-  MatisseFiles[["menage_echelle_2_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_2.RData",sep="")
-  MatisseFiles[["IMACLIM_3ME_scen_horiz_xl"]] = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/","Optimiste","/","ssrec","/IMACLIM_3ME.xlsx",sep="")
-  MatisseFiles[["menage_echelle_31_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_31.RData",sep="")
-  MatisseFiles[["menage_echelle_32_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_32.RData",sep="")
-  MatisseFiles[["sBCE_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/sBCE.RData",sep="")
-  MatisseFiles[["sub_rehab_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Subvention_rehab.RData",sep="")
-  MatisseFiles[["cout_baill_pub_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Cout_bailleur_public.RData",sep="")
-  MatisseFiles[["menage_echelle_33_pre_revent_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33_avant_reventil.RData",sep="")
-  MatisseFiles[["menage_echelle_33_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33.RData",sep="")
-  MatisseFiles[["menage_echelle_TC_DPE_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_DPE.RData",sep="")
-  MatisseFiles[["bm_net_csv"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/BM_net.csv",sep="")
-  MatisseFiles[["menage_echelle_TC_VE_pre_revent_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE_avant_reventil.RData",sep="")
-  MatisseFiles[["menage_echelle_TC_VE_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE.RData",sep="")
-  MatisseFiles[["menage_echelle_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_echelle.RData",sep="")
-  MatisseFiles[["agreg_best_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/agreg_best.RData",sep="")
-  MatisseFiles[["menage_calibr_2010_final_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_calibr_2010.RData",sep="")
-  MatisseFiles[["menage_contraintes_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_contraintes.RData",sep="")
-  MatisseFiles[["pond_init_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/pond_init.RData",sep="")
-  MatisseFiles[["diff_pond_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/diff_pond.RData",sep="")
-  MatisseFiles[["pond_final_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/pond_final.RData",sep="")
-  MatisseFiles[["agreg_final_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.RData",sep="")
-  MatisseFiles[["menage_echelle_final_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle.RData",sep="")
-  MatisseFiles[["agreg_final_csv"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.csv",sep="")
-  MatisseFiles[["pond_final_heurist_scen_horiz_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep="")
-  MatisseFiles[["pond_final_heurist_scen_horiz_txt"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/READ_ME_pond_final_heuristique_",scenario,"_",horizon,".txt",sep="")
-  MatisseFiles[["export_iter_0_csv"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/export_Iter_0.csv",sep="")
-  MatisseFiles[["menage_iteration_rd"]] = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_iteration.RData",sep="")
-  
-  
-  
-}
-
 
 
 

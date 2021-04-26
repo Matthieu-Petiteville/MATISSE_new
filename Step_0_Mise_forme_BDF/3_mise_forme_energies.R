@@ -14,6 +14,7 @@
 
 suppressMessages(library(reshape2, warn.conflicts=F , quietly = T))
 suppressMessages(library(tidyverse, warn.conflicts=F , quietly = T))
+suppressMessages(library(plyr, warn.conflicts=F , quietly = T))
 source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R",sep=""))
 
@@ -221,11 +222,12 @@ save(menage_forme,file=MatisseFiles$menage_forme_3_rd)
 
 # Clean -------------------------------------------------------------------
 
-# suppressWarnings(rm(Table, list_table, appmen_intensites, dep_ener, dep_ener_2010, dep_source_activite,
-#                     dep_usage_activite, dep_usage_activite2, menage_forme, X, act, activites, dep_sources, 
-#                     list_source_usage, reventil_sources, source, source_act, source_act_list, source_usage, 
-#                     source_usage_act, sources, usage, usage_act, usages, usages_bis))
-# gc()
+suppressWarnings(rm(Table, list_table, appmen_intensites, dep_ener, dep_ener_2010, dep_source_activite,
+                    dep_usage_activite, dep_usage_activite2, menage_forme, X, act, activites, dep_sources,
+                    list_source_usage, reventil_sources, source, source_act, source_act_list, source_usage,
+                    source_usage_act, sources, usage, usage_act, usages, usages_bis, dep_ener_verif1, 
+                    dep_source, menage_forme_ener))
+gc()
 
 
 # Verifications -----------------------------------------------------------
@@ -257,20 +259,20 @@ save(menage_forme,file=MatisseFiles$menage_forme_3_rd)
 # sum(rowSums(dep_source_activite[sources])) # en €
 # [1] 13 932 919
 
-for (source in sources){
-  print(source)
-  print(sum(rowSums(dep_ener[list_source_usage] %>% select(starts_with(source))))==sum(dep_ener[source]))
-}
+# for (source in sources){
+#   print(source)
+#   print(sum(rowSums(dep_ener[list_source_usage] %>% select(starts_with(source))))==sum(dep_ener[source]))
+# }
 # sum(rowSums(dep_ener[list_source_usage] %>% select(starts_with("Elec"))))
 # # [1] 7028660
 # sum(dep_ener$Elec)
 # # [1] 7028660
-sum(rowSums(dep_ener[list_source_usage] %>% select(starts_with("Gaz"))))
+# sum(rowSums(dep_ener[list_source_usage] %>% select(starts_with("Gaz"))))
 # # [1] 7827271
-sum(dep_ener$Gaz)
+# sum(dep_ener$Gaz)
 # # [1] 7028660
 # sum(rowSums(dep_ener[list_source_usage] %>% select(starts_with("Fuel"))))
-# # [1] 2132795
+# [1] 2132795
 # sum(dep_ener$Fuel)
 # # [1] 2132795
 
@@ -316,7 +318,7 @@ sum(dep_ener$Gaz)
 #   dep_ener_verif1[source]<-rowSums(dep_ener_verif1 %>% select(contains(source)))
 #   print(source)
 #   print(table(dep_ener_verif1[source]-dep_ener[source]<10^(-5)))
-#   
+# 
 #   dep_source=paste("dep",source,sep="_")
 #   print(table(dep_ener[source]-menage_forme[dep_source]<10^(-9)))
 # }
@@ -347,9 +349,9 @@ sum(dep_ener$Gaz)
 
 
 # menage_forme_ener <- energie_dom_surf(menage_forme)
-# menage_forme_ener %>% 
+# menage_forme_ener %>%
 #   dplyr::group_by(DPE_pred) %>%
 #   summarise("Mwh_m2" = weighted.mean(x = ener_dom_surf, w = pondmen))
 # menage_forme_ener %>% group_by(DPE_pred)%>%
-#   summarise("Mwh_m2"=weighted.mean(x=energie_tot_surf,w=pondmen))
+#   summarise("Mwh_m2"=weighted.mean(x=energie_tot_surf , w = pondmen))
 # 

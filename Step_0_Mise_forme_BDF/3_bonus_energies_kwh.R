@@ -10,7 +10,7 @@ suppressMessages(library(tidyverse , warn.conflicts=F , quietly = T))
 suppressMessages(library(readxl , warn.conflicts=F , quietly = T))
 
 
-energie_dom_surf<-function(menage){
+energie_dom_surf<-function(menage, getFulldf = F){
   
   
   # Data -------------------------------------------------------------
@@ -194,8 +194,11 @@ energie_dom_surf<-function(menage){
   #   menage %>%
   #   left_join(dep_source_usage %>% select(ident_men,ener_dom_surf),by="ident_men")
   
-  menage_ener_dom<-menage %>% select(ident_men,ener_dom_surf,ener_dom,vol_tot,energie_tot_surf,DPE_pred,surfhab_d,pondmen)
-  
+  if(getFulldf){
+    menage_ener_dom<-menage
+  }else{
+    menage_ener_dom<-menage %>% select(ident_men,ener_dom_surf,ener_dom,vol_tot,energie_tot_surf,DPE_pred,surfhab_d,pondmen)
+  }
   return(menage_ener_dom)
   
   
