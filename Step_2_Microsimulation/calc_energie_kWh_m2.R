@@ -14,7 +14,7 @@ library(tidyverse)
 library(readxl)
 
 
-energie_dom_surf<-function(menage){
+energie_dom_surf<-function(menage, getFulldf = F){
 
 
 # IMPORT DATA -------------------------------------------------------------
@@ -256,7 +256,13 @@ menage %>% summarise(weighted.mean(x=ener_dom_surf,w=pondmen,na.rm=T)) #MWh
 #   menage %>%
 #   left_join(dep_source_usage %>% select(ident_men,ener_dom_surf),by="ident_men")
 
-menage_ener_dom<-menage %>% select(ident_men,ener_dom_surf,ener_dom,energie_tot_surf)
+
+if(getFulldf){
+  menage_ener_dom<-menage
+}else{
+  menage_ener_dom <- menage %>% select(ident_men,ener_dom_surf,ener_dom,energie_tot_surf)
+}
+
 
 return(menage_ener_dom)
 
