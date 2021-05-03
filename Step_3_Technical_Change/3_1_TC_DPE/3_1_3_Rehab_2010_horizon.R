@@ -1,3 +1,5 @@
+#Including enertot change
+
 # LIBRARIES ---------------------------------------------------------------
 library(tidyverse)
 library(decisionSupport)
@@ -57,7 +59,7 @@ list_dep=c("agriculture",
 
 ### Renommer datatable
 menage_echelle<-menage_echelle_32
-  # rm(menage_echelle_32)
+# rm(menage_echelle_32)
 
 
 ### Recoder variable
@@ -115,13 +117,13 @@ menage_echelle<-
   mutate(solde_int=0,solde_ener=0,principal_dette=0,solde_princ=0,subvention=0)%>% 
   mutate_when(solv>0.297 & stalog<=2,list(exclus=TRUE))%>% #seule la solvabilité des propriétaires est importante, les locataires insolvables peuvent quand même être rénovés
   mutate(count_rehab="")
-  # 
-  # #voir si on peut les intégrer
-  # mutate_when(ident_men==8063,list(exclus=TRUE))%>% #menage trop fragile
-  # mutate_when(ident_men==11672,list(exclus=TRUE))%>% #menage trop fragile #RDB=1867 (AMS 2035)
-  # mutate_when(ident_men==6369,list(exclus=TRUE))%>% #(ménage qui bugge en AMS 2035 Median forfait => 2033, avec -263% de solde_int) # RDB= 177
-  # mutate_when(ident_men==10583,list(exclus=TRUE))%>% #RDB=39
- 
+# 
+# #voir si on peut les intégrer
+# mutate_when(ident_men==8063,list(exclus=TRUE))%>% #menage trop fragile
+# mutate_when(ident_men==11672,list(exclus=TRUE))%>% #menage trop fragile #RDB=1867 (AMS 2035)
+# mutate_when(ident_men==6369,list(exclus=TRUE))%>% #(ménage qui bugge en AMS 2035 Median forfait => 2033, avec -263% de solde_int) # RDB= 177
+# mutate_when(ident_men==10583,list(exclus=TRUE))%>% #RDB=39
+
 
 
 Cout_bailleur_prive=c()
@@ -136,8 +138,8 @@ menages_insolvables_suppr=c()
 
 
 # LOOP on YEARS -----------------------------------------------------------
-  #important pour que les ménages puissent faire plusieurs REHAB
-  # va surtout avantager les ménages locataires pour qui la solvabilité n'est pas un obstacle (ne portent pas le coût de la réno)
+#important pour que les ménages puissent faire plusieurs REHAB
+# va surtout avantager les ménages locataires pour qui la solvabilité n'est pas un obstacle (ne portent pas le coût de la réno)
 
 
 ###
@@ -147,12 +149,12 @@ menages_insolvables_suppr=c()
 for (Y in 2010:horizon){
   print(Y)
   ident_r<-c()
-
+  
   sauv_menage_echelle_annee_precedente<-menage_echelle
-
   
   
-    
+  
+  
   # DONNEES THREEME ---------------------------------------------------------
   
   # taux de remboursement des rénovations énergétiques
@@ -178,7 +180,7 @@ for (Y in 2010:horizon){
   Cost_m2=c()
   # travaux de rénovation énergétiques en volume par saut de classe (en M2) 
   # Transition de L vers M
-
+  
   for (dep in LETTERS[1:7]){
     # classe DPE de départ
     
@@ -203,10 +205,10 @@ for (Y in 2010:horizon){
             filter(year==Y) %>%
             select(value)
         )
-
-          #   stock_euros/stock_m2 = coût de la réhabiliation par m2 (en €/m2)
+        
+        #   stock_euros/stock_m2 = coût de la réhabiliation par m2 (en €/m2)
         # Création matrice Cost_m2 : 
-          #   DPE_départ | DPE_arrivée | coût_m2 | coût_total_transition | m2_total_transition
+        #   DPE_départ | DPE_arrivée | coût_m2 | coût_total_transition | m2_total_transition
         Cost_m2=rbind(Cost_m2,c(dep,arr,stock_euros/stock_m2*(10^6),stock_euros,stock_m2))
         
       }
@@ -227,10 +229,10 @@ for (Y in 2010:horizon){
   Cost_m2$transition_tot_m2<-as.numeric( Cost_m2$transition_tot_m2)
   Cost_m2$transition_tot_Meuros<-as.numeric( Cost_m2$transition_tot_Meuros)
   
-
   
-# MATRICE GAIN ENER (ANNEE Y) ---------------------------------------------
-
+  
+  # MATRICE GAIN ENER (ANNEE Y) ---------------------------------------------
+  
   # Extraction de la conso moyenne au m2 en kWH par classe DPE
   conso_moy_dep=data.frame("A"=0, "B"=0, "C"=0, "D"=0, "E"=0, "F"=0, "G"=0)
   for (i in LETTERS[1:7]){
@@ -256,12 +258,12 @@ for (Y in 2010:horizon){
   
   
   
-
-# DPE_STALOG_PROPRI : saut de classe  ------------------------------------------
-
+  
+  # DPE_STALOG_PROPRI : saut de classe  ------------------------------------------
+  
   order=paste(rep(LETTERS[1:7],each=6),rep(priority,6),sep="_")
   order_value<-rep(0,length(order))
-
+  
   # order_value = longueur de chaque classe DPE_stalog_propri pour pouvoir incrémenter le classement médian
   for (i in 1:length(order)){
     table_order_value<-menage_echelle %>% filter(DPE_stalog_propri==order[i])
@@ -270,7 +272,7 @@ for (Y in 2010:horizon){
   order_value[is.na(order_value)] <- 0
   order_value<-as.numeric(order_value)
   order_ter<-as.numeric(order_value)
-
+  
   # Pour chaque DPE_stalog_propri
   # On va classer par la suite les ménages par DPE, au sein de chaque DPE, classement optimiste et pessimiste en classant par DPE_stalog_propri et par conso d'énergie. 
   # On passe d'un classement au sein de chaque classe DPE_stalog_propri => on passe à un classement par DPE en respectant la priorité stalog_propri. 
@@ -279,7 +281,7 @@ for (Y in 2010:horizon){
     for (i in 2:6){ # on parcourt les 6 catégories stalog_propri
       a<-6*j+1
       b<-6*j+i-1 # pas la peine d'aller jusqu'à 6*j+i, on veut le seuil des 5 premiers stalog_propri pour l'ajouter au 6e
-    order_ter[6*j+i]<-sum(order_value[a:b])
+      order_ter[6*j+i]<-sum(order_value[a:b])
     }
     order_ter[6*j+1]<-0
   }
@@ -292,9 +294,9 @@ for (Y in 2010:horizon){
   
   
   
-
   
-# CLASSEMENT MENAGES ------------------------------------------------------
+  
+  # CLASSEMENT MENAGES ------------------------------------------------------
   # is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
   
   menage_echelle<-
@@ -302,7 +304,7 @@ for (Y in 2010:horizon){
     group_by(DPE_stalog_propri) %>% 
     dplyr::mutate(kWh_rank_opt =row_number(-ener_dom)) %>% 
     ungroup()
-
+  
   
   
   menage_echelle<-
@@ -312,7 +314,7 @@ for (Y in 2010:horizon){
     ungroup()  
   
   
-
+  
   menage_echelle <-
     menage_echelle %>% 
     group_by(DPE_stalog_propri) %>% 
@@ -362,7 +364,7 @@ for (Y in 2010:horizon){
     select(-rank_add)
   
   
- 
+  
   
   if(str_detect(scenario_classement,"Optimal_ener")){
     menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_opt_ener)
@@ -381,7 +383,7 @@ for (Y in 2010:horizon){
   # print(table(table(menage_echelle %>% filter(DPE_dep==i)%>%select(kWh_rank_med))))
   # }
   ######
-
+  
   menage_echelle <-
     menage_echelle %>% 
     group_by(DPE_dep) %>% 
@@ -395,7 +397,7 @@ for (Y in 2010:horizon){
     ungroup()
   
   
-
+  
   if(str_detect(scenario_classement,"Pessimiste")){
     menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_pess)
   }
@@ -413,10 +415,10 @@ for (Y in 2010:horizon){
   }
   
   
-
-
-
-# Sélection 2e tour -----------------------------------------------------------------
+  
+  
+  
+  # Sélection 2e tour -----------------------------------------------------------------
   
   menage_echelle <- 
     menage_echelle %>%
@@ -427,9 +429,9 @@ for (Y in 2010:horizon){
     mutate_when(year_neuf>0,list(kWh_rank=0)) #on exclut ceux qui 
   
   
-
-# BASCULE DES MENAGES --------------------------------------------------------------
-
+  
+  # BASCULE DES MENAGES --------------------------------------------------------------
+  
   
   for (dep in LETTERS[1:7]){
     #dep : classe DPE de départ
@@ -457,20 +459,20 @@ for (Y in 2010:horizon){
         stock_m2_trans <-
           as.numeric(
             (Cost_m2 %>% 
-              filter(classe_dep==dep) %>% 
-              filter(classe_arr==arr)%>% 
-              select(transition_tot_m2)
-          )[1,])
+               filter(classe_dep==dep) %>% 
+               filter(classe_arr==arr)%>% 
+               select(transition_tot_m2)
+            )[1,])
         
-      
+        
         
         ##
         # BOUCLE WHILE sur surface rénovée
         ###
         sum <- 0
         # Deux conditions : 
-          # 1/ on remplit les objectifs de ThreeME en volumes de m2
-          # 2/ on s'assure d'avoir encore des ménages classés
+        # 1/ on remplit les objectifs de ThreeME en volumes de m2
+        # 2/ on s'assure d'avoir encore des ménages classés
         while(sum<stock_m2_trans & i<max(menage_echelle_classe$kWh_rank,na.rm=T)){
           
           sum =
@@ -483,12 +485,12 @@ for (Y in 2010:horizon){
           
           # Modification des variables REHAB et class_arr dans la base globale
           
-              menage_echelle<- menage_echelle %>% 
-                mutate(REHAB=ifelse(ident_men==im,TRUE,REHAB))%>%
-                mutate(year_rehab=ifelse(ident_men==im,Y,year_rehab))%>%
-                mutate(classe_arr=ifelse(ident_men==im,arr,classe_arr))
-            
-            
+          menage_echelle<- menage_echelle %>% 
+            mutate(REHAB=ifelse(ident_men==im,TRUE,REHAB))%>%
+            mutate(year_rehab=ifelse(ident_men==im,Y,year_rehab))%>%
+            mutate(classe_arr=ifelse(ident_men==im,arr,classe_arr))
+          
+          
           
           ###
           # ITERATION
@@ -505,15 +507,15 @@ for (Y in 2010:horizon){
     }
   }
   
-# supression bases superflues
+  # supression bases superflues
   rm(menage_echelle_classe,i,sum,stock_m2_trans)
-
   
   
   
-
-# BUDGET : PRINCIPAL & SUBVENTION & ENERGIES  -----------------------------
-
+  
+  
+  # BUDGET : PRINCIPAL & SUBVENTION & ENERGIES  -----------------------------
+  
   for (dep in LETTERS[1:7]){
     # classe de départ
     
@@ -548,36 +550,45 @@ for (Y in 2010:horizon){
         
         if(Y==horizon){rate_gain_ener=rate_gain_ener/2}         
         # on moyenne les économies d'énergies pour tenir des rénovations tout au long de l'année.
-       
+        
         ## MODIFICATION DES BUDGETS
         if(dim(menage_echelle %>% filter(year_rehab==Y & DPE_dep==dep & classe_arr==arr) %>% select(ident_men))[1]>0)
         {
-        menage_echelle <- 
-          menage_echelle %>% 
-          mutate_when(
-            # Condition
-            year_rehab==Y &
-              DPE_dep==dep & 
-              classe_arr==arr,
-            # Action
-            list(
-              principal_dette=cost_m2*surfhab_d*(1-subvention_rate),
-              subvention=cost_m2*surfhab_d*subvention_rate,
-              
-              #Energie 
-              Elec_ECS=Elec_ECS*(1+rate_gain_ener),
-              Gaz_ECS=Gaz_ECS*(1+rate_gain_ener),
-              GPL_ECS=GPL_ECS*(1+rate_gain_ener),
-              Fuel_ECS=Fuel_ECS*(1+rate_gain_ener),
-              Solides_ECS=Solides_ECS*(1+rate_gain_ener),
-              Urbain_ECS=Urbain_ECS*(1+rate_gain_ener),
-              Elec_chauff=Elec_chauff*(1+rate_gain_ener),
-              Gaz_chauff=Gaz_chauff*(1+rate_gain_ener),
-              GPL_chauff=GPL_chauff*(1+rate_gain_ener),
-              Fuel_chauff=Fuel_chauff*(1+rate_gain_ener),
-              Solides_chauff=Solides_chauff*(1+rate_gain_ener),
-              Urbain_chauff=Urbain_chauff*(1+rate_gain_ener),
-              Elec_clim=Elec_clim*(1+rate_gain_ener)))
+          menage_echelle <- 
+            menage_echelle %>% 
+            mutate_when(
+              # Condition
+              year_rehab==Y &
+                DPE_dep==dep & 
+                classe_arr==arr,
+              # Action
+              list(
+                principal_dette=cost_m2*surfhab_d*(1-subvention_rate),
+                subvention=cost_m2*surfhab_d*subvention_rate,
+                
+                #Energie 
+                Elec_ECS=Elec_ECS*(1+rate_gain_ener),
+                Gaz_ECS=Gaz_ECS*(1+rate_gain_ener),
+                GPL_ECS=GPL_ECS*(1+rate_gain_ener),
+                Fuel_ECS=Fuel_ECS*(1+rate_gain_ener),
+                Solides_ECS=Solides_ECS*(1+rate_gain_ener),
+                Urbain_ECS=Urbain_ECS*(1+rate_gain_ener),
+                Elec_chauff=Elec_chauff*(1+rate_gain_ener),
+                Gaz_chauff=Gaz_chauff*(1+rate_gain_ener),
+                GPL_chauff=GPL_chauff*(1+rate_gain_ener),
+                Fuel_chauff=Fuel_chauff*(1+rate_gain_ener),
+                Solides_chauff=Solides_chauff*(1+rate_gain_ener),
+                Urbain_chauff=Urbain_chauff*(1+rate_gain_ener),
+                Elec_clim=Elec_clim*(1+rate_gain_ener),
+                Elec_ElecSpe=Elec_ElecSpe*(1+rate_gain_ener),
+                Elec_ecl=Elec_ecl*(1+rate_gain_ener),
+                Elec_Cuisson=Elec_Cuisson*(1+rate_gain_ener),
+                Gaz_Cuisson=Gaz_Cuisson*(1+rate_gain_ener),
+                GPL_Cuisson=GPL_Cuisson*(1+rate_gain_ener),
+                Fuel_Cuisson=Fuel_Cuisson*(1+rate_gain_ener),
+                Solides_Cuisson=Solides_Cuisson*(1+rate_gain_ener),
+                Urbain_Cuisson= Urbain_Cuisson*(1+rate_gain_ener)   
+              ))
         }
       }
     }
@@ -586,9 +597,9 @@ for (Y in 2010:horizon){
   
   
   
-
-# AGREGATS RENOVATION LOCATAIRES ------------------------------------------
-
+  
+  # AGREGATS RENOVATION LOCATAIRES ------------------------------------------
+  
   # Calcul de la somme du montant des travaux avant annulation des ménages loctaires
   # (qui ne le paient pas directement)
   # NB: on annule le montant du principal mais pas la subvention qui sert à calculer la subvention de l'Etat plus bas. 
@@ -610,10 +621,10 @@ for (Y in 2010:horizon){
   
   
   
-
-# HAUSSE DE LOYERS : BAILLEURS PRIVES -------------------------------------
-
-
+  
+  # HAUSSE DE LOYERS : BAILLEURS PRIVES -------------------------------------
+  
+  
   #Gestion des hausses de loyer
   tot_rev504<-as.numeric(menage_echelle %>% summarise(sum(rev504*(FC$revpat)*pondmen)))
   
@@ -628,42 +639,42 @@ for (Y in 2010:horizon){
   
   if(!Dette_bailleur_prive[1]==0){ 
     # cond. pas de bailleurs privés payant une rénovation
-       for (im in (menage_echelle %>% filter(!is.na(rev504) & rev504>0))$ident_men){ 
-         #on parcourt tous les propriétaires bailleurs
+    for (im in (menage_echelle %>% filter(!is.na(rev504) & rev504>0))$ident_men){ 
+      #on parcourt tous les propriétaires bailleurs
+      
+      menage_echelle<-
+        menage_echelle %>%
+        mutate_when(ident_men==im,list(hausse_loyer=amort.period(Loan=solde_dette_BP,n=as.numeric(1/R_RMBS_NEWBUIL_H01_CA),i=R_I_REHAB_H01_CG_2,pf=1)[2]))
+      # la hausse de loyers prend en compte le paiement des intérêts et le remboursement du principal
+      # la hausse de loyers, hausse de revenu du ménage propriétaire se somme aux hausses des années précédentes
+      # Hyp : tous les locataires ont changé sur 15 ans pour justifier une hausse de loyer (interdicition d'augmenter les loyers d'un même locataire sous motif de rénovation énergétique)
+      menage_echelle<-menage_echelle %>%
+        mutate_when(ident_men==im,
+                    list(hausse_loyer_sum=hausse_loyer_sum+hausse_loyer,
+                         solde_int =  solde_int+as.numeric(int_princ(loan=solde_dette_BP,n=as.numeric(1/R_RMBS_NEWBUIL_H01_CA),year_purchase=Y,horizon=horizon,i=R_I_REHAB_H01_CG_2,pf=1)[1]),
+                         solde_princ = solde_princ+as.numeric(int_princ(loan=solde_dette_BP,n=as.numeric(1/R_RMBS_NEWBUIL_H01_CA),year_purchase=Y,horizon=horizon,i=R_I_REHAB_H01_CG_2,pf=1)[2])))
+      
+    }
     
-    menage_echelle<-
-      menage_echelle %>%
-      mutate_when(ident_men==im,list(hausse_loyer=amort.period(Loan=solde_dette_BP,n=as.numeric(1/R_RMBS_NEWBUIL_H01_CA),i=R_I_REHAB_H01_CG_2,pf=1)[2]))
-    # la hausse de loyers prend en compte le paiement des intérêts et le remboursement du principal
-    # la hausse de loyers, hausse de revenu du ménage propriétaire se somme aux hausses des années précédentes
-    # Hyp : tous les locataires ont changé sur 15 ans pour justifier une hausse de loyer (interdicition d'augmenter les loyers d'un même locataire sous motif de rénovation énergétique)
-    menage_echelle<-menage_echelle %>%
-      mutate_when(ident_men==im,
-                  list(hausse_loyer_sum=hausse_loyer_sum+hausse_loyer,
-                       solde_int =  solde_int+as.numeric(int_princ(loan=solde_dette_BP,n=as.numeric(1/R_RMBS_NEWBUIL_H01_CA),year_purchase=Y,horizon=horizon,i=R_I_REHAB_H01_CG_2,pf=1)[1]),
-                       solde_princ = solde_princ+as.numeric(int_princ(loan=solde_dette_BP,n=as.numeric(1/R_RMBS_NEWBUIL_H01_CA),year_purchase=Y,horizon=horizon,i=R_I_REHAB_H01_CG_2,pf=1)[2])))
-    
-  }
-  
-  # répartition des hausses de loyer sur les ménages rénovant
-  Hausses_loyer <- menage_echelle %>% summarise(sum(pondmen*hausse_loyer))
-  if(Hausses_loyer>0){
-    menage_echelle <- 
-      menage_echelle %>%
-      mutate_when(is.na(propri),list(propri=999999)) %>%
-      mutate_when(REHAB & stalog>=4 & stalog<=5 & propri<=6 & propri>=5, 
-                list(solde_loyer=solde_loyer+as.numeric(Hausses_loyer/Dette_bailleur_prive*principal_dette)))
-  }
-  # la hausse de loyer répercutée sur les ménages vaut le montant des travaux (principal_dette) au pro-rata de la hausse des revenus locatif des bailleurs par rapport au montant réel des travaux. 
-  # Produit en croix Hausse_loyer_locataire/montant travaux locataire=Hausse_loyer_agrégée_bailleur/montant_agrégé_travaux_bailleurs
+    # répartition des hausses de loyer sur les ménages rénovant
+    Hausses_loyer <- menage_echelle %>% summarise(sum(pondmen*hausse_loyer))
+    if(Hausses_loyer>0){
+      menage_echelle <- 
+        menage_echelle %>%
+        mutate_when(is.na(propri),list(propri=999999)) %>%
+        mutate_when(REHAB & stalog>=4 & stalog<=5 & propri<=6 & propri>=5, 
+                    list(solde_loyer=solde_loyer+as.numeric(Hausses_loyer/Dette_bailleur_prive*principal_dette)))
+    }
+    # la hausse de loyer répercutée sur les ménages vaut le montant des travaux (principal_dette) au pro-rata de la hausse des revenus locatif des bailleurs par rapport au montant réel des travaux. 
+    # Produit en croix Hausse_loyer_locataire/montant travaux locataire=Hausse_loyer_agrégée_bailleur/montant_agrégé_travaux_bailleurs
   }
   
   
   
   
   
-
-# Cas_particulier : LOCATAIRES --------------------------------------------
+  
+  # Cas_particulier : LOCATAIRES --------------------------------------------
   
   #On utilise une dernière fois le principal_dette des locataires pour la répartition des hausses de loyer, ensuite on le met à zéro pour calculer 
   # les solde_intérêt et solde_remboursement du principal pour les ménages propriétaires. 
@@ -671,16 +682,16 @@ for (Y in 2010:horizon){
   menage_echelle <- 
     menage_echelle %>%
     mutate_when(year_rehab==Y & stalog>=4, list(principal_dette=0))
-
-
   
   
   
-# SOLDE_INT & SOLDE_PRINC -------------------------------------------------
   
-    
+  
+  # SOLDE_INT & SOLDE_PRINC -------------------------------------------------
+  
+  
   # Remboursement emprunt pendant 25 ans, Quand l'horizon est à 2035, les rénovations 2010 sont déjà remboursées, pas de solde_int et solde_princ
-
+  
   if((horizon-Y)<25){
     
     #int_price importé depuis Repayment.R, fonction maison
@@ -705,9 +716,9 @@ for (Y in 2010:horizon){
   
   
   
- 
-
-# SOLVABILITE ex-post -----------------------------------------------------
+  
+  
+  # SOLVABILITE ex-post -----------------------------------------------------
   
   # calcul solvabilité
   menage_echelle <- 
@@ -722,25 +733,25 @@ for (Y in 2010:horizon){
   
   # les ménages insolvables sont "rebootés" à l'itération précédente, avant leur rénovation
   if(dim(menages_insolvables)[1]>0){
-  menage_echelle <-
-  rbind(menage_echelle %>%
-  filter(!ident_men %in% menages_insolvables$ident_men),
-  sauv_menages_insolvables)%>%
-  arrange(ident_men)
+    menage_echelle <-
+      rbind(menage_echelle %>%
+              filter(!ident_men %in% menages_insolvables$ident_men),
+            sauv_menages_insolvables)%>%
+      arrange(ident_men)
   }
   
   
   
   
-# MEMOIRE REHAB -----------------------------------------------------------
-
+  # MEMOIRE REHAB -----------------------------------------------------------
+  
   # Mémoire des rénovations de chaque ménage
   menage_echelle <- menage_echelle %>% mutate(count_rehab=ifelse(year_rehab==Y,paste(count_rehab,Y,sep="_"),count_rehab))
   
   
-# pour analyse ex-post, mémoire des statistiques des ménages après chaque round de rénovation 
+  # pour analyse ex-post, mémoire des statistiques des ménages après chaque round de rénovation 
   # Toutes les rénovations dans ident_rehab
-
+  
   ident_rehab<-rbind(ident_rehab, 
                      menage_echelle %>% 
                        filter(year_rehab==Y)%>%
@@ -753,7 +764,7 @@ for (Y in 2010:horizon){
                               principal_dette))
   ident_rehab<-ident_rehab %>% dplyr::arrange(ident_men)
   #par exemple ménage 3851 rénove deux fois en AMS 2035 forfait Optimiste. En 2020 de E à D, en 2032 de D à C
-# Les solde_int et solde_princ sont additif, pas le principal_dette. 
+  # Les solde_int et solde_princ sont additif, pas le principal_dette. 
   # ident_men DPE_dep classe_arr year_rehab solde_int solde_princ principal_dette
   # 1      3851 E       D                2020     4047.       8643.          16669.
   # 2      3851 D       C                2032     7889.      11216.           6108.
@@ -778,12 +789,12 @@ for (Y in 2010:horizon){
                                       classe_arr))
   
   
-
-
-
-# SOLDE_ENER --------------------------------------------------------------
-
-
+  
+  
+  
+  # SOLDE_ENER --------------------------------------------------------------
+  
+  
   # Mise à jour des totaux
   menage_echelle<-
     menage_echelle %>% 
@@ -802,9 +813,9 @@ for (Y in 2010:horizon){
     rowSums(menage_echelle[dep_sources])
   
   
-
-# UPDATE : energie surfacique (kWh) ---------------------------------------
-
+  
+  # UPDATE : energie surfacique (kWh) ---------------------------------------
+  
   # on calcule l'énergie surfacique et énergie domestique en volume par les variables "Elec","Gaz", qui sont màj à chaque itération. 
   menage_ener_dom<-energie_dom_surf(menage_echelle)
   menage_echelle<- 
@@ -812,7 +823,7 @@ for (Y in 2010:horizon){
     select(-ener_dom_surf,-ener_dom) %>%
     left_join(menage_ener_dom,by="ident_men")
   
-
+  
   
   # REMISE A ZERO -----------------------------------------------------------
   
@@ -850,7 +861,7 @@ menage_echelle<-
     dep_Fuel=dep_Fuel_verif,
     dep_Solides=dep_Solides_verif,
     dep_Urbain=dep_Urbain_verif)
-  
+
 
 
 menage_echelle <- 
@@ -871,7 +882,7 @@ solde<-
            solde_int+ #>0
            solde_loyer+ #>0
            -hausse_loyer_sum) %>% #<0 => comme une économie 
-    select(ident_men,solde)
+  select(ident_men,solde)
 
 
 
@@ -890,9 +901,9 @@ for (im in (menage_echelle %>% filter(!is.na(rev504) & rev504>0))$ident_men){
   menage_echelle<-
     menage_echelle %>%
     mutate_when(ident_men==im,list(BTP=BTP+solde_dette_BP ))
-    #coût des rénovations à l'horizon pour les propriétaires bailleurs. 
-   # NB : si pas de rénovation par des bailleurs privés à l'horizon, solde_dette_BP=0
-  }
+  #coût des rénovations à l'horizon pour les propriétaires bailleurs. 
+  # NB : si pas de rénovation par des bailleurs privés à l'horizon, solde_dette_BP=0
+}
 
 
 
@@ -927,31 +938,31 @@ save(menage_echelle,file=MatisseFiles$menage_echelle_33_pre_revent_rd)
 # ThreeMe prend en compte les effets rebonds pour les budgets post renovation énergétique (solde_ener+solde_int) => ThreeME est aveugle sur les transferts entre ménage, difficile à dire si les effets rebonds concernent aussi ces soldes. Solution (22/06/2020) => on considère que les effets rebonds macro prennent déjà en compte ces effets
 # 
 
-  sauv_avant_reventil<-menage_echelle
-  menage_echelle_33 <- Ventil_solde(solde,menage_echelle,step="REHAB")
-  
-  ###
-  # Test
-  ###
-  Solde_Ener_tot<-
-    rbind(Solde_Ener_tot,
-          c(Y,
-    menage_echelle %>%
-      filter(REHAB) %>%
-      filter(stalog>=4 & stalog<=5) %>%
-      filter(propri==2) %>%
-      summarise(sum(solde_ener*pondmen))))
-  
- 
+sauv_avant_reventil<-menage_echelle
+menage_echelle_33 <- Ventil_solde(solde,menage_echelle,step="REHAB")
+
+###
+# Test
+###
+Solde_Ener_tot<-
+  rbind(Solde_Ener_tot,
+        c(Y,
+          menage_echelle %>%
+            filter(REHAB) %>%
+            filter(stalog>=4 & stalog<=5) %>%
+            filter(propri==2) %>%
+            summarise(sum(solde_ener*pondmen))))
+
+
 
 # UPADTE Energie Surfacique (kWh) -----------------------------------------
-  menage_ener_dom<-energie_dom_surf(menage_echelle)
-  menage_echelle_33<- 
-    menage_echelle_33 %>%
-    select(-ener_dom_surf,-ener_dom) %>%
-    left_join(menage_ener_dom,by="ident_men")
-  
-  
+menage_ener_dom<-energie_dom_surf(menage_echelle)
+menage_echelle_33<- 
+  menage_echelle_33 %>%
+  select(-ener_dom_surf,-ener_dom) %>%
+  left_join(menage_ener_dom,by="ident_men")
+
+
 
 
 
@@ -1058,7 +1069,7 @@ gc()
 # mean(table_solv_year[-1,2]) #=> 0.03229769
 
 
- # TESTER Rénovation successives des ménages
+# TESTER Rénovation successives des ménages
 # table_solv_year_ind %>% filter(ident_men==1542)
 # table_solv_year_ind %>% filter(ident_men==6494)
 # table_solv_year_ind %>% filter(ident_men==8946)

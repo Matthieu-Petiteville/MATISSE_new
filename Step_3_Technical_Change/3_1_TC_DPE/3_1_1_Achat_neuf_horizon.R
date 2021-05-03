@@ -1,5 +1,5 @@
 # OBJECTIF : Les ménages achetant un logement en 2010 le sont également à l'horizon, on sélectionne parmi ceux là les ménages achetant un logement neuf.
-
+#Including enertot change
 
 
 
@@ -236,14 +236,14 @@ ident_accedants <-
   mutate(year_neuf=0)%>%
   mutate(classe_arr=DPE_dep)%>%
   dplyr::arrange(.,kWh_rank)
-  # A VERIFIER JUSTIFICATION
+# A VERIFIER JUSTIFICATION
 
 #Justification : on adopte un système similaire aux autres étapes : sélection uniquement sur le classemenet énergétique, le système s'appuyant sur ancons et anacq
 # est plus complexe à justifier : est-ce qu'on considère plus probable qu'un ménage achetant un logement neuf et efficace à l'horizon soit un ménage qui ait acheté 
 # un logement ancien dans le passé ou justement de privilégier des ménages déjà efficaces dans des logements les plus récents possibles ? 
 # les deux stratégies se justifient, pour éviter de choisir on adopte la stratégie du "rateau" déjà employée pour les rénovations et les achats avant l'horizon. 
 ## old version :
-  # dplyr::arrange(.,-neuf_horizon,-ancons,DPE_dep,-anacq,kWh_rank) #on classe sur l'année de construction (du plus récent au plus vieux, de la meilleure classe DPE à la pire,de la plus récente année d'acquisition à la plus ancienne, sur la consommation d'énergie surfacique en fonction du scenario de classement)
+# dplyr::arrange(.,-neuf_horizon,-ancons,DPE_dep,-anacq,kWh_rank) #on classe sur l'année de construction (du plus récent au plus vieux, de la meilleure classe DPE à la pire,de la plus récente année d'acquisition à la plus ancienne, sur la consommation d'énergie surfacique en fonction du scenario de classement)
 # 
 
 
@@ -276,9 +276,9 @@ if(scenario_classement=="VAN"){
     mutate(kWh_rank=kWh_rank_van_B)%>%
     select(-kWh_rank_van_B)%>%
     dplyr::arrange(.,-year_jorizon,-ancons,DPE_dep,-anacq,kWh_rank)
-# en reclassant sur neuf_horizon, on assure que les ménages déjà convertis parce que rentables en A le sont toujours, et qu'on repart dans les ménages non
-# convertis classés par VAN_B
-    }
+  # en reclassant sur neuf_horizon, on assure que les ménages déjà convertis parce que rentables en A le sont toujours, et qu'on repart dans les ménages non
+  # convertis classés par VAN_B
+}
 
 
 
@@ -309,7 +309,7 @@ while(DPE_B<NEWBUIL_H01_CB_2){
 ident_accedants <- 
   ident_accedants %>% 
   select(ident_men,classe_arr,year_neuf)
-  
+
 
 menage_echelle <- 
   menage_echelle %>%
@@ -318,7 +318,7 @@ menage_echelle <-
               is.na(classe_arr),list(classe_arr=DPE_dep)) %>%
   mutate(solde_ener=0)
 
-  # mutate(solde_dette=0,solde_ener=0,solde_int=0,solde_princ=0,principal_dette=0,solde_int_total=0,solde_princ_total=0)
+# mutate(solde_dette=0,solde_ener=0,solde_int=0,solde_princ=0,principal_dette=0,solde_int_total=0,solde_princ_total=0)
 ##
 # TEST
 # menage_echelle %>% filter(neuf_horizon)%>%group_by(classe_arr)%>%summarise(sum(pondmen*surfhab_d))
@@ -339,7 +339,7 @@ for (dep in LETTERS[2:7]){
     # classe arrivée
     if(dep>arr){
       # print(paste('dep is ',dep," , arr is ",arr,sep=""))
-
+      
       # Coefficient de gain énergétique (multiplié par 1/2 pour centrer les consommations des constructions de fin et de début d'année)
       rate_gain_ener<-as.numeric(
         Mat_gain_ener %>% 
@@ -350,30 +350,39 @@ for (dep in LETTERS[2:7]){
       
       #s'il existe un ménage dans cette situation dep->arr à l'horizon
       if(dim(menage_echelle %>% filter(year_neuf==horizon & DPE_dep==dep & classe_arr==arr) %>% select(ident_men))[1]>0) 
-        {
-      menage_echelle <- 
-        menage_echelle %>% 
-        mutate_when(
-          # Condition
-          year_neuf==horizon &
-            DPE_dep==dep & 
-            classe_arr==arr,
-          # Action
-          list(
-            Elec_ECS=Elec_ECS*(1+rate_gain_ener),
-            Gaz_ECS=Gaz_ECS*(1+rate_gain_ener),
-            GPL_ECS=GPL_ECS*(1+rate_gain_ener),
-            Fuel_ECS=Fuel_ECS*(1+rate_gain_ener),
-            Solides_ECS=Solides_ECS*(1+rate_gain_ener),
-            Urbain_ECS=Urbain_ECS*(1+rate_gain_ener),
-            Elec_chauff=Elec_chauff*(1+rate_gain_ener),
-            Gaz_chauff=Gaz_chauff*(1+rate_gain_ener),
-            GPL_chauff=GPL_chauff*(1+rate_gain_ener),
-            Fuel_chauff=Fuel_chauff*(1+rate_gain_ener),
-            Solides_chauff=Solides_chauff*(1+rate_gain_ener),
-            Urbain_chauff=Urbain_chauff*(1+rate_gain_ener),
-            Elec_clim=Elec_clim*(1+rate_gain_ener)
-          ))
+      {
+        menage_echelle <- 
+          menage_echelle %>% 
+          mutate_when(
+            # Condition
+            year_neuf==horizon &
+              DPE_dep==dep & 
+              classe_arr==arr,
+            # Action
+            list(
+              Elec_ECS=Elec_ECS*(1+rate_gain_ener),
+              Gaz_ECS=Gaz_ECS*(1+rate_gain_ener),
+              GPL_ECS=GPL_ECS*(1+rate_gain_ener),
+              Fuel_ECS=Fuel_ECS*(1+rate_gain_ener),
+              Solides_ECS=Solides_ECS*(1+rate_gain_ener),
+              Urbain_ECS=Urbain_ECS*(1+rate_gain_ener),
+              Elec_chauff=Elec_chauff*(1+rate_gain_ener),
+              Gaz_chauff=Gaz_chauff*(1+rate_gain_ener),
+              GPL_chauff=GPL_chauff*(1+rate_gain_ener),
+              Fuel_chauff=Fuel_chauff*(1+rate_gain_ener),
+              Solides_chauff=Solides_chauff*(1+rate_gain_ener),
+              Urbain_chauff=Urbain_chauff*(1+rate_gain_ener),
+              Elec_clim=Elec_clim*(1+rate_gain_ener),
+              Elec_ElecSpe=Elec_ElecSpe*(1+rate_gain_ener),
+              Elec_ecl=Elec_ecl*(1+rate_gain_ener),
+              Elec_Cuisson=Elec_Cuisson*(1+rate_gain_ener),
+              Gaz_Cuisson=Gaz_Cuisson*(1+rate_gain_ener),
+              GPL_Cuisson=GPL_Cuisson*(1+rate_gain_ener),
+              Fuel_Cuisson=Fuel_Cuisson*(1+rate_gain_ener),
+              Solides_Cuisson=Solides_Cuisson*(1+rate_gain_ener),
+              Urbain_Cuisson= Urbain_Cuisson*(1+rate_gain_ener)
+              #Comparer à list_source_usage et ajouter tous les items manquants
+            ))
       }
     }
   }
