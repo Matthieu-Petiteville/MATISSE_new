@@ -151,6 +151,21 @@ menage_echelle<-
   dplyr::mutate(kWh_rank_opt_ener =row_number(-ener_dom_surf)) %>% 
   ungroup()
 
+menage_echelle<-
+  menage_echelle %>% 
+  dplyr::mutate(kWh_rank_pess_ener =max(kWh_rank_opt_ener,na.rm=T)-kWh_rank_opt_ener+1) %>% 
+  ungroup()
+
+
+menage_echelle <-
+  menage_echelle %>% 
+  dplyr::mutate(kWh_rank_med_ener = kWh_rank_pess_ener-kWh_rank_opt_ener) %>% 
+  mutate_when(
+    kWh_rank_med_ener<=0,
+    list(kWh_rank_med_ener=-kWh_rank_med_ener+1)) %>%
+  ungroup()
+
+
 #Possible optimisation : passer en fonction le classement des ménages et le conditionner au type de scenario classement
 
 # ems<-calc_ems(menage_echelle,FC)
@@ -165,6 +180,13 @@ menage_echelle<-
 if(str_detect(scenario_classement,"Optimal_ener")){
   menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_opt_ener)
 }
+if(str_detect(scenario_classement,"Pess_ener")){
+  menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_pess_ener)
+}
+if(str_detect(scenario_classement,"Med_ener")){
+  menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_med_ener)
+}
+
 if(str_detect(scenario_classement,"Optimal_co2")){
   menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_opt_co2)
 }
