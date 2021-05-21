@@ -12,6 +12,12 @@ source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/3_2_1_VE_classement_horizon.R",sep=""))
 
 # DATA --------------------------------------------------------------------
+if(exists("scenario_classement_veh")){
+  scenario_classement_veh_local <- scenario_classement_veh
+}else{
+  scenario_classement_veh_local <- scenario_classement
+}
+
 
 load(MatisseFiles$source_usage_rd)
 load(MatisseFiles$FC_2010_horizon_rd)
@@ -49,34 +55,34 @@ list_dep=c("agriculture",
 
 
 # CLASSEMENT --------------------------------------------------------------
-if(str_detect(scenario_classement,"Optimal_ener")){
+if(str_detect(scenario_classement_veh_local,"Optimal_ener")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
 }
-if(str_detect(scenario_classement,"Pess_ener")){
+if(str_detect(scenario_classement_veh_local,"Pess_ener")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
 }
-if(str_detect(scenario_classement,"Med_ener")){
+if(str_detect(scenario_classement_veh_local,"Med_ener")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
 }
-if(str_detect(scenario_classement,"Optimal_co2")){
+if(str_detect(scenario_classement_veh_local,"Optimal_co2")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
 }
 
 
-if(str_detect(scenario_classement,"Pessimiste")){
+if(str_detect(scenario_classement_veh_local,"Pessimiste")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_pess)
 }
-if(str_detect(scenario_classement,"Optimiste")){
+if(str_detect(scenario_classement_veh_local,"Optimiste")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
 }
-if(scenario_classement=="Median"){
+if(scenario_classement_veh_local=="Median"){
   
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_med)
 }
-if(scenario_classement=="Rich"){
+if(scenario_classement_veh_local=="Rich"){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_rich)
 }
-if(scenario_classement=="Poor"){
+if(scenario_classement_veh_local=="Poor"){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_poor)
 }
 
