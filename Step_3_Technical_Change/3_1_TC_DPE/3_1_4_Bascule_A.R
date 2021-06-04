@@ -62,7 +62,8 @@ prix_classe_horizon$prix_elec<- prix_classe$prix_elec * FC$A02
 # A03
 prix_classe_horizon$prix_gaz<- prix_classe$prix_gaz * FC$A03
 # A04
-prix_classe_horizon[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]<- prix_classe[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]* FC$A04
+prix_classe_horizon[c("prix_fuel","prix_gpl")]<- prix_classe[c("prix_fuel","prix_gpl")]* FC$A04
+prix_classe_horizon[c("prix_bois","prix_chaleur")]<- prix_classe[c("prix_bois","prix_chaleur")]* FC$A03
 
 
 # CLASSER MENAGES PAR CLASSE ----------------------------------------------
