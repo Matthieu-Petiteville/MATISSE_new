@@ -52,7 +52,9 @@ prix_classe_horizon$prix_elec<- prix_classe$prix_elec * as.numeric(FC$A02)
 prix_classe_horizon$prix_gaz<- prix_classe$prix_gaz * as.numeric(FC$A03)
 
 # A04
-prix_classe_horizon[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]<- prix_classe[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]* as.numeric(FC$A04)
+#Bois + chaleur utilisent le FC du gaz, cf 3ME
+prix_classe_horizon[c("prix_fuel","prix_gpl")]<- prix_classe[c("prix_fuel","prix_gpl")]* as.numeric(FC$A04)
+prix_classe_horizon[c("prix_bois","prix_chaleur")]<- prix_classe[c("prix_bois","prix_chaleur")]* as.numeric(FC$A03)
 
 
 
