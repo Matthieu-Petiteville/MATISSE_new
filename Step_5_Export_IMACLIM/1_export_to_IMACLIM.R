@@ -27,6 +27,23 @@ load(MatisseFiles$cout_baill_pub_rd)
 load(MatisseFiles$sBCE_rd)
 
 
+# Extract Données Solides -------------------------------------------------
+suppressMessages(suppressWarnings(scen <- read_excel(path = MatisseFiles$sortie_3me_xl , sheet="scen AMS")))
+ThreeME <- 
+  scen %>% 
+  select(-Def) %>% 
+  gather(key=year , value=value , -c(1)) %>%
+  filter(year==c(2010, horizon))
+
+extract_solides <- 
+  ThreeME %>% 
+  filter(Var %in% c("CHM_21_2" , "CHD_21_2")) %>%
+  group_by(year)   %>% 
+  summarize(sum_charb = sum(value))
+
+evol_solides <- extract_solides$sum_charb[2] / extract_solides$sum_charb[1] - 1 
+
+
 # EXPORT ------------------------------------------------------------------
 
 # dénominateur : 
@@ -45,7 +62,7 @@ export <-  t(data.frame(
   "share_A01"=share$share_A01[1]/denom,
   "ELEC"=evol_energie$Elec,       #A02
   "GAZ"=evol_energie$Gaz,         #A03
-  "SOLIDES"=evol_energie$Solides, #A04
+  "SOLIDES"=evol_solides, #A04
   "share_A05"=share$share_A05[1]/denom,
   "share_A06"=share$share_A06[1]/denom,
   "OIL"=evol_energie$Oil,         #A07
@@ -64,6 +81,6 @@ write.csv(export,file=MatisseFiles$export_iter_0_csv)
 menage_iteration<-menage_echelle
 save(menage_iteration,file=MatisseFiles$menage_iteration_rd)
 
-suppressWarnings((rm(menage_iteration, menage_echelle, FC, export)))
+suppressWarnings((rm(menage_iteration, menage_echelle, FC, export, extract_solides, evol_solides, ThreeME, scen)))
 gc()
 
