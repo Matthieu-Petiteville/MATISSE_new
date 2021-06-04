@@ -207,7 +207,9 @@ energie_mix<-function(menage,FC){
   prix_classe_horizon$prix_gaz<- prix_classe$prix_gaz * as.numeric(FC$A03)
   
   # A04
-  prix_classe_horizon[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]<- prix_classe[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]* as.numeric(FC$A04)
+  prix_classe_horizon[c("prix_fuel","prix_gpl")]<- prix_classe[c("prix_fuel","prix_gpl")]* as.numeric(FC$A04)
+  prix_classe_horizon[c("prix_bois","prix_chaleur")]<- prix_classe[c("prix_bois","prix_chaleur")]* as.numeric(FC$A03)
+
   }
   
   
@@ -447,9 +449,10 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
     select(ident_men, pondmen,carb_lubr, dep_Elec, dep_Gaz,dep_Solides, dep_Fuel,dep_GPL,dep_Urbain,carb_lubr)%>%
     mutate(Oil_2010=dep_Fuel+dep_GPL+carb_lubr) %>% 
     mutate(Elec_2010=dep_Elec)%>%
-    mutate(Gaz_2010=dep_Gaz+dep_Urbain)%>% 
-    mutate(Solides_2010=dep_Solides)%>%
-    select(ident_men,pondmen,Elec_2010,Gaz_2010,Oil_2010,Solides_2010) %>% 
+    mutate(Gaz_2010=dep_Gaz+dep_Urbain+dep_Solides)%>% 
+    # mutate(Solides_2010=dep_Solides)%>%
+    # select(ident_men,pondmen,Elec_2010,Gaz_2010,Oil_2010,Solides_2010) %>% 
+    select(ident_men,pondmen,Elec_2010,Gaz_2010,Oil_2010) %>% 
     gather(key=ener, value=value, -c(1:2))%>%
     group_by(ener) %>% 
     summarise("Dep_energie_agg_2010"=sum(pondmen*value))
@@ -460,9 +463,10 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
     select(ident_men, pondmen, carb_lubr,dep_Elec, dep_Gaz,dep_Solides, dep_Fuel,dep_GPL,dep_Urbain)%>%
     mutate(Oil=(dep_Fuel+dep_GPL)/IP_A04+carb_lubr/IP_A07) %>%
     mutate(Elec=dep_Elec/IP_A02)%>%
-    mutate(Gaz=dep_Gaz/IP_A03+dep_Urbain/IP_A04)%>%
-    mutate(Solides=dep_Solides/IP_A04)%>%
-    select(ident_men,pondmen,Elec,Gaz,Oil,Solides) %>% 
+    mutate(Gaz=dep_Gaz/IP_A03+dep_Urbain/IP_A03+dep_Solides/IP_A03)%>%
+    # mutate(Solides=dep_Solides/IP_A04)%>%
+    # select(ident_men,pondmen,Elec,Gaz,Oil,Solides) %>% 
+    select(ident_men,pondmen,Elec,Gaz,Oil) %>% 
     gather(key=ener, value=value, -c(1:2)) %>% 
     group_by(ener) %>% 
     summarise("Dep_energie_agg_horizon"=sum(pondmen*value))
