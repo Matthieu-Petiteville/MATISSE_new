@@ -10,7 +10,7 @@ library(car)
 
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
-source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_6_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
 
@@ -18,7 +18,10 @@ source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_
 
 if(!exists("class_force_bascule")){class_force_bascule <- c()}
 if(!exists("year_new_bascule")){year_new_bascule <- 2100}
-if(!exists("bascule_min_jump")){class_force_bascule <- 7}
+if(!exists("bascule_min_jump")){bascule_min_jump <- 7}
+if(!exists("dom_effic_source")){dom_effic_source <<- data.frame(sources = c("Elec","Gaz","Fuel","GPL","Urbain","Solides") ,
+                                                                eff_gain = c(0, 0, 0, 0, 0, 0))}
+
 
 
 #Importer taux de croissance des prix et des revenus
@@ -191,8 +194,7 @@ menage_echelle <- menage_echelle %>%
   mutate(DPE_jump = - match(DPE_horizon,LETTERS) + match(DPE_pred,LETTERS))
 
 menage_echelle <- 
-  menage_echelle %>% 
-  mutate(bascule=0)
+  menage_echelle %>%
   mutate(bascule=0)%>%
   mutate_when(classe_arr %in% class_force_bascule, list(bascule=1)) %>%
   mutate_when(year_neuf > year_new_bascule , list(bascule = 1)) %>%
