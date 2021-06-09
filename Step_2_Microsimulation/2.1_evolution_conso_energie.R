@@ -17,7 +17,7 @@ library(dplyr)
 library(reshape2)
 library(tidyverse)
 source(paste(M_home,"/Step_2_Microsimulation/2.2_fonction_evolution_conso_energie.R",sep=""))
-source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_6_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 
 

@@ -8,7 +8,7 @@ library(tidyverse)
 library(ggplot2)
 
 source(paste(M_home,"/Common/tools.R",sep=""))
-source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_6_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))

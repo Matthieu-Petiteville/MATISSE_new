@@ -6,7 +6,7 @@ library(FinancialMath)
 library(readxl)
 
 source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
-source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_6_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/3_2_1_VE_classement_horizon.R",sep=""))
