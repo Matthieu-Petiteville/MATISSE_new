@@ -59,4 +59,4 @@ source(paste(M_home,"/Step_4_Reweighting/3_pondr.R")
 # ####
 # # Step 5
 # ####
-source(paste(M_home,"/Step_5_export_IMACLIM/1_export_to_IMACLIM.R")
+source(paste(M_home,"/Step_6_Export_IMACLIM/1_export_to_IMACLIM.R")
