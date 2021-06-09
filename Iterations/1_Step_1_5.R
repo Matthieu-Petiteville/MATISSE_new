@@ -25,7 +25,7 @@ source(paste(M_home,"/Step_2_Microsimulation/2.2_fonction_evolution_conso_energi
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep=""))
 
 ## Step 5
-source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_6_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 
 
 
