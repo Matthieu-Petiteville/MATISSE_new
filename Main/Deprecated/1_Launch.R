@@ -54,7 +54,7 @@ for (scenario in scenario_v){
         # Step 5
         ####
         
-        source(paste(M_home,"/Step_5_export_IMACLIM/1_export_to_IMACLIM.R",sep=""))
+        source(paste(M_home,"/Step_6_Export_IMACLIM/1_export_to_IMACLIM.R",sep=""))
 
         print(paste(paste("Scenario : ",scenario,", horizon : ", horizon, ", scenario technique :",scenario_classement, " ,scenario redistributif :",redistribution,sep="")," : DONE (",end[3]/60," min)",sep=""))
 
