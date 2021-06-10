@@ -16,14 +16,6 @@ source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_
 
 # DATA --------------------------------------------------------------------
 
-if(!exists("class_force_bascule")){class_force_bascule <- c()}
-if(!exists("year_new_bascule")){year_new_bascule <- 2100}
-if(!exists("bascule_min_jump")){bascule_min_jump <- 7}
-if(!exists("dom_effic_source")){dom_effic_source <<- data.frame(sources = c("Elec","Gaz","Fuel","GPL","Urbain","Solides") ,
-                                                                eff_gain = c(0, 0, 0, 0, 0, 0))}
-
-
-
 #Importer taux de croissance des prix et des revenus
 load(MatisseFiles$FC_2010_horizon_rd)
 load(MatisseFiles$menage_echelle_33_rd)
@@ -55,38 +47,6 @@ list_dep=c("agriculture",
 
 menage_echelle<-menage_echelle_33
 
-#ExtractDomEfficiency gradient from 3ME
-S <- switch (scenario,
-             "AMS" = "scen AMS",
-             "AME" = "scen AME",
-             "ssTCO" = "scen AMS ss TCO",
-             "ssRES" = "scen AMS ss residentiel",
-             "ssVE" = "scen AMS ss VE")
-suppressMessages(suppressWarnings(scen <- read_excel(path = MatisseFiles$sortie_3me_xl, sheet = S)))  
-
-ThreeME <- 
-  scen %>%
-  select(-Def) %>%
-  gather(key = year, value = value, -c(1)) %>%
-  filter(year %in% c(2010, horizon))
-
-ThreeME <- ThreeME[grep("^ENER_BUIL_H01_C._2.11630/BUIL_H01_C._2$",ThreeME$Var),]
-
-dom_eff_df <- data.frame(classe = LETTERS[1:7])
-dom_eff_df$Code <- paste("ENER_BUIL_H01_C",dom_eff_df$classe,"_2*11630/BUIL_H01_C",dom_eff_df$classe,"_2", sep="")
-dom_eff_df <- dom_eff_df %>% 
-  left_join(ThreeME %>% filter(year == 2010), by = c("Code" = "Var")) %>% 
-  mutate(Value_init = value) %>% 
-  select(-year, -value)
-dom_eff_df <- dom_eff_df %>% 
-  left_join(ThreeME %>% filter(year == horizon), by = c("Code" = "Var")) %>% 
-  mutate(Value_hor = value) %>% 
-  select(-year, -value)
-dom_eff_df <- dom_eff_df %>%
-  mutate(Dom_eff = Value_hor/ Value_init - 1)
-
-
-
 # PREPARATION DONNEES PRIX ENERGIE ----------------------------------------
 
 
@@ -102,8 +62,8 @@ prix_classe_horizon$prix_elec<- prix_classe$prix_elec * FC$A02
 # A03
 prix_classe_horizon$prix_gaz<- prix_classe$prix_gaz * FC$A03
 # A04
-prix_classe_horizon[c("prix_fuel","prix_gpl")]<- prix_classe[c("prix_fuel","prix_gpl")]* FC$A04
-prix_classe_horizon[c("prix_bois","prix_chaleur")]<- prix_classe[c("prix_bois","prix_chaleur")]* FC$A03
+prix_classe_horizon[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]<- prix_classe[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]* FC$A04
+
 
 # CLASSER MENAGES PAR CLASSE ----------------------------------------------
 
@@ -178,36 +138,11 @@ menage_echelle <- menage_echelle %>% mutate_when(is.na(Solides_chauff),list(Soli
 menage_echelle <- menage_echelle %>% mutate_when(is.na(Urbain_chauff),list(Urbain_chauff=0))
 
 
-###
-## NEW 16/04
-###
-menage_echelle <- menage_echelle %>% mutate_when(is.na(GPL_Cuisson),list(GPL_Cuisson=0))
-menage_echelle <- menage_echelle %>% mutate_when(is.na(Fuel_Cuisson),list(Fuel_Cuisson=0))
-menage_echelle <- menage_echelle %>% mutate_when(is.na(Solides_Cuisson),list(Solides_Cuisson=0))
-menage_echelle <- menage_echelle %>% mutate_when(is.na(Urbain_Cuisson),list(Urbain_Cuisson=0))
-menage_echelle <- menage_echelle %>% mutate_when(is.na(Gaz_Cuisson),list(Gaz_Cuisson=0))
+# verif
 
-
-
-# Selection menages --------------------------------------------------------
-menage_echelle <- menage_echelle %>%
-  mutate(DPE_jump = - match(DPE_horizon,LETTERS) + match(DPE_pred,LETTERS))
-
-menage_echelle <- 
-  menage_echelle %>%
-  mutate(bascule=0)%>%
-  mutate_when(classe_arr %in% class_force_bascule, list(bascule=1)) %>%
-  mutate_when(year_neuf > year_new_bascule , list(bascule = 1)) %>%
-  mutate_when(year_rehab > 0 & DPE_jump > bascule_min_jump, list(bascule = 1))
-  
-  
-# menage_echelle[1:20,c("DPE_dep","DPE_pred","DPE_horizon","DPE_jump", "bascule", "classe_arr", "year_rehab", "year_neuf")]
-
-
-# Bascule -----------------------------------------------------------------
 
 for (x in c("Gaz_ECS","GPL_ECS","Fuel_ECS","Solides_ECS","Urbain_ECS","Gaz_chauff",
-            "GPL_chauff","Fuel_chauff","Solides_chauff","Urbain_chauff","Gaz_Cuisson","GPL_Cuisson","Solides_Cuisson","Urbain_Cuisson","Fuel_Cuisson")){
+            "GPL_chauff","Fuel_chauff","Solides_chauff","Urbain_chauff")){
   
   if (str_detect(x,"Gaz")){menage_echelle[paste(x,"vol",sep="_")]<-menage_echelle[x]/menage_echelle$prix_Gaz}
   if (str_detect(x,"GPL")){menage_echelle[paste(x,"vol",sep="_")]<-menage_echelle[x]/menage_echelle$prix_GPL}
@@ -218,30 +153,26 @@ for (x in c("Gaz_ECS","GPL_ECS","Fuel_ECS","Solides_ECS","Urbain_ECS","Gaz_chauf
 
 menage_echelle$vol_basc_elec_ECS <- rowSums(menage_echelle%>%select(ends_with("ECS_vol")))
 menage_echelle$vol_basc_elec_chauff <- rowSums(menage_echelle%>%select(ends_with("chauff_vol")))
-menage_echelle$vol_basc_elec_cuisson <- rowSums(menage_echelle%>%select(ends_with("Cuisson_vol")))
-
 
 
 menage_echelle <-
   menage_echelle %>%
   mutate(dep_basc_elec_ECS=vol_basc_elec_ECS*prix_Elec)%>%
-  mutate(dep_basc_elec_chauff=vol_basc_elec_chauff*prix_Elec)%>%
-  mutate(dep_basc_elec_cuisson=vol_basc_elec_cuisson*prix_Elec)
+  mutate(dep_basc_elec_chauff=vol_basc_elec_chauff*prix_Elec)
 
 
-menage_echelle$dep_non_elec<-rowSums(menage_echelle %>% select(c("Gaz_ECS","GPL_ECS","Fuel_ECS","Solides_ECS","Urbain_ECS","Gaz_chauff","GPL_chauff","Fuel_chauff","Solides_chauff","Urbain_chauff","Gaz_Cuisson","GPL_Cuisson","Solides_Cuisson","Urbain_Cuisson","Fuel_Cuisson")))
+menage_echelle$dep_non_elec<-rowSums(menage_echelle %>% select(c("Gaz_ECS","GPL_ECS","Fuel_ECS","Solides_ECS","Urbain_ECS","Gaz_chauff","GPL_chauff","Fuel_chauff","Solides_chauff","Urbain_chauff")))
 
 solde<- 
   menage_echelle %>%
-  mutate(solde=dep_basc_elec_ECS+dep_basc_elec_chauff+dep_basc_elec_cuisson-dep_non_elec #<0 => économie si les dépenses équivalentes en élec sont plus faibles que les dépenses en gaz,fuel, solides,etc
+  mutate(solde=dep_basc_elec_ECS+dep_basc_elec_chauff-dep_non_elec #<0 => économie si les dépenses équivalentes en élec sont plus faibles que les dépenses en gaz,fuel, solides,etc
   )%>%
-  select(ident_men,solde,bascule)
-
+select(ident_men,solde,classe_arr)
 
 solde<-
   solde %>% 
-  mutate_when(bascule==0,list(solde=0))%>%
-  select(-bascule)
+  mutate_when(!classe_arr=="A",list(solde=0))%>%
+select(-classe_arr)
 
 # menage_echelle%>%filter(ident_men %in% c(sapply(solde%>%filter(classe_arr=="A" & solde==0)%>%select(ident_men),function(x) as.numeric(x))))%>% 
 #   filter(!dep_basc_elec_ECS==0) %>%
@@ -265,53 +196,28 @@ solde<-
 # 2117   128 
 # > 867-128
 # [1] 739
-
+  
 
 menage_echelle <- 
   menage_echelle %>%
-  mutate_when(bascule==1,list(Gaz_ECS=0,
-                              GPL_ECS=0,
-                              Fuel_ECS=0,
-                              Solides_ECS=0,
-                              Urbain_ECS=0,
-                              Gaz_chauff=0,
-                              GPL_chauff=0,
-                              Fuel_chauff=0,
-                              Solides_chauff=0,
-                              Urbain_chauff=0,
-                              Gaz_Cuisson=0,
-                              GPL_Cuisson=0,
-                              Solides_Cuisson=0,
-                              Urbain_Cuisson=0,
-                              Fuel_Cuisson=0,
-                              Elec_chauff=Elec_chauff+dep_basc_elec_chauff,
-                              Elec_ECS=Elec_ECS+dep_basc_elec_ECS,
-                              Elec_Cuisson=Elec_Cuisson+dep_basc_elec_cuisson,
-                              dep_Gaz=dep_Gaz-Gaz_ECS-Gaz_chauff-Gaz_Cuisson,
-                              dep_GPL=dep_GPL-GPL_ECS-GPL_chauff-GPL_Cuisson,
-                              dep_Fuel=dep_Fuel-Fuel_ECS-Fuel_chauff-Fuel_Cuisson,
-                              dep_Solides=dep_Solides-Solides_ECS-Solides_chauff-Solides_Cuisson,
-                              dep_Urbain=dep_Urbain-Urbain_ECS-Urbain_chauff-Urbain_Cuisson,
-                              dep_Elec=dep_Elec+dep_basc_elec_chauff+dep_basc_elec_ECS+dep_basc_elec_cuisson))
-
-
-#Ajustement efficacité domicile
-usages <- c("ECS", "chauff", "clim", "Cuisson", "ecl", "ElecSpe")
-sources <- c("Elec","Gaz","Fuel","GPL","Urbain","Solides")
-dom_eff_DPE_vec <- dom_eff_df$Dom_eff[match(menage_echelle$DPE_horizon , dom_eff_df$classe)]
-
-for(so in sources){
-  dom_eff_compo_vec <- (1 + dom_eff_DPE_vec) * (1 + dom_effic_source$eff_gain[which(dom_effic_source$sources == so)])
-  
-  for(us in usages){
-    my_col <- paste(so,us,sep="_")
-    if(my_col %in% names(menage_echelle)){
-      solde["solde"] <-  solde$solde + menage_echelle[,my_col] * (dom_eff_compo_vec - 1)
-      menage_echelle[,my_col] <- menage_echelle[,my_col] * dom_eff_compo_vec
-    }      
-  }
-  menage_echelle[paste("dep",so,sep="_")] <- menage_echelle[paste("dep",so,sep="_")] * dom_eff_compo_vec
-}
+  mutate_when(classe_arr=="A",list(Gaz_ECS=0,
+                                   GPL_ECS=0,
+                                   Fuel_ECS=0,
+                                   Solides_ECS=0,
+                                   Urbain_ECS=0,
+                                   Gaz_chauff=0,
+                                   GPL_chauff=0,
+                                   Fuel_chauff=0,
+                                   Solides_chauff=0,
+                                   Urbain_chauff=0,
+                                   Elec_chauff=Elec_chauff+dep_basc_elec_chauff,
+                                   Elec_ECS=Elec_ECS+dep_basc_elec_ECS,
+                                   dep_Gaz=dep_Gaz-Gaz_ECS-Gaz_chauff,
+                                   dep_GPL=dep_GPL-GPL_ECS-GPL_chauff,
+                                   dep_Fuel=dep_Fuel-Fuel_ECS-Fuel_chauff,
+                                   dep_Solides=dep_Solides-Solides_ECS-Solides_chauff,
+                                   dep_Urbain=dep_Urbain-Urbain_ECS-Urbain_chauff,
+                                   dep_Elec=dep_Elec+dep_basc_elec_chauff+dep_basc_elec_ECS))
 
 
 

@@ -99,11 +99,31 @@ microsimulation_depenses <- function(menage_echelle, menage_forme, FC){
       (1 + menage_echelle$elast_rev_A03 * menage_echelle$TC_RDB_reel) *
       FC$A03
     
-    menage_echelle[list_dep_autres_ener]<-
-      menage_forme[list_dep_autres_ener] *
+    
+    #Urbain et solides : elast sur 04, FC sur gaz, comme 3ME 
+    menage_echelle$dep_Urbain <-
+      menage_forme$dep_Urbain *
+      (1 + menage_echelle$elast_prix_A04 * (FC$A03 / menage_echelle$IP_stone - 1)) *
+      (1 + menage_echelle$elast_rev_A04 * menage_echelle$TC_RDB_reel) *
+      FC$A03
+    menage_echelle$dep_Solides  <-
+      menage_forme$dep_Solides *
+      (1 + menage_echelle$elast_prix_A04 * (FC$A03 / menage_echelle$IP_stone - 1)) *
+      (1 + menage_echelle$elast_rev_A04 * menage_echelle$TC_RDB_reel) *
+      FC$A03    
+    
+    #GPL et Fuel : elast et FC sur 04 
+    menage_echelle$dep_GPL  <-
+      menage_forme$dep_GPL *
       (1 + menage_echelle$elast_prix_A04 * (FC$A04 / menage_echelle$IP_stone - 1)) *
       (1 + menage_echelle$elast_rev_A04 * menage_echelle$TC_RDB_reel) *
-      FC$A04
+      FC$A04      
+    menage_echelle$dep_Fuel  <-
+      menage_forme$dep_Fuel *
+      (1 + menage_echelle$elast_prix_A04 * (FC$A04 / menage_echelle$IP_stone - 1)) *
+      (1 + menage_echelle$elast_rev_A04 * menage_echelle$TC_RDB_reel) *
+      FC$A04      
+    
     
     # Dep_logement
     menage_echelle$dep_energie_logement <- rowSums(menage_echelle[c("dep_Elec", "dep_Gaz", list_dep_autres_ener)])
@@ -191,11 +211,31 @@ microsimulation_depenses <- function(menage_echelle, menage_forme, FC){
     (1 + menage_echelle$elast_rev_A03 * menage_echelle$TC_RDB_reel) *
     FC$A03
   
-  # A04
-  menage_echelle[list_dep_autres_ener] <- menage_forme[list_dep_autres_ener] *
+
+  #Urbain et solides : elast sur 04, FC sur gaz, comme 3ME 
+  menage_echelle$dep_Urbain <-
+    menage_forme$dep_Urbain *
+    (1 + menage_echelle$elast_prix_A04 * (FC$A03 / menage_echelle$IP_stone - 1)) *
+    (1 + menage_echelle$elast_rev_A04 * menage_echelle$TC_RDB_reel) *
+    FC$A03
+  menage_echelle$dep_Solides  <-
+    menage_forme$dep_Solides *
+    (1 + menage_echelle$elast_prix_A04 * (FC$A03 / menage_echelle$IP_stone - 1)) *
+    (1 + menage_echelle$elast_rev_A04 * menage_echelle$TC_RDB_reel) *
+    FC$A03    
+  
+  #GPL et Fuel : elast et FC sur 04 
+  menage_echelle$dep_GPL  <-
+    menage_forme$dep_GPL *
     (1 + menage_echelle$elast_prix_A04 * (FC$A04 / menage_echelle$IP_stone - 1)) *
     (1 + menage_echelle$elast_rev_A04 * menage_echelle$TC_RDB_reel) *
-    FC$A04
+    FC$A04      
+  menage_echelle$dep_Fuel  <-
+    menage_forme$dep_Fuel *
+    (1 + menage_echelle$elast_prix_A04 * (FC$A04 / menage_echelle$IP_stone - 1)) *
+    (1 + menage_echelle$elast_rev_A04 * menage_echelle$TC_RDB_reel) *
+    FC$A04      
+  
   
   # Dep_logement
   menage_echelle$dep_energie_logement <- rowSums(menage_echelle[c("dep_Elec", "dep_Gaz", list_dep_autres_ener)])

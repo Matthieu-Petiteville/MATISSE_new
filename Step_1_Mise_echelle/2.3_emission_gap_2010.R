@@ -38,9 +38,9 @@ coeff_Gaz_2010<- as.numeric(EMS%>%filter(year==2010)%>%filter(Var=="EMS_HH_24_2"
 
 menage_forme <-
   menage_forme %>%
-  mutate(ems_CL=dep_Solides*coeff_CL_2010)%>%
+  mutate(ems_CL=0)%>%
   mutate(ems_Oil=(carb_lubr+dep_Fuel+dep_GPL)*coeff_Oil_2010)%>%
-  mutate(ems_Gaz=(dep_Gaz+dep_Urbain)*coeff_Gaz_2010)
+  mutate(ems_Gaz=(dep_Gaz+dep_Urbain+dep_Solides)*coeff_Gaz_2010)
 menage_forme <- menage_forme %>% mutate(emissions=ems_CL+ems_Oil+ems_Gaz)%>%
   mutate(ems_uc=emissions/coeffuc)
 
@@ -67,7 +67,7 @@ men_dec_1/ems_uc_tot
 
 facteur_dec1 <- as.numeric(men_dec_1/ems_uc_tot)
 # 2.201544
-
+#2.172059 après FixCharb
 
 
 
@@ -79,7 +79,7 @@ men_tuu_0/ems_uc_tot
 
 facteur_tuu0 <- as.numeric(men_tuu_0/ems_uc_tot)
 # 3.32953
-
+#3.294676 après FixCharb
 
 # Clean -------------------------------------------------------------------
 rm(menage_forme,EMS)

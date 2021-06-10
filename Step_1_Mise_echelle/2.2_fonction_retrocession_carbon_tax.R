@@ -9,8 +9,11 @@ retrocession_carbon_tax <- function(TCO, TCO_tot, menage_echelle){
   try(detach("package:plyr"),silent=T)
   
   # Pour gagner du temps 
-  facteur_dec1 <-  2.201544
-  facteur_tuu0 <-  3.32953
+  # facteur_dec1 <-  2.201544
+  # facteur_tuu0 <-  3.32953
+  #Ci-dessous, valeurs post FixCharb
+  facteur_dec1 <-  2.172059
+  facteur_tuu0 <-  3.294676
 
   #TCO par UC => TCO à redistribuer par unité de consommation en moyenne
   TCO_tot_UC <- TCO_tot / as.numeric(menage_echelle %>% 

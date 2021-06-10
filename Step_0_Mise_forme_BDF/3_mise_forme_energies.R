@@ -15,7 +15,7 @@
 suppressMessages(library(reshape2, warn.conflicts=F , quietly = T))
 suppressMessages(library(tidyverse, warn.conflicts=F , quietly = T))
 suppressMessages(library(plyr, warn.conflicts=F , quietly = T))
-source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_6_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R",sep=""))
 
 

@@ -16,14 +16,6 @@ source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_
 
 # DATA --------------------------------------------------------------------
 
-if(!exists("class_force_bascule")){class_force_bascule <- c()}
-if(!exists("year_new_bascule")){year_new_bascule <- 2100}
-if(!exists("bascule_min_jump")){bascule_min_jump <- 7}
-if(!exists("dom_effic_source")){dom_effic_source <<- data.frame(sources = c("Elec","Gaz","Fuel","GPL","Urbain","Solides") ,
-                                                                eff_gain = c(0, 0, 0, 0, 0, 0))}
-
-
-
 #Importer taux de croissance des prix et des revenus
 load(MatisseFiles$FC_2010_horizon_rd)
 load(MatisseFiles$menage_echelle_33_rd)
@@ -55,38 +47,6 @@ list_dep=c("agriculture",
 
 menage_echelle<-menage_echelle_33
 
-#ExtractDomEfficiency gradient from 3ME
-S <- switch (scenario,
-             "AMS" = "scen AMS",
-             "AME" = "scen AME",
-             "ssTCO" = "scen AMS ss TCO",
-             "ssRES" = "scen AMS ss residentiel",
-             "ssVE" = "scen AMS ss VE")
-suppressMessages(suppressWarnings(scen <- read_excel(path = MatisseFiles$sortie_3me_xl, sheet = S)))  
-
-ThreeME <- 
-  scen %>%
-  select(-Def) %>%
-  gather(key = year, value = value, -c(1)) %>%
-  filter(year %in% c(2010, horizon))
-
-ThreeME <- ThreeME[grep("^ENER_BUIL_H01_C._2.11630/BUIL_H01_C._2$",ThreeME$Var),]
-
-dom_eff_df <- data.frame(classe = LETTERS[1:7])
-dom_eff_df$Code <- paste("ENER_BUIL_H01_C",dom_eff_df$classe,"_2*11630/BUIL_H01_C",dom_eff_df$classe,"_2", sep="")
-dom_eff_df <- dom_eff_df %>% 
-  left_join(ThreeME %>% filter(year == 2010), by = c("Code" = "Var")) %>% 
-  mutate(Value_init = value) %>% 
-  select(-year, -value)
-dom_eff_df <- dom_eff_df %>% 
-  left_join(ThreeME %>% filter(year == horizon), by = c("Code" = "Var")) %>% 
-  mutate(Value_hor = value) %>% 
-  select(-year, -value)
-dom_eff_df <- dom_eff_df %>%
-  mutate(Dom_eff = Value_hor/ Value_init - 1)
-
-
-
 # PREPARATION DONNEES PRIX ENERGIE ----------------------------------------
 
 
@@ -104,6 +64,7 @@ prix_classe_horizon$prix_gaz<- prix_classe$prix_gaz * FC$A03
 # A04
 prix_classe_horizon[c("prix_fuel","prix_gpl")]<- prix_classe[c("prix_fuel","prix_gpl")]* FC$A04
 prix_classe_horizon[c("prix_bois","prix_chaleur")]<- prix_classe[c("prix_bois","prix_chaleur")]* FC$A03
+
 
 # CLASSER MENAGES PAR CLASSE ----------------------------------------------
 
@@ -190,21 +151,19 @@ menage_echelle <- menage_echelle %>% mutate_when(is.na(Gaz_Cuisson),list(Gaz_Cui
 
 
 # Selection menages --------------------------------------------------------
-menage_echelle <- menage_echelle %>%
-  mutate(DPE_jump = - match(DPE_horizon,LETTERS) + match(DPE_pred,LETTERS))
+
 
 menage_echelle <- 
-  menage_echelle %>%
+  menage_echelle %>% 
   mutate(bascule=0)%>%
-  mutate_when(classe_arr %in% class_force_bascule, list(bascule=1)) %>%
-  mutate_when(year_neuf > year_new_bascule , list(bascule = 1)) %>%
-  mutate_when(year_rehab > 0 & DPE_jump > bascule_min_jump, list(bascule = 1))
-  
-  
-# menage_echelle[1:20,c("DPE_dep","DPE_pred","DPE_horizon","DPE_jump", "bascule", "classe_arr", "year_rehab", "year_neuf")]
+  mutate_when(classe_arr=="A",list(bascule=1))%>%
+  mutate_when(classe_arr%in%c("B","C", "D", "E", "F") & year_rehab>0,list(bascule=1))
+
 
 
 # Bascule -----------------------------------------------------------------
+
+
 
 for (x in c("Gaz_ECS","GPL_ECS","Fuel_ECS","Solides_ECS","Urbain_ECS","Gaz_chauff",
             "GPL_chauff","Fuel_chauff","Solides_chauff","Urbain_chauff","Gaz_Cuisson","GPL_Cuisson","Solides_Cuisson","Urbain_Cuisson","Fuel_Cuisson")){
@@ -295,23 +254,6 @@ menage_echelle <-
                               dep_Elec=dep_Elec+dep_basc_elec_chauff+dep_basc_elec_ECS+dep_basc_elec_cuisson))
 
 
-#Ajustement efficacité domicile
-usages <- c("ECS", "chauff", "clim", "Cuisson", "ecl", "ElecSpe")
-sources <- c("Elec","Gaz","Fuel","GPL","Urbain","Solides")
-dom_eff_DPE_vec <- dom_eff_df$Dom_eff[match(menage_echelle$DPE_horizon , dom_eff_df$classe)]
-
-for(so in sources){
-  dom_eff_compo_vec <- (1 + dom_eff_DPE_vec) * (1 + dom_effic_source$eff_gain[which(dom_effic_source$sources == so)])
-  
-  for(us in usages){
-    my_col <- paste(so,us,sep="_")
-    if(my_col %in% names(menage_echelle)){
-      solde["solde"] <-  solde$solde + menage_echelle[,my_col] * (dom_eff_compo_vec - 1)
-      menage_echelle[,my_col] <- menage_echelle[,my_col] * dom_eff_compo_vec
-    }      
-  }
-  menage_echelle[paste("dep",so,sep="_")] <- menage_echelle[paste("dep",so,sep="_")] * dom_eff_compo_vec
-}
 
 
 

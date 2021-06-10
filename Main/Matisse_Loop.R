@@ -1,6 +1,6 @@
 # Fonction permettant de lancer tout ou partie des différents steps
 
-Matisse_Loop <- function(step_to_run = 1:5, ForceRerun = FALSE){
+Matisse_Loop <- function(step_to_run = 1:6, ForceRerun = FALSE){
 
   AddLogs("MAIN",paste("Running MatisseLoop with steps",paste(step_to_run,collapse = "/"),sep =" "))
 
@@ -91,21 +91,38 @@ Matisse_Loop <- function(step_to_run = 1:5, ForceRerun = FALSE){
       AddLogs("MAIN","Not running step 4 : it's already in StepTracker and ForceRerun is FALSE")
     }
   }
-
+  
   ####
   # Step 5
   ####
   if(5 %in% step_to_run){
     if(ForceRerun || !iSLineInStepTracker(5)){
       AddLogs("MAIN","Running step 5")
-  
-      source(paste(M_home,"/Step_5_export_IMACLIM/1_export_to_IMACLIM.R",sep=""))
+      
+      source(paste(M_home,"/Step_5_AlignOn3ME/1_CalibrateMenageOn3ME.r",sep=""))
+      AddLogs("MAIN","Completed step 5.1")
+      source(paste(M_home,"/Step_5_AlignOn3ME/2_AligneElecOn3ME.r",sep=""))
+      AddLogs("MAIN","Completed step 5.2")
       AddLogs("MAIN","Completed step 5")
       AddLineToStepTracker(5)
     }else{
       AddLogs("MAIN","Not running step 5 : it's already in StepTracker and ForceRerun is FALSE")
     }
+  }  
+
+  ####
+  # Step 6
+  ####
+  if(6 %in% step_to_run){
+    if(ForceRerun || !iSLineInStepTracker(6)){
+      AddLogs("MAIN","Running step 6")
+  
+      source(paste(M_home,"/Step_6_export_IMACLIM/1_export_to_IMACLIM.R",sep=""))
+      AddLogs("MAIN","Completed step 6")
+      AddLineToStepTracker(6)
+    }else{
+      AddLogs("MAIN","Not running step 6 : it's already in StepTracker and ForceRerun is FALSE")
+    }
   }
 
-  
 }

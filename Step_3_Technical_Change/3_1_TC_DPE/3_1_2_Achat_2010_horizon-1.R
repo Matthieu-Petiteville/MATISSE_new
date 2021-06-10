@@ -1,7 +1,7 @@
 # Constructions neuves entre 2010 et horizon :
-  # Selection des ménages
-  # Mise à jour budgets
-
+# Selection des ménages
+# Mise à jour budgets
+#Including enertot change
 
 
 # LIBRARIES ---------------------------------------------------------------
@@ -10,7 +10,7 @@ library(dplyr)
 
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/Repayment.R",sep=""))
-source(paste(M_home,"/Step_5_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
+source(paste(M_home,"/Step_6_Export_IMACLIM/compute_savings_share_enermix.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
 
@@ -89,10 +89,10 @@ menage_echelle<-menage_echelle_31
 
 
 # Nouvelles variables : sont "exclus" les ménages qui ne peuvent bénéficier de la construction d'un logement neuf
-  # Exclus 
-      # les ménages c13711>10000 : les ménages qui achètent une maison à l'horizon ne peuvent pas avoir construit un logement peu de temps avant
-      # Les ménages déjà en A
-      # Les locataires (on garde stalog 1 et 2, propriétaires et propriétaires remboursant un emprunt)
+# Exclus 
+# les ménages c13711>10000 : les ménages qui achètent une maison à l'horizon ne peuvent pas avoir construit un logement peu de temps avant
+# Les ménages déjà en A
+# Les locataires (on garde stalog 1 et 2, propriétaires et propriétaires remboursant un emprunt)
 #NEUF va indiquer les ménages sélectionnés pour rénover leur logement : 
 # passer de DPE_pred à class_arr
 
@@ -105,7 +105,7 @@ menage_echelle<-
               stalog>2,list(exclus=TRUE)) %>%
   mutate_when(!year_neuf==horizon, list(classe_arr=DPE_dep))%>% 
   mutate(solde_ener=0)
-  
+
 
 
 
@@ -151,6 +151,21 @@ menage_echelle<-
   dplyr::mutate(kWh_rank_opt_ener =row_number(-ener_dom_surf)) %>% 
   ungroup()
 
+menage_echelle<-
+  menage_echelle %>% 
+  dplyr::mutate(kWh_rank_pess_ener =max(kWh_rank_opt_ener,na.rm=T)-kWh_rank_opt_ener+1) %>% 
+  ungroup()
+
+
+menage_echelle <-
+  menage_echelle %>% 
+  dplyr::mutate(kWh_rank_med_ener = kWh_rank_pess_ener-kWh_rank_opt_ener) %>% 
+  mutate_when(
+    kWh_rank_med_ener<=0,
+    list(kWh_rank_med_ener=-kWh_rank_med_ener+1)) %>%
+  ungroup()
+
+
 #Possible optimisation : passer en fonction le classement des ménages et le conditionner au type de scenario classement
 
 # ems<-calc_ems(menage_echelle,FC)
@@ -161,10 +176,17 @@ menage_echelle<-
   mutate(ems_tot_chauff_ecs_surf=ems_tot_chauff_ecs/surfhab_d)%>%
   mutate(ems_tot_chauff_ecs_surf=ifelse(is.infinite(ems_tot_chauff_ecs_surf),0,ems_tot_chauff_ecs_surf))%>%
   dplyr::mutate(kWh_rank_opt_co2 =row_number(-ems_tot_chauff_ecs_surf))
-  
+
 if(str_detect(scenario_classement,"Optimal_ener")){
   menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_opt_ener)
 }
+if(str_detect(scenario_classement,"Pess_ener")){
+  menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_pess_ener)
+}
+if(str_detect(scenario_classement,"Med_ener")){
+  menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_med_ener)
+}
+
 if(str_detect(scenario_classement,"Optimal_co2")){
   menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_opt_co2)
 }
@@ -217,14 +239,14 @@ ident_r<-c()
 # Le parc DPE a été calé sur les volumes 2010, les nouvelles constructions de cette année là ont déjà été prises en compte. Ce ne sera en revanche pas le cas des 
 # rénovations thermiques, nous avons corrigé la bdd des gros travaux de rénovations en Step_0.4
 for (Y in 2011:(horizon-1)){
-
-    ident_r<-c()
+  
+  ident_r<-c()
   
   # remise à 0 du principal de la dette année après année
   # menage_echelle <- menage_echelle %>% mutate(principal_dette=0)
   
   # Mat_gain_ener -----------------------------------------------------------
-
+  
   # Extraction de la conso moyenne au m2 en kWH par classe DPE
   conso_moy_dep=data.frame("A"=0, "B"=0, "C"=0, "D"=0, "E"=0, "F"=0, "G"=0)
   for (i in LETTERS[1:7]){
@@ -238,7 +260,7 @@ for (Y in 2011:(horizon-1)){
           select(value)
       )
   }
-
+  
   
   #Fonction possible : déjà utilisée ailleurs (3.1.1)
   Mat_gain_ener<-data.frame("DPE_before"=sort(rep(LETTERS[1:7],7)),"DPE_after"=rep(LETTERS[1:7],7))
@@ -246,7 +268,7 @@ for (Y in 2011:(horizon-1)){
   Mat_gain_ener$value_before<-sapply(Mat_gain_ener$DPE_before,function(x) as.numeric(conso_moy_dep[x]))
   Mat_gain_ener$value<-(Mat_gain_ener$value_after-Mat_gain_ener$value_before)/Mat_gain_ener$value_before
   Mat_gain_ener <- Mat_gain_ener %>% select(-c(value_after,value_before))
-
+  
   # DONNEES THREEME ---------------------------------------------------------
   # travaux de rénovation énergétiques en volume par saut de classe (en M2)
   # Transition de dep vers arr
@@ -259,7 +281,7 @@ for (Y in 2011:(horizon-1)){
   #       filter(year==Y) %>%
   #       select(value)
   #   )*10^6
-
+  
   NEWBUIL_H01_2_Y<-
     as.numeric(
       ThreeME %>%
@@ -267,21 +289,21 @@ for (Y in 2011:(horizon-1)){
         filter(year==Y) %>%
         select(value)
     )
-
-
+  
+  
   
   # BASCULE -----------------------------------------------------------------
   
   for (arr in LETTERS[1:3]){
-
+    
     if(arr=="A"){stock_m2_trans=NEWBUIL_H01_CA_2 %>% filter(year==Y)%>%select(value)}
-     
+    
     if(arr=="B"){
-        stock_m2_trans=NEWBUIL_H01_CB_2 %>% filter(year==Y)%>%select(value)
-        menage_echelle <-
-          menage_echelle %>%
-          mutate_when(DPE_dep=="B",list(kWh_rank=0))
-      }
+      stock_m2_trans=NEWBUIL_H01_CB_2 %>% filter(year==Y)%>%select(value)
+      menage_echelle <-
+        menage_echelle %>%
+        mutate_when(DPE_dep=="B",list(kWh_rank=0))
+    }
     if(arr=="C"){
       stock_m2_trans=NEWBUIL_H01_CC_2 %>% filter(year==Y)%>%select(value)
       menage_echelle <-
@@ -290,29 +312,29 @@ for (Y in 2011:(horizon-1)){
                     DPE_dep=="C",list(kWh_rank=0))
     }
     
-        sum=0
-
-        i=1
-        while(!i %in% menage_echelle$kWh_rank){i=i+1} # on cherche le prochain ménage classé et non exclus
-        #Peut-être une opti ici : la logique while i est assez moche.
-        #Possible utilisation de min(kWh_rank) pour accélérer, mais besoin de gérer les cas de kWh_rank=0 => Passage à NA ou Inf?
-
-        while(sum<stock_m2_trans){
-          sum =
-            sum +
-            as.numeric(menage_echelle %>% filter(kWh_rank==i) %>% summarise(sum(pondmen*surfhab_d)))
-
-          # identifiant du ménage sélectionné
-          im <- as.numeric(menage_echelle %>% filter(kWh_rank==i) %>% select(ident_men))
-          ident_r <- c(ident_r,im)
-
-          # Modification des variables NEUF et class_arr dans la base globale
-          menage_echelle<- menage_echelle %>%
-            mutate_when(ident_men==im,list(NEUF=TRUE,classe_arr=arr,year_neuf=Y,kWh_rank=0))
-
-          i=i+1
-          while(!i %in% menage_echelle$kWh_rank){i=i+1}
-        }
+    sum=0
+    
+    i=1
+    while(!i %in% menage_echelle$kWh_rank){i=i+1} # on cherche le prochain ménage classé et non exclus
+    #Peut-être une opti ici : la logique while i est assez moche.
+    #Possible utilisation de min(kWh_rank) pour accélérer, mais besoin de gérer les cas de kWh_rank=0 => Passage à NA ou Inf?
+    
+    while(sum<stock_m2_trans){
+      sum =
+        sum +
+        as.numeric(menage_echelle %>% filter(kWh_rank==i) %>% summarise(sum(pondmen*surfhab_d)))
+      
+      # identifiant du ménage sélectionné
+      im <- as.numeric(menage_echelle %>% filter(kWh_rank==i) %>% select(ident_men))
+      ident_r <- c(ident_r,im)
+      
+      # Modification des variables NEUF et class_arr dans la base globale
+      menage_echelle<- menage_echelle %>%
+        mutate_when(ident_men==im,list(NEUF=TRUE,classe_arr=arr,year_neuf=Y,kWh_rank=0))
+      
+      i=i+1
+      while(!i %in% menage_echelle$kWh_rank){i=i+1}
+    }
   }
   
   
@@ -325,120 +347,127 @@ for (Y in 2011:(horizon-1)){
   NEWBUIL_H01_CB_2 %>% filter(year==Y)%>%select(value)
   NEWBUIL_H01_CC_2 %>% filter(year==Y)%>%select(value)
   menage_echelle %>% filter(NEUF)%>%mutate(surfpond=pondmen*surfhab_d)%>%arrange(classe_arr,-ener_dom)%>%select(ident_men, classe_arr,surfpond,ener_dom) # permet de vérifier que le dernier ménage sélectionné permet de passer strictement au dessus des volumes de ThreeME
-        
   
-
-# Modification des budgets ------------------------------------------------
-
-    for (dep in LETTERS[2:7]){
-      for (arr in LETTERS[1:3]){
-        
-
-        rate_gain_ener<-as.numeric(
-          Mat_gain_ener %>%
-            filter(DPE_before==dep) %>%
-            filter(DPE_after==arr) %>%
-            select(value))
-
-        #s'il existe (dim>0) un ménage sélectionné pour acheter du neuf de classe arr (classe_arr==arr) à l'année (year_neuf==7) partant de la classe dep (DPE_dep==dep)
-        if(dim(menage_echelle %>% filter(year_neuf==Y & DPE_dep==dep & classe_arr==arr) %>% select(ident_men))[1]>0){
-          menage_echelle <-
-            menage_echelle %>%
-            mutate_when(
-              # Condition
-              year_neuf==Y &
-                DPE_dep==dep &
-                classe_arr==arr,
-              # Action
-              list(
-                #Energie
-                Elec_ECS=Elec_ECS*(1+rate_gain_ener),
-                Gaz_ECS=Gaz_ECS*(1+rate_gain_ener),
-                GPL_ECS=GPL_ECS*(1+rate_gain_ener),
-                Fuel_ECS=Fuel_ECS*(1+rate_gain_ener),
-                Solides_ECS=Solides_ECS*(1+rate_gain_ener),
-                Urbain_ECS=Urbain_ECS*(1+rate_gain_ener),
-                Elec_chauff=Elec_chauff*(1+rate_gain_ener),
-                Gaz_chauff=Gaz_chauff*(1+rate_gain_ener),
-                GPL_chauff=GPL_chauff*(1+rate_gain_ener),
-                Fuel_chauff=Fuel_chauff*(1+rate_gain_ener),
-                Solides_chauff=Solides_chauff*(1+rate_gain_ener),
-                Urbain_chauff=Urbain_chauff*(1+rate_gain_ener),
-                Elec_clim=Elec_clim*(1+rate_gain_ener)
-              ))
-        }
-        
-        }
-        }
+  
+  
+  # Modification des budgets ------------------------------------------------
+  
+  for (dep in LETTERS[2:7]){
+    for (arr in LETTERS[1:3]){
+      
+      
+      rate_gain_ener<-as.numeric(
+        Mat_gain_ener %>%
+          filter(DPE_before==dep) %>%
+          filter(DPE_after==arr) %>%
+          select(value))
+      
+      #s'il existe (dim>0) un ménage sélectionné pour acheter du neuf de classe arr (classe_arr==arr) à l'année (year_neuf==7) partant de la classe dep (DPE_dep==dep)
+      if(dim(menage_echelle %>% filter(year_neuf==Y & DPE_dep==dep & classe_arr==arr) %>% select(ident_men))[1]>0){
+        menage_echelle <-
+          menage_echelle %>%
+          mutate_when(
+            # Condition
+            year_neuf==Y &
+              DPE_dep==dep &
+              classe_arr==arr,
+            # Action
+            list(
+              #Energie
+              Elec_ECS=Elec_ECS*(1+rate_gain_ener),
+              Gaz_ECS=Gaz_ECS*(1+rate_gain_ener),
+              GPL_ECS=GPL_ECS*(1+rate_gain_ener),
+              Fuel_ECS=Fuel_ECS*(1+rate_gain_ener),
+              Solides_ECS=Solides_ECS*(1+rate_gain_ener),
+              Urbain_ECS=Urbain_ECS*(1+rate_gain_ener),
+              Elec_chauff=Elec_chauff*(1+rate_gain_ener),
+              Gaz_chauff=Gaz_chauff*(1+rate_gain_ener),
+              GPL_chauff=GPL_chauff*(1+rate_gain_ener),
+              Fuel_chauff=Fuel_chauff*(1+rate_gain_ener),
+              Solides_chauff=Solides_chauff*(1+rate_gain_ener),
+              Urbain_chauff=Urbain_chauff*(1+rate_gain_ener),
+              Elec_clim=Elec_clim*(1+rate_gain_ener),
+              Elec_ElecSpe=Elec_ElecSpe*(1+rate_gain_ener),
+              Elec_ecl=Elec_ecl*(1+rate_gain_ener),
+              Elec_Cuisson=Elec_Cuisson*(1+rate_gain_ener),
+              Gaz_Cuisson=Gaz_Cuisson*(1+rate_gain_ener),
+              GPL_Cuisson=GPL_Cuisson*(1+rate_gain_ener),
+              Fuel_Cuisson=Fuel_Cuisson*(1+rate_gain_ener),
+              Solides_Cuisson=Solides_Cuisson*(1+rate_gain_ener),
+              Urbain_Cuisson= Urbain_Cuisson*(1+rate_gain_ener)              ))
+      }
+      
     }
-  
-  
+  }
+}
+
+
 rm(i,sum,stock_m2_trans)
 
-  sauv_int<-menage_echelle
+sauv_int<-menage_echelle
 
-    #Vérif OK
-  # for (Y in seq(2011,horizon-1)){
-  # print(Y)
-  # print(menage_echelle %>% filter(year_neuf==Y)%>%group_by(classe_arr)%>%summarise(sum(pondmen*surfhab_d)))
-  # print(as.numeric(NEWBUIL_H01_CA_2 %>% filter(year==Y)%>%select(value)))
-  # print(as.numeric(NEWBUIL_H01_CB_2 %>% filter(year==Y)%>%select(value)))
-  # print(as.numeric(NEWBUIL_H01_CC_2 %>% filter(year==Y)%>%select(value)))
-  # menage_echelle %>% filter(NEUF)%>%mutate(surfpond=pondmen*surfhab_d)%>%arrange(classe_arr,-ener_dom)%>%select(ident_men, classe_arr,surfpond,ener_dom)
-  # }
-  # Au total
-  menage_echelle %>% filter(year_neuf>2010 & year_neuf<2035)%>%group_by(classe_arr)%>%summarise(sum(pondmen*surfhab_d))
-  NEWBUIL_H01_CA_2 %>% filter(year>2010)%>%summarise(sum(value))
-  NEWBUIL_H01_CB_2 %>% filter(year>2010)%>%summarise(sum(value))
-  NEWBUIL_H01_CC_2 %>% filter(year>2010)%>%summarise(sum(value))
-  
-  # SOLDE_ENER --------------------------------------------------------------
-  
-  # Mise à jour des totaux
-  menage_echelle<-
-    menage_echelle %>% 
-    mutate(
-      dep_Elec_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Elec"))),
-      dep_Gaz_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Gaz"))),
-      dep_GPL_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("GPL"))),
-      dep_Fuel_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Fuel"))),
-      dep_Urbain_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Urbain"))),
-      dep_Solides_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Solides")))
-    )
-  
-  # Due à la fusion Sources et Dep_sources sont redondants, la mise à jour de Sources permet de déduire facilement le solde sur tous les sources d'énergie
-  menage_echelle$solde_ener<-
-    rowSums(menage_echelle[dep_sources_verif]) -
-    rowSums(menage_echelle[dep_sources])
-  
-  
-  # Test
-  # A<-menage_echelle %>% filter(abs(solde_ener)>10^(-9))%>% select(ident_men)
-  # menage_echelle %>% filter(NEUF) %>% filter(!year_neuf==horizon) %>% filter(!ident_men %in% A$ident_men) %>% select(ident_men)
-  # 5797
-  # View(rbind(menage_echelle))
-  
-  menage_echelle<-
-    menage_echelle %>% 
-    mutate(
-      dep_Elec=dep_Elec_verif,
-      dep_Gaz=dep_Gaz_verif,
-      dep_GPL=dep_GPL_verif,
-      dep_Fuel=dep_Fuel_verif,
-      dep_Solides=dep_Solides_verif,
-      dep_Urbain=dep_Urbain_verif)
-  
-  # menage_echelle$dep_energie=rowSums(menage_echelle[dep_sources])
-  # menage_echelle$dep_energie_logement=rowSums(menage_echelle[
-  #   c("Elec_ECS","Gaz_ECS","GPL_ECS","Fuel_ECS","Solides_ECS","Urbain_ECS","Elec_chauff","Gaz_chauff",
-  #     "GPL_chauff","Fuel_chauff","Solides_chauff","Urbain_chauff","Elec_clim")])
-  
-  
-  # SOLDE_DETTE -------------------------------------------------------------
-  solde<-menage_echelle %>% 
-    mutate(solde=solde_ener) %>%
-    select(ident_men,solde)
-  
+#Vérif OK
+# for (Y in seq(2011,horizon-1)){
+# print(Y)
+# print(menage_echelle %>% filter(year_neuf==Y)%>%group_by(classe_arr)%>%summarise(sum(pondmen*surfhab_d)))
+# print(as.numeric(NEWBUIL_H01_CA_2 %>% filter(year==Y)%>%select(value)))
+# print(as.numeric(NEWBUIL_H01_CB_2 %>% filter(year==Y)%>%select(value)))
+# print(as.numeric(NEWBUIL_H01_CC_2 %>% filter(year==Y)%>%select(value)))
+# menage_echelle %>% filter(NEUF)%>%mutate(surfpond=pondmen*surfhab_d)%>%arrange(classe_arr,-ener_dom)%>%select(ident_men, classe_arr,surfpond,ener_dom)
+# }
+# Au total
+menage_echelle %>% filter(year_neuf>2010 & year_neuf<2035)%>%group_by(classe_arr)%>%summarise(sum(pondmen*surfhab_d))
+NEWBUIL_H01_CA_2 %>% filter(year>2010)%>%summarise(sum(value))
+NEWBUIL_H01_CB_2 %>% filter(year>2010)%>%summarise(sum(value))
+NEWBUIL_H01_CC_2 %>% filter(year>2010)%>%summarise(sum(value))
+
+# SOLDE_ENER --------------------------------------------------------------
+
+# Mise à jour des totaux
+menage_echelle<-
+  menage_echelle %>% 
+  mutate(
+    dep_Elec_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Elec"))),
+    dep_Gaz_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Gaz"))),
+    dep_GPL_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("GPL"))),
+    dep_Fuel_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Fuel"))),
+    dep_Urbain_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Urbain"))),
+    dep_Solides_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Solides")))
+  )
+
+# Due à la fusion Sources et Dep_sources sont redondants, la mise à jour de Sources permet de déduire facilement le solde sur tous les sources d'énergie
+menage_echelle$solde_ener<-
+  rowSums(menage_echelle[dep_sources_verif]) -
+  rowSums(menage_echelle[dep_sources])
+
+
+# Test
+# A<-menage_echelle %>% filter(abs(solde_ener)>10^(-9))%>% select(ident_men)
+# menage_echelle %>% filter(NEUF) %>% filter(!year_neuf==horizon) %>% filter(!ident_men %in% A$ident_men) %>% select(ident_men)
+# 5797
+# View(rbind(menage_echelle))
+
+menage_echelle<-
+  menage_echelle %>% 
+  mutate(
+    dep_Elec=dep_Elec_verif,
+    dep_Gaz=dep_Gaz_verif,
+    dep_GPL=dep_GPL_verif,
+    dep_Fuel=dep_Fuel_verif,
+    dep_Solides=dep_Solides_verif,
+    dep_Urbain=dep_Urbain_verif)
+
+# menage_echelle$dep_energie=rowSums(menage_echelle[dep_sources])
+# menage_echelle$dep_energie_logement=rowSums(menage_echelle[
+#   c("Elec_ECS","Gaz_ECS","GPL_ECS","Fuel_ECS","Solides_ECS","Urbain_ECS","Elec_chauff","Gaz_chauff",
+#     "GPL_chauff","Fuel_chauff","Solides_chauff","Urbain_chauff","Elec_clim")])
+
+
+# SOLDE_DETTE -------------------------------------------------------------
+solde<-menage_echelle %>% 
+  mutate(solde=solde_ener) %>%
+  select(ident_men,solde)
+
 ###
 ## Vérif
 ###
@@ -452,48 +481,48 @@ rm(i,sum,stock_m2_trans)
 
 
 ####
-  
-  
-  # VENTILATION -------------------------------------------------------------
-  
-  # source("Technical_change/Econometrie_solde_budg_bouclage_autres.R")
-  menage_echelle <- menage_echelle %>% mutate_when(year_neuf>0,list(NEUF=TRUE))
-  menage_echelle_32<-Ventil_solde(solde,menage_echelle,step="REHAB")
-  
-  menage_ener_dom<-energie_dom_surf(menage_echelle_32)
-  menage_echelle_32<- 
-    menage_echelle_32 %>%
-    select(-ener_dom_surf,-ener_dom) %>%
-    left_join(menage_ener_dom,by="ident_men")
-  
-  
-  
-  
-  
-  
-  #Test
-  # Agriculture
-  as.numeric(menage_echelle_32 %>% summarise(sum(pondmen*agriculture)))/as.numeric(menage_echelle %>% summarise(sum(pondmen*agriculture)))-1
-  #evolution des dépenses d'agriculture avant/après reventilation => devrait augmenter
-  as.numeric(menage_echelle_32%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))/as.numeric(menage_echelle%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))-1
-  #evolution des dépenses d'agriculture avant/après reventilation => devrait rester identique pour les ménages non concernés par la rénovation. 
-  as.numeric(menage_echelle_32%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))/as.numeric(menage_echelle%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))-1
-  
-  # Dep_Elec
-  as.numeric(menage_echelle_32 %>% summarise(sum(pondmen*dep_Elec)))/as.numeric(menage_echelle %>% summarise(sum(pondmen*dep_Elec)))-1
-  #evolution des dépenses d'dep_Elec avant/après reventilation => devrait augmenter
-  as.numeric(menage_echelle_32%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*dep_Elec)))/as.numeric(menage_echelle%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*dep_Elec)))-1
-  #evolution des dépenses d'dep_Elec avant/après reventilation => devrait rester identique pour les ménages non concernés par la rénovation. 
-  as.numeric(menage_echelle_32%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*dep_Elec)))/as.numeric(menage_echelle%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*dep_Elec)))-1
-  
-  
-  # A2<-menage_echelle %>% select(-kWh_rank_pess,-kWh_rank_opt,-kWh_rank,-solde_dette,-solde_ener)
-  
-  
-  
-  # VERS LA PROCHAINE ETAPE -------------------------------------------------
-  
-  # ident_rehab=cbind(ident_rehab,c(Y,menage_echelle%>%filter(REHAB)%>%select(ident_men)))
+
+
+# VENTILATION -------------------------------------------------------------
+
+# source("Technical_change/Econometrie_solde_budg_bouclage_autres.R")
+menage_echelle <- menage_echelle %>% mutate_when(year_neuf>0,list(NEUF=TRUE))
+menage_echelle_32<-Ventil_solde(solde,menage_echelle,step="REHAB")
+
+menage_ener_dom<-energie_dom_surf(menage_echelle_32)
+menage_echelle_32<- 
+  menage_echelle_32 %>%
+  select(-ener_dom_surf,-ener_dom) %>%
+  left_join(menage_ener_dom,by="ident_men")
+
+
+
+
+
+
+#Test
+# Agriculture
+as.numeric(menage_echelle_32 %>% summarise(sum(pondmen*agriculture)))/as.numeric(menage_echelle %>% summarise(sum(pondmen*agriculture)))-1
+#evolution des dépenses d'agriculture avant/après reventilation => devrait augmenter
+as.numeric(menage_echelle_32%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))/as.numeric(menage_echelle%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))-1
+#evolution des dépenses d'agriculture avant/après reventilation => devrait rester identique pour les ménages non concernés par la rénovation. 
+as.numeric(menage_echelle_32%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))/as.numeric(menage_echelle%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))-1
+
+# Dep_Elec
+as.numeric(menage_echelle_32 %>% summarise(sum(pondmen*dep_Elec)))/as.numeric(menage_echelle %>% summarise(sum(pondmen*dep_Elec)))-1
+#evolution des dépenses d'dep_Elec avant/après reventilation => devrait augmenter
+as.numeric(menage_echelle_32%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*dep_Elec)))/as.numeric(menage_echelle%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*dep_Elec)))-1
+#evolution des dépenses d'dep_Elec avant/après reventilation => devrait rester identique pour les ménages non concernés par la rénovation. 
+as.numeric(menage_echelle_32%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*dep_Elec)))/as.numeric(menage_echelle%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*dep_Elec)))-1
+
+
+# A2<-menage_echelle %>% select(-kWh_rank_pess,-kWh_rank_opt,-kWh_rank,-solde_dette,-solde_ener)
+
+
+
+# VERS LA PROCHAINE ETAPE -------------------------------------------------
+
+# ident_rehab=cbind(ident_rehab,c(Y,menage_echelle%>%filter(REHAB)%>%select(ident_men)))
 
 
 
@@ -502,11 +531,11 @@ rm(i,sum,stock_m2_trans)
 # SAVE --------------------------------------------------------------------
 
 # menage_echelle_32<-menage_echelle
-  # %>% mutate(DPE_2024=DPE_dep) %>% select(-stalog,-propri,-REHAB,-DPE_dep,-classe_arr ,-kWh_rank_pess,-kWh_rank_opt,-kWh_rank,-REHAB,-classe_arr)
+# %>% mutate(DPE_2024=DPE_dep) %>% select(-stalog,-propri,-REHAB,-DPE_dep,-classe_arr ,-kWh_rank_pess,-kWh_rank_opt,-kWh_rank,-REHAB,-classe_arr)
 # load("Technical_change/TC_renovation_DPE/menage_echelle_32.RData")
 
-  
-  
+
+
 
 # Parts Budgétaires -------------------------------------------------------
 
@@ -579,7 +608,7 @@ save(menage_echelle_32, file = MatisseFiles$menage_echelle_32_rd )
 
 # Clean -------------------------------------------------------------------
 suppressWarnings(rm(coeff_dep_ems,coeff_ems_2010,conso_moy_dep,DPE_A,DPE_B,menage_echelle,menage_echelle_32,
-                  menage_echelle_31,ThreeME,FC,A,Mat_gain_ener,menage_ener_dom,sauv_int,solde))
+                    menage_echelle_31,ThreeME,FC,A,Mat_gain_ener,menage_ener_dom,sauv_int,solde))
 gc()
-  
+
 

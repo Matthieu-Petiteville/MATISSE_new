@@ -18,6 +18,7 @@ Ventes <-
   mutate(Year=as.numeric(year))%>%
   filter(Year<=2035 & Year >=2010)%>%
   select(year,Var,value)%>%
+  distinct()%>%
   spread(key=Var,value=value)%>%
   mutate(Ventes_VP=NEWAUTO_TH_H01_2+NEWAUTO_ELEC_H01_2)%>%
   mutate(Ventes_VP=Ventes_VP*1000)%>%

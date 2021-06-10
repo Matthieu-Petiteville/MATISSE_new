@@ -4,7 +4,8 @@
 
 library(tidyverse)
 library(readxl)
-source("D:/Stage_Petiteville/Projet_Ademe/Code_global_ADEME/mutate_when.R")
+source(paste(M_home,"/Common/tools.R",sep=""))
+
 
 # TAUX d'EPARGNE ----------------------------------------------------------
 
@@ -183,11 +184,10 @@ energie_mix<-function(menage,FC){
   
   # IMPORT DATA -------------------------------------------------------------
   
-  setwd("D:/Stage_Petiteville/Projet_Ademe/MATISSE/")
-  load("Data/Data_interne/list_source_usage.RData")
+  load(MatisseFiles$source_usage_rd)
   
   # Import des prix d'énergie par classe de ménage : en €/MWh
-  prix_classe <- read.csv2("Data/BDFE_delauretis/Prix_energie_par_classe.csv", header = TRUE, sep = ";",dec = ".", fill = TRUE)
+  prix_classe <- read.csv2(MatisseFiles$prix_class_csv, header = TRUE, sep = ";",dec = ".", fill = TRUE)
   
   # PREPARATION DONNEES PRIX ENERGIE ----------------------------------------
 
@@ -207,7 +207,9 @@ energie_mix<-function(menage,FC){
   prix_classe_horizon$prix_gaz<- prix_classe$prix_gaz * as.numeric(FC$A03)
   
   # A04
-  prix_classe_horizon[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]<- prix_classe[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]* as.numeric(FC$A04)
+  prix_classe_horizon[c("prix_fuel","prix_gpl")]<- prix_classe[c("prix_fuel","prix_gpl")]* as.numeric(FC$A04)
+  prix_classe_horizon[c("prix_bois","prix_chaleur")]<- prix_classe[c("prix_bois","prix_chaleur")]* as.numeric(FC$A03)
+
   }
   
   
@@ -401,7 +403,7 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
 
 # Data --------------------------------------------------------------------
 
-  load("D:/Stage_Petiteville/Projet_Ademe/MATISSE/Step_0_Mise_forme_BDF/Output/menage_forme_4.RData")
+  load(MatisseFiles$menage_forme_4_rd)
   try(
     detach("package:plyr"), 
     silent=T
@@ -417,23 +419,24 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
   # # Indices de prix ---------------------------------------------------------
   if(Iter>0){
     #attention décalage avec Output_macro_code => skip first line lors de l'enregistrement
-    IP_A02<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"13",sep=""),col_names = F))
+    IP_A02<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"13",sep=""),col_names = F))
+
+    IP_A03<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"14",sep=""),col_names = F))
     
-    IP_A03<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"14",sep=""),col_names = F))
+    IP_A04<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"15",sep=""),col_names = F))
     
-    IP_A04<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"15",sep=""),col_names = F))
-    
-    IP_A07<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"18",sep=""),col_names = F))
+    IP_A07<-as.numeric(read_excel(paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),range=paste(X,"18",sep=""),col_names = F))
   }
   
   if(Iter==0){
-    IP_A02<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"14",sep=""),col_names = F))
     
-    IP_A03<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"15",sep=""),col_names = F))
+    IP_A02<-as.numeric(read_excel(MatisseFiles$output_macro_code_iter_0_xl,sheet=s,range=paste(X,"14",sep=""),col_names = F))
     
-    IP_A04<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"16",sep=""),col_names = F))
+    IP_A03<-as.numeric(read_excel(MatisseFiles$output_macro_code_iter_0_xl,sheet=s,range=paste(X,"15",sep=""),col_names = F))
     
-    IP_A07<-as.numeric(read_excel(paste("D:/Stage_Petiteville/Projet_Ademe/IMACLIM/Output_macro_code_iter_0.xlsx",sep=""),sheet=s,range=paste(X,"19",sep=""),col_names = F))
+    IP_A04<-as.numeric(read_excel(MatisseFiles$output_macro_code_iter_0_xl,sheet=s,range=paste(X,"16",sep=""),col_names = F))
+    
+    IP_A07<-as.numeric(read_excel(MatisseFiles$output_macro_code_iter_0_xl,sheet=s,range=paste(X,"19",sep=""),col_names = F))
   }
   
   
@@ -446,9 +449,10 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
     select(ident_men, pondmen,carb_lubr, dep_Elec, dep_Gaz,dep_Solides, dep_Fuel,dep_GPL,dep_Urbain,carb_lubr)%>%
     mutate(Oil_2010=dep_Fuel+dep_GPL+carb_lubr) %>% 
     mutate(Elec_2010=dep_Elec)%>%
-    mutate(Gaz_2010=dep_Gaz+dep_Urbain)%>% 
-    mutate(Solides_2010=dep_Solides)%>%
-    select(ident_men,pondmen,Elec_2010,Gaz_2010,Oil_2010,Solides_2010) %>% 
+    mutate(Gaz_2010=dep_Gaz+dep_Urbain+dep_Solides)%>% 
+    # mutate(Solides_2010=dep_Solides)%>%
+    # select(ident_men,pondmen,Elec_2010,Gaz_2010,Oil_2010,Solides_2010) %>% 
+    select(ident_men,pondmen,Elec_2010,Gaz_2010,Oil_2010) %>% 
     gather(key=ener, value=value, -c(1:2))%>%
     group_by(ener) %>% 
     summarise("Dep_energie_agg_2010"=sum(pondmen*value))
@@ -459,9 +463,10 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
     select(ident_men, pondmen, carb_lubr,dep_Elec, dep_Gaz,dep_Solides, dep_Fuel,dep_GPL,dep_Urbain)%>%
     mutate(Oil=(dep_Fuel+dep_GPL)/IP_A04+carb_lubr/IP_A07) %>%
     mutate(Elec=dep_Elec/IP_A02)%>%
-    mutate(Gaz=dep_Gaz/IP_A03+dep_Urbain/IP_A04)%>%
-    mutate(Solides=dep_Solides/IP_A04)%>%
-    select(ident_men,pondmen,Elec,Gaz,Oil,Solides) %>% 
+    mutate(Gaz=dep_Gaz/IP_A03+dep_Urbain/IP_A03+dep_Solides/IP_A03)%>%
+    # mutate(Solides=dep_Solides/IP_A04)%>%
+    # select(ident_men,pondmen,Elec,Gaz,Oil,Solides) %>% 
+    select(ident_men,pondmen,Elec,Gaz,Oil) %>% 
     gather(key=ener, value=value, -c(1:2)) %>% 
     group_by(ener) %>% 
     summarise("Dep_energie_agg_horizon"=sum(pondmen*value))

@@ -15,7 +15,6 @@ load(MatisseFiles$menage_forme_rd)
 individu<-read_excel(MatisseFiles$indiv_bdf_xl)
 load(MatisseFiles$IMACLIM_rd)
 load(MatisseFiles$Threeme_rd)
-load(MatisseFiles$menage_echelle_TC_VE_rd)
 
 ventes_VP <- read_excel(path=MatisseFiles$ventes_vp_xl)
 ventil_VP <- as.numeric(ventes_VP %>% filter(Year==horizon)%>%select(Particuliers))
@@ -412,25 +411,16 @@ ventes_VE<-
      filter(year==horizon)%>%
      filter(Var=="NEWAUTO_ELEC_H01_2")%>%
      select(value))[1,]*ventil_VP*1000)
-#Ajustement pour aligner les ventes de VE sur Matisse (travail en % de VE)
-ventes_VE_adj <- sum(menage_echelle_TC_VE$pondmen[which(menage_echelle_TC_VE$new_VE)])
+
 
 ventes_VT<-
   as.numeric(ThreeME %>% 
   filter(year==horizon)%>%
   filter(Var=="NEWAUTO_TH_H01_2")%>%
   select(value)*ventil_VP*1000)
-#Ajustement pour aligner les ventes de VE sur Matisse (travail en % de VE)
-ventes_VT_adj <- sum(menage_echelle_TC_VE$pondmen[which(menage_echelle_TC_VE$new_VT)])
 
-#Old version : VE sales come from 3MEs
-# agreg_best <- 
-#   agreg_best %>%
-#   mutate("ventes_VT"=ventes_VT)%>%
-#   mutate("ventes_VE"=ventes_VE)
 
-#New version : VE sales come from Matisse 
-agreg_best <-
+agreg_best <- 
   agreg_best %>%
   mutate("ventes_VT"=ventes_VT)%>%
   mutate("ventes_VE"=ventes_VE)

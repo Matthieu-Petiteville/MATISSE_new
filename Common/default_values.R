@@ -120,7 +120,9 @@ initializeMatisseFiles <- function(){
     "FC_horiz_marge_rd"                  = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/FC_",horizon,"_marge.RData",sep=""),
     "input_macro_check_csv"              = paste(M_data,"/IMACLIM/Input_macro_check.csv",sep=""),
     "export_iter_csv"                    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/export_Iter_",Iter,".csv",sep=""),
-    "output_pdf"                         = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Report.pdf",sep="")
+    "output_pdf"                         = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Report.pdf",sep=""),
+    "menage_echelle_final_calibre_rd"    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle_calibre.RData",sep=""),
+    "menage_echelle_final_calibre_ele_rd"= paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle_calibre_ele.RData",sep="")
   )
 
 } 

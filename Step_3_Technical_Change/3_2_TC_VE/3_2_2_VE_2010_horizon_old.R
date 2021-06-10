@@ -12,12 +12,6 @@ source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep=""))
 source(paste(M_home,"/Step_3_Technical_Change/3_2_TC_VE/3_2_1_VE_classement_horizon.R",sep=""))
 
 # DATA --------------------------------------------------------------------
-if(exists("scenario_classement_veh")){
-  scenario_classement_veh_local <- scenario_classement_veh
-}else{
-  scenario_classement_veh_local <- scenario_classement
-}
-
 
 load(MatisseFiles$source_usage_rd)
 load(MatisseFiles$FC_2010_horizon_rd)
@@ -55,34 +49,28 @@ list_dep=c("agriculture",
 
 
 # CLASSEMENT --------------------------------------------------------------
-if(str_detect(scenario_classement_veh_local,"Optimal_ener")){
+if(str_detect(scenario_classement,"Optimal_ener")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
 }
-if(str_detect(scenario_classement_veh_local,"Pess_ener")){
-  menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
-}
-if(str_detect(scenario_classement_veh_local,"Med_ener")){
-  menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
-}
-if(str_detect(scenario_classement_veh_local,"Optimal_co2")){
+if(str_detect(scenario_classement,"Optimal_co2")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
 }
 
 
-if(str_detect(scenario_classement_veh_local,"Pessimiste")){
+if(str_detect(scenario_classement,"Pessimiste")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_pess)
 }
-if(str_detect(scenario_classement_veh_local,"Optimiste")){
+if(str_detect(scenario_classement,"Optimiste")){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_opt)
 }
-if(scenario_classement_veh_local=="Median"){
+if(scenario_classement=="Median"){
   
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_med)
 }
-if(scenario_classement_veh_local=="Rich"){
+if(scenario_classement=="Rich"){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_rich)
 }
-if(scenario_classement_veh_local=="Poor"){
+if(scenario_classement=="Poor"){
   menage_echelle <- menage_echelle %>% mutate(VE_rank=VE_rank_poor)
 }
 
@@ -169,7 +157,9 @@ menages_insolvables_suppr=c()
 # LOOP on Y ---------------------------------------------------------------
 
 for (Y in 2011:horizon){
-
+# for (Y in 2011:2034){
+  # print(Y)
+  
   sauv_menage_echelle_annee_precedente<-menage_echelle
   
   
@@ -254,42 +244,10 @@ for (Y in 2011:horizon){
   
   P_VTH <- TOT_VTH_euros/TOT_VTH_nv
   
-  #Correction du nombre de véhicules élec et th pour travailler en % des ventes et non en absolu
-  #Lié à l'écart 3ME/BDF des ventes de véhicules
-  
   
 
   
-  # NEW PART (ADJ VE PCT) ---------------------------------------------------
-  
-  coeff_adj_nb_veh_tot <- as.numeric(
-    menage_echelle %>%
-      filter(prod_veh>5*10^(3) & carb_lubr>0) %>%
-      summarize(sum(pondmen)))
-  
-  TOT_VE_nv_adj <-  TOT_VE_nv * coeff_adj_nb_veh_tot / (TOT_VE_nv + TOT_VTH_nv)
-  TOT_VTH_nv_adj <- TOT_VTH_nv * coeff_adj_nb_veh_tot / (TOT_VE_nv + TOT_VTH_nv)
-  
-  POP_y <- as.numeric( # en Millions €
-    ThreeME %>% 
-      filter(Var=="POP_TOT") %>%
-      filter(year==Y) %>%
-      select(value))
-  POP_init <- as.numeric( # en Millions €
-    ThreeME %>% 
-      filter(Var=="POP_TOT") %>%
-      filter(year==2010) %>%
-      select(value))
-  
-  TOT_VE_nv <- TOT_VE_nv / POP_y * POP_init
-
-  if(Y == horizon){TOT_VE_nv_correct <- TOT_VE_nv_adj}else{TOT_VE_nv_correct <-  TOT_VE_nv}
-  
-  
-
-# FINISHED NEW PART -------------------------------------------------------
-
-  
+ 
   
   while(!i %in% menage_echelle$VE_rank & i<max(menage_echelle$VE_rank,na.rm=T) ){i=i+1}
   
@@ -313,7 +271,7 @@ for (Y in 2011:horizon){
   # Condition : pas encore assez de ventes de VE et encore des ménages éligibles
   
 ## SELECTION
-  while (sum < TOT_VE_nv_correct & i<max(menage_echelle$VE_rank,na.rm=T)){
+  while (sum<TOT_VE_nv & i<max(menage_echelle$VE_rank,na.rm=T)){
    
     ###
     # Cas 1
@@ -681,9 +639,9 @@ sauv_int<-menage_echelle
 # # -30.7% 2035
 
 # Diminution des usages (télétravail et voirie)
-forcage_vkm <- read_excel(path=MatisseFiles$forcage_km_xl,sheet="value")
-gain_vkm <- as.numeric(forcage_vkm %>% filter(year==horizon)%>%select(gain_vkm))
-gain_efficacite <- as.numeric(forcage_vkm %>% filter(year==horizon)%>%select(gain_efficacite))
+forcage_vkm<-read_excel(path=MatisseFiles$forcage_km_xl,sheet="value")
+gain_vkm<-as.numeric(forcage_vkm %>% filter(year==horizon)%>%select(gain_vkm))
+
 
 #Malus pour les VT
 # attention malus BM_rel<0 pour indiquer un surcoût, on rajoute un moins
@@ -718,9 +676,9 @@ menage_echelle <-
 
 menage_echelle <-
   menage_echelle %>%
-  mutate(solde_carb= solde_carb + carb_lubr * (1 - (1 + gain_vkm ) *  (1 + gain_efficacite))) %>%
+  mutate(solde_carb=solde_carb+carb_lubr*gain_vkm) %>%
   mutate(
-    carb_lubr= carb_lubr * (1 + gain_vkm ) *  (1 + gain_efficacite),
+    carb_lubr=carb_lubr+carb_lubr*gain_vkm,
     prod_veh=prod_veh+solde_veh+solde_malus,
     autres_services=autres_services+solde_int,
     Hors_budget=Hors_budget+solde_princ,

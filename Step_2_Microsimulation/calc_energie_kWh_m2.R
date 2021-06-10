@@ -14,7 +14,7 @@ library(tidyverse)
 library(readxl)
 
 
-energie_dom_surf<-function(menage){
+energie_dom_surf<-function(menage, getFulldf = F){
 
 
 # IMPORT DATA -------------------------------------------------------------
@@ -52,7 +52,9 @@ prix_classe_horizon$prix_elec<- prix_classe$prix_elec * as.numeric(FC$A02)
 prix_classe_horizon$prix_gaz<- prix_classe$prix_gaz * as.numeric(FC$A03)
 
 # A04
-prix_classe_horizon[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]<- prix_classe[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]* as.numeric(FC$A04)
+#Bois + chaleur utilisent le FC du gaz, cf 3ME
+prix_classe_horizon[c("prix_fuel","prix_gpl")]<- prix_classe[c("prix_fuel","prix_gpl")]* as.numeric(FC$A04)
+prix_classe_horizon[c("prix_bois","prix_chaleur")]<- prix_classe[c("prix_bois","prix_chaleur")]* as.numeric(FC$A03)
 
 
 
@@ -256,7 +258,13 @@ menage %>% summarise(weighted.mean(x=ener_dom_surf,w=pondmen,na.rm=T)) #MWh
 #   menage %>%
 #   left_join(dep_source_usage %>% select(ident_men,ener_dom_surf),by="ident_men")
 
-menage_ener_dom<-menage %>% select(ident_men,ener_dom_surf,ener_dom,energie_tot_surf)
+
+if(getFulldf){
+  menage_ener_dom<-menage
+}else{
+  menage_ener_dom <- menage %>% select(ident_men,ener_dom_surf,ener_dom,energie_tot_surf)
+}
+
 
 return(menage_ener_dom)
 
