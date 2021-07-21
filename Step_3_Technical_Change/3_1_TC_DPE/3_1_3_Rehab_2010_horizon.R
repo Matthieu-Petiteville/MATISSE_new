@@ -840,7 +840,7 @@ for (Y in 2010:horizon){
   # UPDATE : energie surfacique (kWh) ---------------------------------------
   
   # on calcule l'énergie surfacique et énergie domestique en volume par les variables "Elec","Gaz", qui sont màj à chaque itération. 
-  menage_ener_dom<-energie_dom_surf(menage_echelle)
+  menage_ener_dom<-energie_dom_surf(menage_echelle, F)
   menage_echelle<- 
     menage_echelle %>%
     select(-ener_dom_surf,-ener_dom) %>%
@@ -979,7 +979,7 @@ Solde_Ener_tot<-
 
 
 # UPADTE Energie Surfacique (kWh) -----------------------------------------
-menage_ener_dom<-energie_dom_surf(menage_echelle)
+menage_ener_dom<-energie_dom_surf(menage_echelle, F)
 menage_echelle_33<- 
   menage_echelle_33 %>%
   select(-ener_dom_surf,-ener_dom) %>%

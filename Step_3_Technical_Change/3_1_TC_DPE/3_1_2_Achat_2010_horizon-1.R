@@ -489,7 +489,7 @@ solde<-menage_echelle %>%
 menage_echelle <- menage_echelle %>% mutate_when(year_neuf>0,list(NEUF=TRUE))
 menage_echelle_32<-Ventil_solde(solde,menage_echelle,step="REHAB")
 
-menage_ener_dom<-energie_dom_surf(menage_echelle_32)
+menage_ener_dom<-energie_dom_surf(menage_echelle_32, F)
 menage_echelle_32<- 
   menage_echelle_32 %>%
   select(-ener_dom_surf,-ener_dom) %>%
