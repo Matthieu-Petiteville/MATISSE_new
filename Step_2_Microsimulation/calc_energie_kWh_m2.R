@@ -260,7 +260,7 @@ menage %>% summarise(weighted.mean(x=ener_dom_surf,w=pondmen,na.rm=T)) #MWh
 
 
 if(getFulldf){
-  menage_ener_dom<-menage
+  menage_ener_dom <- menage
 }else{
   menage_ener_dom <- menage %>% select(ident_men,ener_dom_surf,ener_dom,energie_tot_surf)
 }
