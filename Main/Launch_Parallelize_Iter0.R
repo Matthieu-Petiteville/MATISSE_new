@@ -8,7 +8,15 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Common/default_values.r",sep=""))
 source(paste(M_home,"/Main/Matisse_Loop.r",sep=""))
 source(paste(M_home,"/Parallelize/ParallelizeMatisse.r",sep=""))
-MaxRscript = 3
+MaxRscript = 4
+
+scenario_v <- "AMS"
+horizon_v <- 2035
+scenario_classement_v <- "Optimiste"
+redistribution_v <- c("decile", "forfait", "niveau_vie", "tuu")
+scenario_classement_veh <- "Median"
+scenario_classement_bascule <<- "Optimiste"
+
 
 CurrentRScript = 0
 # Loop on scenarios/horizon/classement/redistribution -------------------------------------------------------
