@@ -24,7 +24,6 @@ source(paste(M_home,"/Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R",sep=""))
 load(MatisseFiles$appmen_intensites_2010_rd)
 # NB : dans appmen_intensites : dépenses détaillées par source_activite et par usage_activite. Variables souhaitée : source_usage. 
 load(MatisseFiles$menage_forme_2_rd)
-# compute_savings_rate_export(menage_forme)
 
 
 # Sources, usages, activités --------------------------------------------
