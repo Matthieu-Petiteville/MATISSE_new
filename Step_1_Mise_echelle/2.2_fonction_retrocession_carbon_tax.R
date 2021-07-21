@@ -36,7 +36,6 @@ retrocession_carbon_tax <- function(TCO, TCO_tot, menage_echelle){
       menage_echelle %>%
       mutate(rev_TCO = coeffuc / sum_pond * TCO_tot)
   }
-  
   if(redistribution == "niveau_vie"){ #Rétrocession niveau_vie sur rev_tot=RDBAI
     #rétrocession niveau_vie sur rev_tot=RDBAI
     #=> on est bien neutre sur le plan distribution du revenu
@@ -120,17 +119,180 @@ retrocession_carbon_tax <- function(TCO, TCO_tot, menage_echelle){
     menage_echelle <-
       menage_echelle %>%
       group_by(1:n()) %>%
-      mutate(rev_TCO = distrib(tuu, as.numeric(coeffuc))) %>%
+      mutate(rev_TCO = distrib( , as.numeric(coeffuc))) %>%
       ungroup()
     
     menage_echelle <- 
       menage_echelle %>%
       ungroup()
   }
-  
-  menage_echelle$RDB <- menage_echelle$RDB + menage_echelle$rev_TCO
+  if(redistribution == "dectuu_grad"){
+    
+    part_dec <- 0.04
+    part_tuu <- (1-9*part_dec)/(10+part_dec)
+    grad_vec <- (10 - 1:10)^4
+    grad_vec <- grad_vec * part_dec / sum(grad_vec)
+    tuu_vec <- (9 - 0:8)^4
+    tuu_df <- menage_echelle %>% group_by(tuu) %>% summarise(sum_pond_uc = sum(pondmen * coeffuc))
+    tuu_df$pct_pond_uc <- tuu_df$sum_pond_uc / sum(tuu_df$sum_pond_uc)
+    tuu_vec <- tuu_vec * tuu_df$pct_pond_uc 
+    tuu_vec <- tuu_vec * part_tuu / sum(tuu_vec)
+    
+    menage_echelle$dec_fac <- grad_vec[menage_echelle$decuc2]
+    menage_echelle$tuu_fac <- tuu_vec[menage_echelle$tuu + 1]
+    menage_echelle$grad_fac <- (1 + menage_echelle$dec_fac) * (1 + menage_echelle$tuu_fac) - 1 
+    
+    menage_echelle <- menage_echelle %>%
+      dplyr::group_by(tuu, decuc2) %>%
+      mutate(sum_pond_dec_tuu = sum(pondmen)) %>%
+      ungroup()
+    
+    menage_echelle$rev_TCO <- TCO_tot * menage_echelle$grad_fac / menage_echelle$sum_pond_dec_tuu
+    
+    menage_echelle <- menage_echelle %>% select(-dec_fac, tuu_fac, grad_fac)
+  }
+  if(redistribution == "seq_dectuu"){
+    
+    #Premier step : idem redistribution == decile
+    Tab_dec<-
+      menage_echelle %>%
+      dplyr::group_by(decuc2) %>%
+      summarise(sum(pondmen * coeffuc))
+    
+    Tab_dec <- 
+      Tab_dec %>%
+      mutate(decuc2 = as.numeric(decuc2) - 1) 
+    x_dec= bisect(function(x) (Tab_dec[1, 2] * (1 - x)^0 + #décile 1
+                                 Tab_dec[2, 2] * (1 - x)^1 +
+                                 Tab_dec[3, 2] * (1 - x)^2 +
+                                 Tab_dec[4, 2] * (1 - x)^3 +
+                                 Tab_dec[5, 2] * (1 - x)^4 +
+                                 Tab_dec[6, 2] * (1 - x)^5 +
+                                 Tab_dec[7, 2] * (1 - x)^6 +
+                                 Tab_dec[8, 2] * (1 - x)^7 +
+                                 Tab_dec[9, 2] * (1 - x)^8) * #décile 9
+                    as.numeric(facteur_dec1 * TCO_tot_UC) - TCO_tot, 0, 1)$root
 
+    #fonction de distribution avec i le decuc2 
+    distrib <- function(i, coeffuc){
+      i <- as.double(i) - 1  #on translate le decuc2 pour être raccord avec plus haut
+      ifelse(i == 9, return(0), return(coeffuc * ((1 - x_dec) ** i) * 
+                                         as.numeric(TCO_tot_UC * facteur_dec1)))
+    }
+    
+    menage_echelle <-
+      menage_echelle %>%
+      group_by(1:n()) %>% #on groupe ménage par ménage
+      mutate(rev_TCO_dec = as.numeric(distrib(i = decuc2, coeffuc = as.numeric(coeffuc)))) %>%
+      ungroup()
+    
+  
+    #Deuxième step : on répartit la TC obtenue dans chaque décile parmi les TUU
+    dec_vec <- sort(unique(menage_echelle$decuc2))
+    tuu_vec <- sort(unique(menage_echelle$tuu))
+    #Choix d'un vecteur de distribution par tuu
+    tuu_df <- data.frame(tuu = tuu_vec)
+    tuu_df$scale <- (9 - tuu_df$tuu) ^ 3
+    tuu_df <- tuu_df %>% left_join(menage_echelle %>% group_by(tuu) %>% summarise(sum_pond_uc = sum(pondmen * coeffuc)))
+    tuu_df$weight_pond_uc <- tuu_df$sum_pond_uc / sum(tuu_df$sum_pond_uc)
+    tuu_df$factor <- tuu_df$scale * tuu_df$weight_pond_uc / (sum(tuu_df$scale * tuu_df$weight_pond_uc))
+    
+    res_df <- tibble()
+    for(dec_i in dec_vec){
+      dec_tuu_df <- tuu_df
+      sub_men <- menage_echelle %>% filter(decuc2 == dec_i)
+      TC_rev_temp <- sum(sub_men$rev_TCO_dec * sub_men$pondmen)
+      dec_tuu_df <- dec_tuu_df %>% mutate(TC_tuu = TC_rev_temp * factor)
+      dec_tuu_df <- dec_tuu_df %>% 
+                    left_join(sub_men %>% group_by(tuu) %>% summarise(subsum_pond_uc = sum(pondmen * coeffuc)), by = "tuu") %>%
+                    mutate(TC_uc = TC_tuu / subsum_pond_uc)
+      sub_men$TC_uc <- dec_tuu_df$TC_uc[match(sub_men$tuu, dec_tuu_df$tuu)]
+      sub_men <- sub_men %>% mutate(rev_TCO = TC_uc * coeffuc)
+      res_df <- rbind(res_df, sub_men %>% select(ident_men, rev_TCO))
+    }
+    
+    menage_echelle$rev_TCO <- res_df$rev_TCO[match(menage_echelle$ident_men, res_df$ident_men)]
+    
+    print(paste("Somme TC"  = sum(menage_echelle$rev_TCO * menage_echelle$pondmen)))
+    menage_echelle <- menage_echelle %>% select(- rev_TCO_dec)
+  }
+  if(redistribution == "dectuu_seq_ucmat"){
+    
+    #Premier step : idem redistribution == decile
+    Tab_dec<-
+      menage_echelle %>%
+      dplyr::group_by(decuc2) %>%
+      summarise(sum(pondmen * coeffuc))
+    
+    Tab_dec <- 
+      Tab_dec %>%
+      mutate(decuc2 = as.numeric(decuc2) - 1) 
+    x_dec= bisect(function(x) (Tab_dec[1, 2] * (1 - x)^0 + #décile 1
+                                 Tab_dec[2, 2] * (1 - x)^1 +
+                                 Tab_dec[3, 2] * (1 - x)^2 +
+                                 Tab_dec[4, 2] * (1 - x)^3 +
+                                 Tab_dec[5, 2] * (1 - x)^4 +
+                                 Tab_dec[6, 2] * (1 - x)^5 +
+                                 Tab_dec[7, 2] * (1 - x)^6 +
+                                 Tab_dec[8, 2] * (1 - x)^7 +
+                                 Tab_dec[9, 2] * (1 - x)^8) * #décile 9
+                    as.numeric(facteur_dec1 * TCO_tot_UC) - TCO_tot, 0, 1)$root
+    
+    #fonction de distribution avec i le decuc2 
+    distrib <- function(i, coeffuc){
+      i <- as.double(i) - 1  #on translate le decuc2 pour être raccord avec plus haut
+      ifelse(i == 9, return(0), return(coeffuc * ((1 - x_dec) ** i) * 
+                                         as.numeric(TCO_tot_UC * facteur_dec1)))
+    }
+    
+    menage_echelle <-
+      menage_echelle %>%
+      group_by(1:n()) %>% #on groupe ménage par ménage
+      mutate(rev_TCO_dec = as.numeric(distrib(i = decuc2, coeffuc = as.numeric(coeffuc)))) %>%
+      ungroup()
+    
+    
+    #Deuxième step : on répartit la TC obtenue dans chaque décile parmi les TUU
+    dec_vec <- sort(unique(menage_echelle$decuc2))
+    tuu_vec <- sort(unique(menage_echelle$tuu))
+    #Choix d'un vecteur de distribution par tuu
+    tuu_df <- data.frame(tuu = tuu_vec)
+    tuu_df$scale <- (9 - tuu_df$tuu) ^ 0.5
+    tuu_df <- tuu_df %>% left_join(menage_echelle %>% group_by(tuu) %>% summarise(sum_pond_uc = sum(pondmen * coeffuc)))
+    tuu_df$weight_pond_uc <- tuu_df$sum_pond_uc / sum(tuu_df$sum_pond_uc)
+    tuu_df$factor <- tuu_df$scale * tuu_df$weight_pond_uc / (sum(tuu_df$scale * tuu_df$weight_pond_uc))
+    
+    res_df <- tibble()
+    for(dec_i in dec_vec){
+      sub_men <- menage_echelle %>% filter(decuc2 == dec_i)
+
+      #Choix d'un vecteur de distribution par tuu
+      tuu_df <- data.frame(tuu = tuu_vec)
+      tuu_df$scale <- (9 - tuu_df$tuu) ^ 0.5
+      tuu_df <- tuu_df %>% left_join(sub_men %>% group_by(tuu) %>% summarise(sum_pond_uc = sum(pondmen * coeffuc)))
+      tuu_df$weight_pond_uc <- tuu_df$sum_pond_uc / sum(tuu_df$sum_pond_uc)
+      tuu_df$factor <- tuu_df$scale * tuu_df$weight_pond_uc / (sum(tuu_df$scale * tuu_df$weight_pond_uc))
+      dec_tuu_df <- tuu_df
+      
+      TC_rev_temp <- sum(sub_men$rev_TCO_dec * sub_men$pondmen)
+      dec_tuu_df <- dec_tuu_df %>% mutate(TC_tuu = TC_rev_temp * factor)
+      dec_tuu_df <- dec_tuu_df %>% 
+        left_join(sub_men %>% group_by(tuu) %>% summarise(subsum_pond_uc = sum(pondmen * coeffuc)), by = "tuu") %>%
+        mutate(TC_uc = TC_tuu / subsum_pond_uc)
+      sub_men$TC_uc <- dec_tuu_df$TC_uc[match(sub_men$tuu, dec_tuu_df$tuu)]
+      sub_men <- sub_men %>% mutate(rev_TCO = TC_uc * coeffuc)
+      res_df <- rbind(res_df, sub_men %>% select(ident_men, rev_TCO))
+    }
+    
+    menage_echelle$rev_TCO <- res_df$rev_TCO[match(menage_echelle$ident_men, res_df$ident_men)]
+    
+    print(paste("Somme TC"  = sum(menage_echelle$rev_TCO * menage_echelle$pondmen)))
+    menage_echelle <- menage_echelle %>% select(- rev_TCO_dec)
+  }
+  menage_echelle$RDB <- menage_echelle$RDB + menage_echelle$rev_TCO
+  
   return(menage_echelle)
+  
 }
 
 
