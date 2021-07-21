@@ -11,12 +11,12 @@ source(paste(M_home,"/Common/tools.R",sep=""))
 # PARAMETRES ITERATION ----------------------------------------------------
 
 args<-commandArgs(trailingOnly=T)
-scenario=args[1]
-horizon=args[2]
-iter=args[3]
-scenario_classement=args[4]
-redistribution=args[5]
-Iter<-as.numeric(iter) 
+# scenario=args[1]
+# horizon=args[2]
+# iter=args[3]
+# scenario_classement=args[4]
+# redistribution=args[5]
+# Iter<-as.numeric(iter) 
 Iter_last<-Iter-1
 horizon=as.numeric(horizon)
 
