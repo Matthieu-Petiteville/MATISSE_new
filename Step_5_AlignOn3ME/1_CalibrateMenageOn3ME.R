@@ -8,88 +8,107 @@ library(readxl)
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/calc_ems.R",sep=""))
 source(paste(M_home,"/Step_2_Microsimulation/calc_energie_kWh_m2.R",sep="")) # importe  bdd 3 variables : ident_men,ener_dom_surf,ener_dom
 source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/Econometrie_solde_budg_Logement.R",sep=""))
+source(paste(M_home,"/Step_5_AlignOn3ME/1_func_SelectBascule.R",sep=""))
 
 
 # Data --------------------------------------------------------------------
 
 if(!exists("align_bascule_on_3ME")){align_bascule_on_3ME <- F}
-
 load(MatisseFiles$menage_echelle_final_rd)
 
 if(align_bascule_on_3ME){
   load(MatisseFiles$menage_forme_rd)
   load(MatisseFiles$FC_2010_horizon_rd)
-  
-  
-  #3ME
-  S <- switch (scenario,
-               "AMS" = "scen AMS",
-               "AME" = "scen AME",
-               "ssTCO" = "scen AMS ss TCO",
-               "ssRES" = "scen AMS ss residentiel",
-               "ssVE" = "scen AMS ss VE")
-  suppressMessages(suppressWarnings(scen <- read_excel(path = MatisseFiles$sortie_3me_xl, sheet = S)))
-  ThreeME <- 
-    scen %>%
-    select(-Def) %>%
-    gather(key = year, value = value, -c(1))
-  ThreeMe_year <- ThreeME %>% filter(year %in% c(2010,horizon))
-  Ext_3ME <- ThreeMe_year[grep("^EXP_BUIL_H01_C._22.*$", ThreeMe_year$Var),] %>% mutate(type = "fio") %>% select(-Var)
-  Ext_3ME <- rbind(Ext_3ME, ThreeMe_year[grep("^EXP_BUIL_H01_C._23.*$", ThreeMe_year$Var),] %>% mutate(type = "ele") %>% select(-Var))
-  Ext_3ME <- rbind(Ext_3ME, ThreeMe_year[grep("^EXP_BUIL_H01_C._24.*$", ThreeMe_year$Var),] %>% mutate(type = "gaz") %>% select(-Var))
-  
-  Sum_3ME <- Ext_3ME %>%
-          mutate(type_year = paste(type,year,sep="_")) %>%
-          group_by(type_year) %>%
-          summarise(sum_Me = sum(value)) %>%
-          mutate(type = substr(type_year,1,3),  year = substr(type_year,5,9)) %>%
-          select(-type_year)
-  
-  #Menage 2010 puis calcul des valeurs cible par type d'énergie à l'horizon
-  menage_col <- colnames(menage_echelle)
-  
-  Sum_Mat <- data.frame(sum_Me = sum((menage_forme$dep_Fuel + menage_forme$dep_GPL) * menage_forme$pondmen) / 10^6,
-                        type = "fio",
-                        year = 2010)
-  Sum_Mat <- rbind(Sum_Mat,
-                   data.frame(sum_Me = sum(menage_forme$dep_Elec * menage_forme$pondmen) / 10^6,
-                              type = "ele",
-                              year = 2010))
-  Sum_Mat <- rbind(Sum_Mat,
-                   data.frame(sum_Me = sum((menage_forme$dep_Gaz + menage_forme$dep_Urbain + menage_forme$dep_Solides) * menage_forme$pondmen) / 10^6,
-                              type = "gaz",
-                              year = 2010))
-  
-  #Sum horizon
-  Sum_horizon_Mat <- data.frame(sum_Me = sum((menage_echelle$dep_Fuel + menage_echelle$dep_GPL) * menage_echelle$pondmen)/  FC$A07 / 10^6,
-                        type = "fio",
-                        year = horizon)
-  Sum_horizon_Mat <- rbind(Sum_horizon_Mat,
-                   data.frame(sum_Me = sum(menage_echelle$dep_Elec * menage_echelle$pondmen)/ FC$A02 / 10^6,
-                              type = "ele",
-                              year = horizon))
-  Sum_horizon_Mat <- rbind(Sum_horizon_Mat,
-                   data.frame(sum_Me = sum((menage_echelle$dep_Gaz + menage_echelle$dep_Urbain + menage_echelle$dep_Solides) * menage_echelle$pondmen)/ FC$A03 / 10^6,
-                              type = "gaz",
-                              year = horizon))
-  
-  for(ener in Sum_Mat$type){
-    sub_3ME <- Sum_3ME[which(Sum_3ME$type == ener),]
-    sub_Mat <- Sum_Mat[which(Sum_Mat$type == ener),]
+    #3ME
+    S <- switch (scenario,
+                 "AMS" = "scen AMS",
+                 "AME" = "scen AME",
+                 "ssTCO" = "scen AMS ss TCO",
+                 "ssRES" = "scen AMS ss residentiel",
+                 "ssVE" = "scen AMS ss VE")
+    suppressMessages(suppressWarnings(scen <- read_excel(path = MatisseFiles$sortie_3me_xl, sheet = S)))
+    ThreeME <- 
+      scen %>%
+      select(-Def) %>%
+      gather(key = year, value = value, -c(1))
+    ThreeMe_year <- ThreeME %>% filter(year %in% c(2010,horizon))
+    Ext_3ME <- ThreeMe_year[grep("^EXP_BUIL_H01_C._22.*$", ThreeMe_year$Var),] %>% mutate(type = "fio") %>% select(-Var)
+    Ext_3ME <- rbind(Ext_3ME, ThreeMe_year[grep("^EXP_BUIL_H01_C._23.*$", ThreeMe_year$Var),] %>% mutate(type = "ele") %>% select(-Var))
+    Ext_3ME <- rbind(Ext_3ME, ThreeMe_year[grep("^EXP_BUIL_H01_C._24.*$", ThreeMe_year$Var),] %>% mutate(type = "gaz") %>% select(-Var))
+    
+    Sum_3ME <- Ext_3ME %>%
+            mutate(type_year = paste(type,year,sep="_")) %>%
+            group_by(type_year) %>%
+            summarise(sum_Me = sum(value)) %>%
+            mutate(type = substr(type_year,1,3),  year = substr(type_year,5,9)) %>%
+            select(-type_year)
+    
+    #Menage 2010 puis calcul des valeurs cible par type d'énergie à l'horizon
+    menage_col <- colnames(menage_echelle)
+    
+    Sum_Mat <- data.frame(sum_Me = sum((menage_forme$dep_Fuel + menage_forme$dep_GPL) * menage_forme$pondmen) / 10^6,
+                          type = "fio",
+                          year = 2010)
     Sum_Mat <- rbind(Sum_Mat,
-                     data.frame(sum_Me = sub_Mat[1,"sum_Me"] * sub_3ME[2,"sum_Me"]/sub_3ME[1,"sum_Me"],
-                                type = ener ,
+                     data.frame(sum_Me = sum(menage_forme$dep_Elec * menage_forme$pondmen) / 10^6,
+                                type = "ele",
+                                year = 2010))
+    Sum_Mat <- rbind(Sum_Mat,
+                     data.frame(sum_Me = sum((menage_forme$dep_Gaz + menage_forme$dep_Urbain + menage_forme$dep_Solides) * menage_forme$pondmen) / 10^6,
+                                type = "gaz",
+                                year = 2010))
+    
+    #Sum horizon
+    Sum_horizon_Mat <- data.frame(sum_Me = sum((menage_echelle$dep_Fuel + menage_echelle$dep_GPL) * menage_echelle$pondmen)/  FC$A07 / 10^6,
+                          type = "fio",
+                          year = horizon)
+    Sum_horizon_Mat <- rbind(Sum_horizon_Mat,
+                     data.frame(sum_Me = sum(menage_echelle$dep_Elec * menage_echelle$pondmen)/ FC$A02 / 10^6,
+                                type = "ele",
                                 year = horizon))
+    Sum_horizon_Mat <- rbind(Sum_horizon_Mat,
+                     data.frame(sum_Me = sum((menage_echelle$dep_Gaz + menage_echelle$dep_Urbain + menage_echelle$dep_Solides) * menage_echelle$pondmen)/ FC$A03 / 10^6,
+                                type = "gaz",
+                                year = horizon))
+    
+    for(ener in Sum_Mat$type){
+      sub_3ME <- Sum_3ME[which(Sum_3ME$type == ener),]
+      sub_Mat <- Sum_Mat[which(Sum_Mat$type == ener),]
+      Sum_Mat <- rbind(Sum_Mat,
+                       data.frame(sum_Me = sub_Mat[1,"sum_Me"] * sub_3ME[2,"sum_Me"]/sub_3ME[1,"sum_Me"],
+                                  type = ener ,
+                                  year = horizon))
+    }
+    
+    Sum_horizon_Mat <- Sum_horizon_Mat %>%
+                      left_join(Sum_Mat %>%
+                                  filter(year == horizon) %>%
+                                  mutate(target_sum_Me = sum_Me) %>%
+                                  select(target_sum_Me, type), by = "type")
+    Sum_horizon_Mat <- Sum_horizon_Mat %>%
+                        mutate(diff_Me = sum_Me - target_sum_Me) %>%
+                        mutate(left_to_bascule = diff_Me)
+    
+  #Si redistribution autre que forfait, on utilise la somme des m² basculés pour prévoir le nombre de bascules
+  if(redistribution != "forfait"){
+    if(!file.exists(MatisseFiles$menage_calibre_forfait_rd)){
+      print("Careful : missing the file for reference bascule : redistribution forfait")
+    }else{
+      load(MatisseFiles$menage_calibre_forfait_rd)
+      if(!("bascule_fio" %in% colnames(menage_echelle_calibre)) || !("bascule_gaz" %in% colnames(menage_echelle_calibre))){
+        print("Careful : missing column bascule_fio/bascule_gaz in ref file for redistribution forfait")
+      }else{
+        tot_basc_m2 <- menage_echelle_calibre %>%
+          group_by(bascule_fio, bascule_gaz) %>%
+          summarise(sum_m2 = sum(pondmen * surfhab_d), .groups = 'drop')
+        target_basc_m2 <<- data.frame(type = c("bascule_fio",
+                                              "bascule_gaz"), 
+                                     sum_m2 = c(sum(tot_basc_m2$sum_m2[which(tot_basc_m2$bascule_fio == 1)]),
+                                                sum(tot_basc_m2$sum_m2[which(tot_basc_m2$bascule_gaz == 1)])))
+        target_basc_m2$left_to_bascule <- target_basc_m2$sum_m2
+      }
+    }
   }
-  
-  Sum_horizon_Mat <- Sum_horizon_Mat %>%
-                    left_join(Sum_Mat %>%
-                                filter(year == horizon) %>%
-                                mutate(target_sum_Me = sum_Me) %>%
-                                select(target_sum_Me, type), by = "type")
-  Sum_horizon_Mat <- Sum_horizon_Mat %>%
-                      mutate(diff_Me = sum_Me - target_sum_Me) %>%
-                      mutate(left_to_bascule = diff_Me)
 }
   
 
@@ -107,7 +126,8 @@ if(align_bascule_on_3ME){
   # A03
   prix_classe_horizon$prix_gaz<- prix_classe$prix_gaz * FC$A03
   # A04
-  prix_classe_horizon[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]<- prix_classe[c("prix_fuel","prix_gpl","prix_bois","prix_chaleur")]* FC$A04
+  prix_classe_horizon[c("prix_fuel","prix_gpl")]<- prix_classe[c("prix_fuel","prix_gpl")]* as.numeric(FC$A04)
+  prix_classe_horizon[c("prix_bois","prix_chaleur")]<- prix_classe[c("prix_bois","prix_chaleur")]* as.numeric(FC$A03)
   # Matrice des prix de chaque énergie pour chaque classe
   prix_classe_mat <- data.matrix(prix_classe_horizon[,c("prix_elec","prix_gaz","prix_fuel","prix_gpl","prix_bois","prix_chaleur")], rownames.force = NA)
   
@@ -163,7 +183,7 @@ if(align_bascule_on_3ME){
     mutate(dep_e_gaz = (dep_Gaz + dep_Urbain) * pondmen/  FC$A03) %>%
     mutate(DPE_jump = - match(DPE_horizon,LETTERS) + match(DPE_pred,LETTERS)) %>%
     mutate(dep_surf_fio = (dep_Fuel + dep_GPL) /  FC$A07 / surfhab_d) %>%
-    mutate(dep_surf_gaz = (dep_Gaz) /  FC$A07 / surfhab_d)
+    mutate(dep_surf_gaz = (dep_Gaz) /  FC$A04 / surfhab_d)
   menage_echelle$dep_surf_fio[which(is.na(menage_echelle$dep_surf_fio))] <- 0
   menage_echelle$dep_surf_gaz[which(is.na(menage_echelle$dep_surf_gaz))] <- 0
   
@@ -181,40 +201,16 @@ if(align_bascule_on_3ME){
       sub_men_ech <- menage_echelle %>% filter(DPE_horizon == classe)
       sub_men_ech$dep_surf_to_rank <- -sub_men_ech[,dep_surf_ener]
       
-      #Variable de classement pour bascule
-      sub_men_ech <-
-        sub_men_ech %>% 
-        dplyr::mutate(kWh_rank_opt = row_number(dep_surf_to_rank)) %>% 
-        dplyr::mutate(kWh_rank_pess = max(kWh_rank_opt,na.rm=T)-kWh_rank_opt+1) %>% 
-        dplyr::mutate(kWh_rank_med = kWh_rank_pess-kWh_rank_opt) %>% 
-        mutate_when(kWh_rank_med<=0,list(kWh_rank_med=-kWh_rank_med+1))
+      select_res <- select_bascule(sub_men_ech, Sum_horizon_Mat, scenario_classement_bascule, redistribution)
+      Sum_horizon_Mat <- select_res$Sum_horizon_Mat
+      sub_men_ech     <- select_res$sub_men_ech
+      nb_basc         <- select_res$nb_basc
+      target_basc_m2  <- select_res$target_basc_m2
       
-      if(str_detect(scenario_classement_bascule,"Pessimiste")){
-        sub_men_ech <- sub_men_ech %>% mutate(kWh_rank=kWh_rank_pess)
-      }
-      if(str_detect(scenario_classement_bascule,"Optimiste")){
-        sub_men_ech <- sub_men_ech %>% mutate(kWh_rank=kWh_rank_opt)
-      }
-      if(scenario_classement_bascule=="Median"){
-        sub_men_ech <- sub_men_ech %>% mutate(kWh_rank=kWh_rank_med)
-      }      
-      
-      cpt = 1
-      nb_basc <- 0
-      while(Sum_horizon_Mat$left_to_bascule[ener_ind] > 0 && cpt <= max(sub_men_ech$kWh_rank)){
-        men_line <- which(sub_men_ech$kWh_rank == cpt)
-        if(sub_men_ech[men_line,dep_ener]>0 && sub_men_ech[men_line,bascule_ener] == 0){
-          sub_men_ech[men_line,bascule_ener] <- 1
-          Sum_horizon_Mat$left_to_bascule[ener_ind] = Sum_horizon_Mat$left_to_bascule[ener_ind] - sub_men_ech[men_line,dep_ener] / 10^6
-          nb_basc <- nb_basc + 1
-        }
-        cpt = cpt + 1
-      }
       print(paste("Classe ",classe," : ",nb_basc," bascules out of ", nrow(sub_men_ech)," menages",sep=""))
       men_to_bascule_idx <- match(sub_men_ech$ident_men[which(sub_men_ech[,bascule_ener] == 1)], menage_echelle$ident_men)
       menage_echelle[men_to_bascule_idx,bascule_ener] <- 1
       menage_echelle[men_to_bascule_idx,dep_ener] <- 0
-  
     }
     
     
@@ -223,37 +219,13 @@ if(align_bascule_on_3ME){
       sub_men_ech <- menage_echelle %>% filter(year_neuf == year_new)
       sub_men_ech$dep_surf_to_rank <- -sub_men_ech[,dep_surf_ener]
       
-      #Variable de classement pour bascule
-      sub_men_ech <-
-        sub_men_ech %>% 
-        dplyr::mutate(kWh_rank_opt = row_number(dep_surf_to_rank)) %>% 
-        dplyr::mutate(kWh_rank_pess = max(kWh_rank_opt,na.rm=T)-kWh_rank_opt+1) %>% 
-        dplyr::mutate(kWh_rank_med = kWh_rank_pess-kWh_rank_opt) %>% 
-        mutate_when(kWh_rank_med<=0,list(kWh_rank_med=-kWh_rank_med+1))
+      select_res <- select_bascule(sub_men_ech, Sum_horizon_Mat, scenario_classement_bascule, redistribution)
+      Sum_horizon_Mat <- select_res$Sum_horizon_Mat
+      sub_men_ech     <- select_res$sub_men_ech
+      nb_basc         <- select_res$nb_basc
+      target_basc_m2  <- select_res$target_basc_m2
       
-      if(str_detect(scenario_classement_bascule,"Pessimiste")){
-        sub_men_ech <- sub_men_ech %>% mutate(kWh_rank=kWh_rank_pess)
-      }
-      if(str_detect(scenario_classement_bascule,"Optimiste")){
-        sub_men_ech <- sub_men_ech %>% mutate(kWh_rank=kWh_rank_opt)
-      }
-      if(scenario_classement_bascule=="Median"){
-        sub_men_ech <- sub_men_ech %>% mutate(kWh_rank=kWh_rank_med)
-      }      
-      
-      cpt = 1
-      nb_basc <- 0
-      while(Sum_horizon_Mat$left_to_bascule[ener_ind] > 0 && cpt <= max(sub_men_ech$kWh_rank)){
-        men_line <- which(sub_men_ech$kWh_rank == cpt)
-        if(sub_men_ech[men_line,dep_ener]>0 && sub_men_ech[men_line,bascule_ener] == 0){
-          sub_men_ech[men_line,bascule_ener] <- 1
-          Sum_horizon_Mat$left_to_bascule[ener_ind] = Sum_horizon_Mat$left_to_bascule[ener_ind] - sub_men_ech[men_line,dep_ener] / 10^6
-          nb_basc <- nb_basc + 1
-        }
-        cpt = cpt + 1
-      }
       print(paste("NewBuild year :", year_new," : ",nb_basc," bascules out of ", nrow(sub_men_ech)," menages",sep=""))
-      
       men_to_bascule_idx <- match(sub_men_ech$ident_men[which(sub_men_ech[,bascule_ener] == 1)], menage_echelle$ident_men)
       menage_echelle[men_to_bascule_idx,bascule_ener] <- 1
       menage_echelle[men_to_bascule_idx,dep_ener] <- 0
@@ -265,40 +237,13 @@ if(align_bascule_on_3ME){
       sub_men_ech <- menage_echelle %>% filter(DPE_jump == jump)
       sub_men_ech$dep_surf_to_rank <- -1 * sub_men_ech[,dep_surf_ener]
       
-      #Variable de classement pour bascule
-      sub_men_ech <-
-        sub_men_ech %>% 
-        dplyr::mutate(kWh_rank_opt = row_number(dep_surf_to_rank)) %>% 
-        dplyr::mutate(kWh_rank_pess = max(kWh_rank_opt,na.rm=T)-kWh_rank_opt+1) %>% 
-        dplyr::mutate(kWh_rank_med = kWh_rank_pess-kWh_rank_opt) %>% 
-        mutate_when(kWh_rank_med<=0,list(kWh_rank_med=-kWh_rank_med+1))
+      select_res <- select_bascule(sub_men_ech, Sum_horizon_Mat, scenario_classement_bascule, redistribution)
+      Sum_horizon_Mat <- select_res$Sum_horizon_Mat
+      sub_men_ech     <- select_res$sub_men_ech
+      nb_basc         <- select_res$nb_basc
+      target_basc_m2  <- select_res$target_basc_m2
       
-      sub_men_ech[16,c("kWh_rank_pess","kWh_rank_opt","dep_surf_to_rank", "dep_surf_fio","dep_GPL","dep_Fuel","surfhab_d")]
-      
-      
-      if(str_detect(scenario_classement_bascule,"Pessimiste")){
-        sub_men_ech <- sub_men_ech %>% mutate(kWh_rank=kWh_rank_pess)
-      }
-      if(str_detect(scenario_classement_bascule,"Optimiste")){
-        sub_men_ech <- sub_men_ech %>% mutate(kWh_rank=kWh_rank_opt)
-      }
-      if(scenario_classement_bascule=="Median"){
-        sub_men_ech <- sub_men_ech %>% mutate(kWh_rank=kWh_rank_med)
-      }  
-      
-      cpt = 1
-      nb_basc <- 0
-      while(Sum_horizon_Mat$left_to_bascule[ener_ind] > 0 && cpt <= max(sub_men_ech$kWh_rank)){
-        men_line <- which(sub_men_ech$kWh_rank == cpt)
-        if(sub_men_ech[men_line,dep_ener]>0 && sub_men_ech[men_line,bascule_ener] == 0){
-          sub_men_ech[men_line,bascule_ener] <- 1
-          Sum_horizon_Mat$left_to_bascule[ener_ind] = Sum_horizon_Mat$left_to_bascule[ener_ind] - sub_men_ech[men_line,dep_ener] / 10^6
-          nb_basc <- nb_basc + 1
-        }
-        cpt = cpt + 1
-      }
       print(paste("DPE Jump :", jump," : ",nb_basc," bascules out of ", nrow(sub_men_ech)," menages",sep=""))
-      
       men_to_bascule_idx <- match(sub_men_ech$ident_men[which(sub_men_ech[,bascule_ener] == 1)], menage_echelle$ident_men)
       menage_echelle[men_to_bascule_idx,bascule_ener] <- 1
       menage_echelle[men_to_bascule_idx,dep_ener] <- 0  
