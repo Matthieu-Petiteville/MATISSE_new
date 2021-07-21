@@ -50,7 +50,7 @@ evolution_conso_ener<-function(menage_echelle,FC){
   # Energie surfacique ------------------------------------------------------
   
   
-  menage_ener_dom<-energie_dom_surf(menage_echelle)
+  menage_ener_dom<-energie_dom_surf(menage_echelle, F)
   
   menage_echelle<- 
     menage_echelle %>%
