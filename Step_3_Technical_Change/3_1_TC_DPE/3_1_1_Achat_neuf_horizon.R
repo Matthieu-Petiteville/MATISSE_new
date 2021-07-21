@@ -501,11 +501,11 @@ as.numeric(menage_echelle_31%>%filter(!year_neuf==horizon) %>% summarise(sum(pon
 
 
 
-menage_ener_dom<-energie_dom_surf(menage_echelle)
+menage_ener_dom <- energie_dom_surf(menage_echelle, F)
 
 menage_echelle_31<- 
   menage_echelle %>%
-  select(-ener_dom_surf,-ener_dom) %>%
+  select(-ener_dom_surf,-ener_dom, -energie_tot_surf) %>%
   left_join(menage_ener_dom,by="ident_men")
 
 
