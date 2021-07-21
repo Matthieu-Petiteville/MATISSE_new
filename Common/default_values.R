@@ -40,6 +40,9 @@ initializeMatisseFiles <- function(){
     "insee_proj_men_xl"        = paste(M_data,"/Donnees_brutes/INSEE/INSEE - projection men.xlsx",sep=""),
     "insee_proj_pop_xl"        = paste(M_data,"/Donnees_brutes/INSEE/INSEE - projection pop.xlsx",sep=""),
     "pop_INSEE_rd"             = paste(M_data,"/Donnees_brutes/INSEE/pop_INSEE.RData",sep=""),
+    "variables_csv"            = paste(M_analysis,"/Rapport/Input/variables.csv",sep = ""),
+    "description_sorties3me_xl"= paste(M_analysis,"/Rapport/Output/Tables excels_Rapport_v2/Description sorties threeme.xlsx",sep = ""),
+    "IPC_AMS_3ME_xl"           = paste(M_data,"/Donnees_brutes/Sorties ThreeME/IPC_AMS_3ME.xlsx",sep=""),
     
     ##IMACLIM
     "sortie_3me_xl"                     = paste(M_data,"/IMACLIM/Sorties Three-ME.xlsx",sep="") ,
@@ -51,6 +54,7 @@ initializeMatisseFiles <- function(){
     "IMACLIM_3ME_ssrec_xl"              = paste(M_data,"/IMACLIM/IMACLIM 3ME_ssrec.xlsm",sep=""),
     "IMACLIM_3ME_xl"                    = paste(M_data,"/IMACLIM/IMACLIM 3ME.xlsm",sep=""),
     "output_macro_code_xl"              = paste(M_data,"/IMACLIM/Output_macro_code.xlsx",sep=""),
+    "Mask5_xl"                          = paste(M_data,"/IMACLIM/Mask5.xlsx",sep=""),
     
     
     ##Output Initial format
@@ -65,41 +69,50 @@ initializeMatisseFiles <- function(){
     "share_2010_rd"           = paste(M_data,"/Output/Initial format/share_2010.RData",sep=""),
     "ener_mix_2010_rd"        = paste(M_data,"/Output/Initial format/ener_mix_2010.RData",sep=""),
     
+    #Menage_ steps
+    "menage_echelle_1_1_rd"              = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_1_1.RData",sep=""),
+    "menage_echelle_1_rd"                = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep=""),
+    "menage_echelle_2_1_rd"              = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_2_1.RData",sep=""),
+    "menage_echelle_2_rd"                = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_2.RData",sep=""),
+    "menage_echelle_31_rd"               = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_31.RData",sep=""),
+    "menage_echelle_32_rd"               = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_32.RData",sep=""),
+    "menage_echelle_33_pre_revent_rd"    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33_avant_reventil.RData",sep=""),
+    "menage_echelle_33_rd"               = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33.RData",sep=""),
+    "menage_echelle_TC_DPE_rd"           = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_DPE.RData",sep=""),
+    "menage_echelle_TC_VE_pre_revent_rd" = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE_avant_reventil.RData",sep=""),
+    "menage_echelle_TC_VE_rd"            = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE.RData",sep=""),
+    "menage_echelle_rd"                  = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_echelle.RData",sep=""),
+    "menage_calibr_2010_final_rd"        = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_calibr_2010.RData",sep=""),
+    "menage_contraintes_rd"              = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_contraintes.RData",sep=""),
+    "menage_echelle_final_rd"            = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle.RData",sep=""),
+    "menage_iteration_rd"                = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_iteration.RData",sep=""),
+    "menage_iteration_iter_rd"           = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_iteration.RData",sep=""),
+    "menage_iteration_iterlast_rd"       = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",ifelse(Iter==0,0,Iter-1),"/Input/menage_iteration.RData",sep=""),
+    "menage_iteration_params_rd"         = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/menage_iteration.RData",sep=""),
+    "menage_echelle_final_calibre_rd"    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle_calibre.RData",sep=""),
+    "menage_echelle_final_calibre_ele_rd"= paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle_calibre_ele.RData",sep=""),
+    "menage_calibre_forfait_rd"          = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/forfait/Iteration_",Iter,"/Output/menage_echelle_calibre.RData",sep=""),
+    "menage_calibre_ele_forfait_rd"      = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/forfait/Iteration_",Iter,"/Output/menage_echelle_calibre_ele.RData",sep=""),
+    
     #Conditional files
     "IMACLIM_rd"                         = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/IMACLIM.RData",sep=""),
     "Threeme_rd"                         = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/ThreeME.RData",sep=""),
     "FC_2010_horizon_rd"                 = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","Iteration_0/Input/FC_2010_",horizon,".RData",sep=""),
     "EMS_scen_rd"                        = paste(M_data,"/Output/Projet_ADEME/",scenario,"/EMS.RData",sep=""),
-    "menage_echelle_1_1_rd"              = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/","/Iteration_0/Output/menage_echelle_1_1.RData",sep=""),
-    "menage_echelle_1_rd"                = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_1.RData",sep=""),
-    "menage_echelle_2_1_rd"              = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_2_1.RData",sep=""),
-    "menage_echelle_2_rd"                = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_echelle_2.RData",sep=""),
     "IMACLIM_3ME_scen_horiz_xl"          = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/","Optimiste","/","ssrec","/IMACLIM_3ME.xlsx",sep=""),
-    "menage_echelle_31_rd"               = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_31.RData",sep=""),
-    "menage_echelle_32_rd"               = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_32.RData",sep=""),
     "sBCE_rd"                            = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/sBCE.RData",sep=""),
     "sub_rehab_rd"                       = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Subvention_rehab.RData",sep=""),
     "cout_baill_pub_rd"                  = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/Cout_bailleur_public.RData",sep=""),
-    "menage_echelle_33_pre_revent_rd"    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33_avant_reventil.RData",sep=""),
-    "menage_echelle_33_rd"               = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_33.RData",sep=""),
-    "menage_echelle_TC_DPE_rd"           = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_DPE.RData",sep=""),
     "bm_net_csv"                         = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/BM_net.csv",sep=""),
-    "menage_echelle_TC_VE_pre_revent_rd" = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE_avant_reventil.RData",sep=""),
-    "menage_echelle_TC_VE_rd"            = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Technical_change","/menage_echelle_TC_VE.RData",sep=""),
-    "menage_echelle_rd"                  = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_echelle.RData",sep=""),
     "agreg_best_rd"                      = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/agreg_best.RData",sep=""),
-    "menage_calibr_2010_final_rd"        = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Input/menage_calibr_2010.RData",sep=""),
-    "menage_contraintes_rd"              = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_contraintes.RData",sep=""),
     "pond_init_rd"                       = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/pond_init.RData",sep=""),
     "diff_pond_rd"                       = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/diff_pond.RData",sep=""),
     "pond_final_rd"                      = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/pond_final.RData",sep=""),
     "agreg_final_rd"                     = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.RData",sep=""),
-    "menage_echelle_final_rd"            = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle.RData",sep=""),
     "agreg_final_csv"                    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/agreg_final.csv",sep=""),
     "pond_final_heurist_scen_horiz_rd"   = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/pond_final_heuristique_",scenario,"_",horizon,".RData",sep=""),
     "pond_final_heurist_scen_horiz_txt"  = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/READ_ME_pond_final_heuristique_",scenario,"_",horizon,".txt",sep=""),
     "export_iter_0_csv"                  = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/export_Iter_0.csv",sep=""),
-    "menage_iteration_rd"                = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_0/Output/menage_iteration.RData",sep=""),
     "IMACLIM_iter_xl"                    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/IMACLIM_3ME_iter",Iter,".xlsx",sep=""),
     "output_macro_iter_xl"               = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/Output_macro_code_iter",Iter,".xlsx",sep=""),
     "IMACLIM_iter_rd"                    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/IMACLIM.RData",sep=""),
@@ -114,17 +127,11 @@ initializeMatisseFiles <- function(){
     "output_micro_params_xl"             = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Output_micro.xlsx",sep=""),
     "IMACLIM_params_xl"                  = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/IMACLIM_3ME.xlsx",sep=""),
     "output_macro_params_xl"             = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Output_macro_code.xlsx",sep=""),
-    "menage_iteration_iter_rd"           = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/menage_iteration.RData",sep=""),
-    "menage_iteration_iterlast_rd"       = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",ifelse(Iter==0,0,Iter-1),"/Input/menage_iteration.RData",sep=""),
-    "menage_iteration_params_rd"         = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/menage_iteration.RData",sep=""),
     "FC_horiz_marge_rd"                  = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Input/FC_",horizon,"_marge.RData",sep=""),
     "input_macro_check_csv"              = paste(M_data,"/IMACLIM/Input_macro_check.csv",sep=""),
     "export_iter_csv"                    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/export_Iter_",Iter,".csv",sep=""),
-    "output_pdf"                         = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Report.pdf",sep=""),
-    "menage_echelle_final_calibre_rd"    = paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle_calibre.RData",sep=""),
-    "menage_echelle_final_calibre_ele_rd"= paste(M_data,"/Output/Projet_Ademe/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Iteration_",Iter,"/Output/menage_echelle_calibre_ele.RData",sep="")
+    "output_pdf"                         = paste(M_data,"/Output/Projet_Ademe/Results/",scenario,"/",horizon,"/",scenario_classement,"/",redistribution,"/Report.pdf",sep="")
   )
-
 } 
 
 

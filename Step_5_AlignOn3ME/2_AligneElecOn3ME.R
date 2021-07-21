@@ -7,12 +7,18 @@ library(tidyverse)
 library(readxl)
 library(scales)
 
+initializeMatisseFiles()
 
 # Data --------------------------------------------------------------------
 
 if(!exists("align_bascule_on_3ME")){align_bascule_on_3ME <- F}
 
-load(MatisseFiles$menage_echelle_final_calibre_rd)
+if(redistribution != "forfait"){
+  load(MatisseFiles$menage_calibre_ele_forfait_rd)
+  load(MatisseFiles$menage_calibre_forfait_rd)
+  rapport_depElec <- mean(menage_echelle_calibre_ele$dep_Elec / menage_echelle_calibre$dep_Elec, na.rm = T)
+}
+
 
 if(align_bascule_on_3ME){
   load(MatisseFiles$menage_forme_rd)
@@ -45,7 +51,6 @@ if(align_bascule_on_3ME){
   
   
   #Menage 2010 puis calcul des valeurs cible par type d'énergie à l'horizon
-  
   Sum_Mat_2010 <- sum(menage_forme$dep_Elec * menage_forme$pondmen) / 10^6
   Sum_horizon_Mat <- sum(menage_echelle_calibre$dep_Elec * menage_echelle_calibre$pondmen)/ FC$A02 / 10^6
   
@@ -87,6 +92,6 @@ if(align_bascule_on_3ME){
   }
 }
 
-menage_echelle_calibre_ele <-menage_echelle_calibre
+menage_echelle_calibre_ele <- menage_echelle_calibre
 save(menage_echelle_calibre_ele,file = MatisseFiles$menage_echelle_final_calibre_ele_rd)
 
