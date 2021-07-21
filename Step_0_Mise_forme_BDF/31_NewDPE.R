@@ -15,7 +15,6 @@ source(paste(M_home,"/Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R",sep=""))
 
 #Récupération de menage_forme_3 et prétraitement
 load(MatisseFiles$menage_forme_3_rd)
-source(paste(M_home,"/Step_0_Mise_forme_BDF/3_bonus_energies_kwh.R",sep=""))
 menage_forme_ener <- energie_dom_surf(menage_forme)
 menage_forme_ener <- menage_forme_ener %>% dplyr::mutate(kWh_rank =row_number(-energie_tot_surf)) 
 menage_forme_ener <- menage_forme_ener[order(menage_forme_ener$kWh_rank),]
