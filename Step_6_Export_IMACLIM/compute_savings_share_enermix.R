@@ -438,8 +438,7 @@ compute_evol_energie<-function(menage,s,h,sc,r,Iter){
     
     IP_A07<-as.numeric(read_excel(MatisseFiles$output_macro_code_iter_0_xl,sheet=s,range=paste(X,"19",sep=""),col_names = F))
   }
-  
-  
+
 
 # Dépenses d'énergie agrégées ---------------------------------------------
 
