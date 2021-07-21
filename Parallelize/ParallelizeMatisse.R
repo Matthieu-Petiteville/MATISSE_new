@@ -4,7 +4,7 @@
 # the function below and they are removed by the function itself. Succes or not of the
 # script is dependant on Matisse_loop.
 
-Parallelize_Matisse_Loop <- function(step_to_run = 1:5, ForceRerun = FALSE) {
+Parallelize_Matisse_Loop <- function(step_to_run = 1:6, ForceRerun = FALSE) {
   
   library(readr)
 
