@@ -1,6 +1,8 @@
 # Objectif : lancer tous les étapes pour un jeu de params
 
 # Launch ------------------------------------------------------------------
+# (équivalent MATISSE_init in MATISSE_new/Common/)
+
 M_home <- gsub("\\\\","/",Sys.getenv("MATISSE_HOME"))
 M_data <- gsub("\\\\","/",Sys.getenv("MATISSE_DATA"))
 M_analysis <- gsub("\\\\","/",Sys.getenv("MATISSE_ANALYSIS"))
