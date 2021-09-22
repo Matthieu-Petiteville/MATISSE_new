@@ -66,8 +66,8 @@ load(MatisseFiles$menage_forme_rd)
   bvec <- agreg_best - agreg_init
   
   # test (permet de comparer les tables cible et de départ avec une distance en % way to go)
-  # View(cbind(rownames(agreg_init),rownames(agreg_best)))
-  # View(cbind("Init"=agreg_init, "Best"=agreg_best,"Way to go"=bvec/agreg_init))
+  View(cbind(rownames(agreg_init),rownames(agreg_best)))
+  View(cbind("Init"=agreg_init, "Best"=agreg_best,"Way to go"=bvec/agreg_init))
 
   # (uvec) CONTRAINTE D INEGALITE 
   uvec <- -1 * pond_init
