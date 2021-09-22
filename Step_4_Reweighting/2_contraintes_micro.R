@@ -30,7 +30,7 @@ menage_echelle <-
 
 menage_contraintes <-
   menage_calibr_2010 %>%
-  select(ident_men,list_contraintes_menage)%>%
+  select(ident_men,all_of(list_contraintes_menage))%>%
   left_join(
     menage_echelle %>%
            select(ident_men,
