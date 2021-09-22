@@ -5,6 +5,7 @@ library(readxl)
 library(car)
 library(dplyr)
 library(base)
+library(plyr)
 source(paste(M_home,"/Common/tools.R",sep=""))
 source(paste(M_home,"/Step_4_Reweighting/Stock_VP_Particuliers_horizon.R",sep=""))
 if(any(grepl("package:plyr", search()))) detach("package:plyr") else message("plyr not loaded")
@@ -149,7 +150,7 @@ menage_calibr_2010[
 
 for (agexsexe in  c("F_0_14","M_0_14","F_15_24","M_15_24","F_25_39","M_25_39",
                     "F_40_59","M_40_59","F_60_74","M_60_74","F_75_plus")){
-  ind<-individu_bis %>% dplyr::group_by(ident_men)%>% summarise(sum(get(agexsexe))) 
+  ind<-individu_bis %>% dplyr::group_by(ident_men)%>% summarise(sum(get(agexsexe)))
   menage_calibr_2010[agexsexe]<-ind$`sum(get(agexsexe))`
 }
 rm(ind)
@@ -432,8 +433,8 @@ ventes_VT_adj <- sum(menage_echelle_TC_VE$pondmen[which(menage_echelle_TC_VE$new
 #New version : VE sales come from Matisse 
 agreg_best <-
   agreg_best %>%
-  mutate("ventes_VT"=ventes_VT)%>%
-  mutate("ventes_VE"=ventes_VE)
+  mutate("new_VT"=ventes_VT) %>%
+  mutate("new_VE"=ventes_VE)
 
 
 
