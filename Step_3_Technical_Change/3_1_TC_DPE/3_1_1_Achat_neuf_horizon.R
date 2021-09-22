@@ -17,7 +17,7 @@ source(paste(M_home,"/Step_3_Technical_Change/3_1_TC_DPE/calc_ems.R",sep=""))
 
 # DATA --------------------------------------------------------------------
 #TCO
-coeff_dep_ems<-read_csv(MatisseFiles$coeff_dep_ems_csv)
+coeff_dep_ems<-read_csv(MatisseFiles$coeff_dep_ems_csv, show_col_types = FALSE)
 load(MatisseFiles$coeff_ems_2010_rd)
 TCO<-as.numeric(read_excel(path=MatisseFiles$IMACLIM_3ME_scen_horiz_xl,range="C103",col_names=F))*10^6
 # TCO ne dépend pas de la rétrocession, c'est du calibrage
@@ -337,7 +337,9 @@ ident_accedants <-
 
 menage_echelle <- 
   menage_echelle %>%
-  left_join(ident_accedants, by="ident_men") %>%
+  left_join(ident_accedants, by="ident_men") 
+menage_echelle <- 
+  menage_echelle %>%
   mutate_when(is.na(year_neuf),list(year_neuf=0),
               is.na(classe_arr),list(classe_arr=DPE_dep)) %>%
   mutate(solde_ener=0)
@@ -421,12 +423,12 @@ for (dep in LETTERS[2:7]){
 menage_echelle<-
   menage_echelle %>% 
   mutate(
-    dep_Elec_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Elec"))),
-    dep_Gaz_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Gaz"))),
-    dep_GPL_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("GPL"))),
-    dep_Fuel_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Fuel"))),
-    dep_Urbain_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Urbain"))),
-    dep_Solides_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Solides")))
+    dep_Elec_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Elec"))),
+    dep_Gaz_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Gaz"))),
+    dep_GPL_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("GPL"))),
+    dep_Fuel_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Fuel"))),
+    dep_Urbain_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Urbain"))),
+    dep_Solides_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Solides")))
   )
 
 # Due à la fusion Sources et Dep_sources sont redondants, la mise à jour de Sources permet de déduire facilement le solde sur tous les sources d'énergie
@@ -486,25 +488,11 @@ solde<-menage_echelle %>%
 menage_echelle_31<-Ventil_solde(solde,menage_echelle,step="REHAB")
 
 
-## 
-# Vérification
-##
-# menage_echelle %>% summarise(sum(pondmen*solde_ener))
-# -199 378 805. (AMS 2035 Opt)
 
-# Agriculture
-as.numeric(menage_echelle_31 %>% summarise(sum(pondmen*agriculture)))/as.numeric(menage_echelle %>% summarise(sum(pondmen*agriculture)))-1
-#evolution des dépenses d'agriculture avant/après reventilation => devrait augmenter
-as.numeric(menage_echelle_31%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))/as.numeric(menage_echelle%>%filter(year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))-1
-#evolution des dépenses d'agriculture avant/après reventilation => devrait rester identique pour les ménages non concernés par la rénovation. 
-as.numeric(menage_echelle_31%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))/as.numeric(menage_echelle%>%filter(!year_neuf==horizon) %>% summarise(sum(pondmen*agriculture)))-1
-
-
-
-menage_ener_dom <- energie_dom_surf(menage_echelle, F)
+menage_ener_dom <- energie_dom_surf(menage_echelle_31, F)
 
 menage_echelle_31<- 
-  menage_echelle %>%
+  menage_echelle_31 %>%
   select(-ener_dom_surf,-ener_dom, -energie_tot_surf) %>%
   left_join(menage_ener_dom,by="ident_men")
 

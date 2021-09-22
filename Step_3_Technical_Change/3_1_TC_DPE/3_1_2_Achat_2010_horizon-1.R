@@ -21,7 +21,7 @@ load(MatisseFiles$FC_2010_horizon_rd)
 load(MatisseFiles$source_usage_rd)
 load(MatisseFiles$Threeme_rd)
 load(MatisseFiles$coeff_ems_2010_rd)
-coeff_dep_ems <- read_csv(MatisseFiles$coeff_dep_ems_csv)
+coeff_dep_ems <- read_csv(MatisseFiles$coeff_dep_ems_csv, show_col_types = FALSE)
 
 
 # DONNEES MANUELLES -------------------------------------------------------
@@ -427,12 +427,12 @@ NEWBUIL_H01_CC_2 %>% filter(year>2010)%>%summarise(sum(value))
 menage_echelle<-
   menage_echelle %>% 
   mutate(
-    dep_Elec_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Elec"))),
-    dep_Gaz_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Gaz"))),
-    dep_GPL_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("GPL"))),
-    dep_Fuel_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Fuel"))),
-    dep_Urbain_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Urbain"))),
-    dep_Solides_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Solides")))
+    dep_Elec_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Elec"))),
+    dep_Gaz_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Gaz"))),
+    dep_GPL_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("GPL"))),
+    dep_Fuel_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Fuel"))),
+    dep_Urbain_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Urbain"))),
+    dep_Solides_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Solides")))
   )
 
 # Due à la fusion Sources et Dep_sources sont redondants, la mise à jour de Sources permet de déduire facilement le solde sur tous les sources d'énergie
