@@ -319,8 +319,8 @@ for(so in sources){
 
 
 sauv_avant_reventil<-menage_echelle
-menage_echelle_34<-Ventil_solde(solde,menage_echelle,step="REHAB")
-menage_echelle_34 <- menage_echelle %>% select(colnames(menage_echelle_33))
+menage_echelle_34 <-Ventil_solde(solde,menage_echelle,step="REHAB")
+menage_echelle_34 <- menage_echelle_34 %>% select(colnames(menage_echelle_33))
 
 menage_ener_dom<-energie_dom_surf(menage_echelle_34)
 menage_echelle_34<- 
@@ -336,7 +336,7 @@ menage_echelle_34<-
 # Verif Finale
 for (source in sources){
   dep_source_verif=paste("dep",source,"verif",sep="_")
-  menage_echelle_34[dep_source_verif]<-rowSums(menage_echelle_34 %>% select(ident_men, list_source_usage) %>% select(contains(source)))
+  menage_echelle_34[dep_source_verif]<-rowSums(menage_echelle_34 %>% select(ident_men, all_of(list_source_usage)) %>% select(contains(source)))
 }
 
 
