@@ -6,7 +6,7 @@ calc_ems<-function(menage,FC){
   # sc="Optimiste"
   
   
-  coeff_dep_ems<-read_csv(MatisseFiles$coeff_dep_ems_csv)
+  coeff_dep_ems<-read_csv(MatisseFiles$coeff_dep_ems_csv, show_col_types = FALSE)
   load(MatisseFiles$FC_2010_horizon_rd)
   load(MatisseFiles$coeff_ems_2010_rd)
   
