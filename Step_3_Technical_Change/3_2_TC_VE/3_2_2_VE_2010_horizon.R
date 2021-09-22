@@ -758,33 +758,33 @@ menage_echelle_VE<-Ventil_solde(solde,menage_echelle,step="VE")
 
 menage_echelle_VE <- 
   menage_echelle_VE %>%
-  mutate(ifelse(dep_Elec_verif>0,Elec_ElecSpe=Elec_ElecSpe*dep_Elec/dep_Elec_verif,0))%>%
-  mutate(ifelse(dep_Elec_verif>0,Elec_clim=Elec_clim*dep_Elec/dep_Elec_verif,0))%>%
-  mutate(ifelse(dep_Elec_verif>0,Elec_ecl=Elec_ecl*dep_Elec/dep_Elec_verif,0))%>%
-  mutate(ifelse(dep_Elec_verif>0,Elec_ECS=Elec_ECS*dep_Elec/dep_Elec_verif,0))%>%
-  mutate(ifelse(dep_Elec_verif>0,Elec_chauff=Elec_chauff*dep_Elec/dep_Elec_verif,0))%>%
-  mutate(ifelse(dep_Elec_verif>0,Elec_Cuisson=Elec_Cuisson*dep_Elec/dep_Elec_verif,0))%>%
-  mutate(ifelse(dep_Gaz_verif>0,Gaz_ECS=Gaz_ECS*dep_Gaz/dep_Gaz_verif,0))%>%
-  mutate(ifelse(dep_Gaz_verif>0,Gaz_chauff=Gaz_chauff*dep_Gaz/dep_Gaz_verif,0))%>%
-  mutate(ifelse(dep_Gaz_verif>0,Gaz_Cuisson=Gaz_Cuisson*dep_Gaz/dep_Gaz_verif,0))%>%
-  mutate(ifelse(dep_Gaz_verif>0,Gaz_ECS=Gaz_ECS*dep_Gaz/dep_Gaz_verif,0))%>%
-  mutate(ifelse(dep_GPL_verif>0,GPL_ECS=GPL_ECS*dep_GPL/dep_GPL_verif,0))%>%
-  mutate(ifelse(dep_GPL_verif>0,GPL_chauff=GPL_chauff*dep_GPL/dep_GPL_verif,0))%>%
-  mutate(ifelse(dep_GPL_verif>0,GPL_Cuisson=GPL_Cuisson*dep_GPL/dep_GPL_verif,0))%>%
-  mutate(ifelse(dep_Solides_verif>0,Solides_Cuisson=Solides_Cuisson*dep_Solides/dep_Solides_verif,0))%>%
-  mutate(ifelse(dep_Solides_verif>0,Solides_chauff=Solides_chauff*dep_Solides/dep_Solides_verif,0))%>%
-  mutate(ifelse(dep_Solides_verif>0,Solides_ECS=Solides_ECS*dep_Solides/dep_Solides_verif,0))%>%
-  mutate(ifelse(dep_Fuel_verif>0,Fuel_ECS=Fuel_ECS*dep_Fuel/dep_Fuel_verif,0))%>%
-  mutate(ifelse(dep_Fuel_verif>0,Fuel_Cuisson=Fuel_Cuisson*dep_Fuel/dep_Fuel_verif,0))%>%
-  mutate(ifelse(dep_Fuel_verif>0,Fuel_chauff=Fuel_chauff*dep_Fuel/dep_Fuel_verif,0))%>%
-  mutate(ifelse(dep_Urbain_verif>0,Urbain_ECS=Urbain_ECS*dep_Urbain/dep_Urbain_verif,0))%>%
-  mutate(ifelse(dep_Urbain_verif>0,Urbain_Cuisson=Urbain_Cuisson*dep_Urbain/dep_Urbain_verif,0))%>%
-  mutate(ifelse(dep_Urbain_verif>0,Urbain_chauff=Urbain_chauff*dep_Urbain/dep_Urbain_verif,0))%>%
+  mutate(Elec_ElecSpe=ifelse(dep_Elec_verif>0,Elec_ElecSpe*dep_Elec/dep_Elec_verif,0))%>%
+  mutate(Elec_clim=ifelse(dep_Elec_verif>0,Elec_clim*dep_Elec/dep_Elec_verif,0))%>%
+  mutate(Elec_ecl=ifelse(dep_Elec_verif>0,Elec_ecl*dep_Elec/dep_Elec_verif,0))%>%
+  mutate(Elec_ECS=ifelse(dep_Elec_verif>0,Elec_ECS*dep_Elec/dep_Elec_verif,0))%>%
+  mutate(Elec_chauff=ifelse(dep_Elec_verif>0,Elec_chauff*dep_Elec/dep_Elec_verif,0))%>%
+  mutate(Elec_Cuisson=ifelse(dep_Elec_verif>0,Elec_Cuisson*dep_Elec/dep_Elec_verif,0))%>%
+  mutate(Gaz_ECS=ifelse(dep_Gaz_verif>0,Gaz_ECS*dep_Gaz/dep_Gaz_verif,0))%>%
+  mutate(Gaz_chauff=ifelse(dep_Gaz_verif>0,Gaz_chauff*dep_Gaz/dep_Gaz_verif,0))%>%
+  mutate(Gaz_Cuisson=ifelse(dep_Gaz_verif>0,Gaz_Cuisson*dep_Gaz/dep_Gaz_verif,0))%>%
+  mutate(GPL_ECS=ifelse(dep_GPL_verif>0,GPL_ECS*dep_GPL/dep_GPL_verif,0))%>%
+  mutate(GPL_chauff=ifelse(dep_GPL_verif>0,GPL_chauff*dep_GPL/dep_GPL_verif,0))%>%
+  mutate(GPL_Cuisson=ifelse(dep_GPL_verif>0,GPL_Cuisson*dep_GPL/dep_GPL_verif,0))%>%
+  mutate(Solides_Cuisson=ifelse(dep_Solides_verif>0,Solides_Cuisson*dep_Solides/dep_Solides_verif,0))%>%
+  mutate(Solides_chauff=ifelse(dep_Solides_verif>0,Solides_chauff*dep_Solides/dep_Solides_verif,0))%>%
+  mutate(Solides_ECS=ifelse(dep_Solides_verif>0,Solides_ECS*dep_Solides/dep_Solides_verif,0))%>%
+  mutate(Fuel_ECS=ifelse(dep_Fuel_verif>0,Fuel_ECS*dep_Fuel/dep_Fuel_verif,0))%>%
+  mutate(Fuel_Cuisson=ifelse(dep_Fuel_verif>0,Fuel_Cuisson*dep_Fuel/dep_Fuel_verif,0))%>%
+  mutate(Fuel_chauff=ifelse(dep_Fuel_verif>0,Fuel_chauff*dep_Fuel/dep_Fuel_verif,0))%>%
+  mutate(Urbain_ECS=ifelse(dep_Urbain_verif>0,Urbain_ECS*dep_Urbain/dep_Urbain_verif,0))%>%
+  mutate(Urbain_Cuisson=ifelse(dep_Urbain_verif>0,Urbain_Cuisson*dep_Urbain/dep_Urbain_verif,0))%>%
+  mutate(Urbain_chauff=ifelse(dep_Urbain_verif>0,Urbain_chauff*dep_Urbain/dep_Urbain_verif,0))%>%
   select(-paste("dep",sources,"verif",sep="_"))
 
 
 for (source in sources){
-menage_echelle_VE[paste("dep",source,"verif",sep="_")]<-rowSums(menage_echelle_VE %>% select(contains(paste(source,"_",sep="")))) 
+menage_echelle_VE[paste("dep",source,"verif",sep="_")]<-
+  rowSums(menage_echelle_VE %>% select(contains(paste(source,"_",sep="")))) 
 }
 
 ####
