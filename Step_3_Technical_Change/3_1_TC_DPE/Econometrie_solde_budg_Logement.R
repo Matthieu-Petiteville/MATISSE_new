@@ -112,6 +112,7 @@ Ventil_solde <- function(solde,menage,step){
   while(iter & nb_iter_RDB<60){
     sauv_menage<-    menage_bis
     nb_iter_RDB=nb_iter_RDB+1
+    print(nb_iter_RDB)
     list_dep_autres_ener=c("dep_GPL","dep_Fuel","dep_Urbain", "dep_Solides")
     
    #on ne reventile pas sur les biens incluant énergie sauf étape 3.4
@@ -134,7 +135,9 @@ Ventil_solde <- function(solde,menage,step){
     
     for (i in 10:14){
       elast_rev<-paste("elast_rev_A",i,sep="")
-      menage_bis[list_dep_14[i]]<-  menage[list_dep_14[i]]*(1+ menage_bis[elast_rev]*ifelse(abs(menage_bis$solde)>menage_bis$RDB,-menage_bis$solde/menage_bis$Rcons_bis,-menage_bis$solde/menage_bis$IP_stone/menage_bis$RDB_reel))
+      menage_bis[list_dep_14[i]]<-  menage[list_dep_14[i]]*(1+ menage_bis[elast_rev]*ifelse(abs(menage_bis$solde)>menage_bis$RDB,
+                                                                                            -menage_bis$solde/menage_bis$Rcons_bis,
+                                                                                            -menage_bis$solde/menage_bis$IP_stone/menage_bis$RDB_reel))
     }
     # NB : le Hors budget est exclus de la reventilation, nous ne connaissons pas le comportement des agents vis-à-vis cet agrégat qui regroupe des dépenses exceptionnelles et/ou importantes
     }
@@ -272,7 +275,7 @@ Ventil_solde <- function(solde,menage,step){
     
     
     # max(tol,na.rm=T)
-    # print(max(tol,na.rm=T))
+    print(max(tol,na.rm=T))
     if(max(tol,na.rm=T)>10^-6){iter=TRUE} else {iter=FALSE}
     
   }
