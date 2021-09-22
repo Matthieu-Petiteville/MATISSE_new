@@ -13,16 +13,16 @@ source(paste(M_home,"/Main/Matisse_Loop.r",sep=""))
 Iter=0
 scenario <- "AMS"
 horizon <- 2035
-scenario_classement <- "Optimiste"
+scenario_classement <- "Median"
 scenario_classement_veh <- "Median"
 scenario_classement_bascule <<- "Optimiste"
-# redistribution <- "forfait"
+redistribution <- "forfait"
 #redistribution <- "niveau_vie"
 #redistribution <- "decile"
 #redistribution <- "tuu"
 # redistribution <- "dectuu_grad"
 # redistribution <- "seq_dectuu"
-redistribution <- "dectuu_seq_ucmat"
+#redistribution <- "dectuu_seq_ucmat"
 
 
 #Bascule standard
@@ -32,7 +32,7 @@ bascule_min_jump <<- 7
 
 #Bascule align
 align_bascule_on_3ME <<- T
-align_class_bascule <<- c("A")
+align_class_bascule <<- c("A", "B")
 align_jump_bascule <<- 6:0
 align_yearnew_bascule <<- list(fio = 2021, gaz = 2021)
 
@@ -41,10 +41,22 @@ Create_Output_Folders(paste(M_data,"/Output/Projet_Ademe",sep="") , scenario , h
 initializeMatisseFiles()
 
 # Loop on scenarios/horizon/classement/redistribution -------------------------------------------------------
-step_to_run = c(1,2,3,4)
+step_to_run = c(1,2)
 ForceRerun = TRUE
 Matisse_Loop(step_to_run =  step_to_run, ForceRerun = ForceRerun)
 
-step_to_run = c(5,6)
+step_to_run = c(3)
+ForceRerun = TRUE
+Matisse_Loop(step_to_run =  step_to_run, ForceRerun = ForceRerun)
+
+step_to_run = c(4)
+ForceRerun = TRUE
+Matisse_Loop(step_to_run =  step_to_run, ForceRerun = ForceRerun)
+
+step_to_run = c(5)
+ForceRerun = TRUE
+Matisse_Loop(step_to_run =  step_to_run, ForceRerun = ForceRerun)
+
+step_to_run = c(6)
 ForceRerun = TRUE
 Matisse_Loop(step_to_run =  step_to_run, ForceRerun = ForceRerun)

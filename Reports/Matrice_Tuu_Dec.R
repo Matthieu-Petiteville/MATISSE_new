@@ -17,10 +17,10 @@ scenario_classement <- "Optimiste"
 # scenario_classement_veh <- "Median"
 # scenario_classement_bascule <<- "Optimiste"
 
-# redistribution <- "forfait"
+redistribution <- "forfait"
 # redistribution <- "niveau_vie"
 # redistribution <- "decile"
-redistribution <- "tuu"
+# redistribution <- "tuu"
 # redistribution <- "dectuu_grad"
 # redistribution <- "seq_dectuu"
 # redistribution <- "dectuu_seq_ucmat"
@@ -84,13 +84,15 @@ table_df <- data.frame(Tab_name = c("TCO_paid_mat", "RDB_mat", "men_mat", "uc_ma
                                     "TCO_rev_mat", 
                                     "TCO_net_mat", 
                                     "TCO_net_RDB_mat", "TCO_net_men_mat", "TCO_net_uc_mat", 
-                                    "Pct_surcomp_mat"),
+                                    "Pct_surcomp_mat", 
+                                    "Pct_over5_TCO2RDB"),
                          Title = c("TCO paid", "RDB", "men", "uc", 
                                    "TCO/RDB", "TCO/men", "TCO/uc", 
                                    "TCO rev",  
                                    "TCO net",
                                    "TCO net/RDB", "TCO net/men", "TCO net/UC",
-                                    "%Men Surcomp"))
+                                   "%Men Surcomp",
+                                   "%Men TC >5% RDB"))
 mat_list <- list()
 for(tab in 1:nrow(table_df)){
   mat_list[[table_df$Tab_name[tab]]] <- matrix(data = NA, nrow = length(dec_vec), ncol = length(tuu_vec))
@@ -134,6 +136,9 @@ for(i in 1:length(dec_vec)){
     
     mat_list[["Pct_surcomp_mat"]][i,j] = sum(sub_men$pondmen[which(sub_men$TCO_tot < (TCO_l$TCO_rev / TCO_l$men ))]) / 
                                           sum(sub_men$pondmen)
+    mat_list[["Pct_over5_TCO2RDB"]][i,j] = sum(sub_men$pondmen[which(sub_men$TCO_tot > sub_men$RDB * 0.05)]) / 
+                                          sum(sub_men$pondmen)
+    
   }
 }
 
