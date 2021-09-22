@@ -26,7 +26,7 @@ load(MatisseFiles$FC_2010_horizon_rd)
 load(MatisseFiles$source_usage_rd)
 load(MatisseFiles$Threeme_rd)
 load(MatisseFiles$coeff_ems_2010_rd)
-coeff_dep_ems<-read_csv(MatisseFiles$coeff_dep_ems_csv)
+coeff_dep_ems<-read_csv(MatisseFiles$coeff_dep_ems_csv, show_col_types = FALSE)
 
 
 # DONNEES MANUELLES -------------------------------------------------------
@@ -151,8 +151,6 @@ for (Y in 2010:horizon){
   ident_r<-c()
   
   sauv_menage_echelle_annee_precedente<-menage_echelle
-  
-  
   
   
   # DONNEES THREEME ---------------------------------------------------------
@@ -378,10 +376,7 @@ for (Y in 2010:horizon){
            kWh_rank_med=kWh_rank_med+rank_add,
            kWh_rank_opt_ener=kWh_rank_opt_ener+rank_add,
            kWh_rank_opt_co2=kWh_rank_opt_co2+rank_add) %>%
-    select(-rank_add)
-  
-  
-  
+           select(-rank_add)
   
   if(str_detect(scenario_classement,"Optimal_ener")){
     menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_opt_ener)
@@ -436,25 +431,21 @@ for (Y in 2010:horizon){
   if(scenario_classement=="Poor"){
     menage_echelle <- menage_echelle %>% mutate(kWh_rank=kWh_rank_poor)
   }
-  
-  
-  
-  
+
   
   # Sélection 2e tour -----------------------------------------------------------------
   
   menage_echelle <- 
     menage_echelle %>%
-    mutate_when(stalog==6,list(kWh_rank=0)) %>%  #on exclut les ménages logés gratuitement
-    mutate_when(stalog==3,list(kWh_rank=0)) %>% # on les ménages Usufruitier, y compris en viager
+    mutate_when(stalog==6,list(exclus=TRUE, kWh_rank=0)) %>%  #on exclut les ménages logés gratuitement
+    mutate_when(stalog==3,list(exclus=TRUE, kWh_rank=0)) %>% # on les ménages Usufruitier, y compris en viager
     mutate_when(exclus,list(kWh_rank=0)) %>%
-    mutate_when(solv>0.297 & stalog<=2,list(exclus=TRUE))%>% #on exclut ceux qui sont passés au dessus de 0.297
-    mutate_when(year_neuf>0,list(kWh_rank=0)) #on exclut ceux qui 
+    mutate_when(solv>0.297 & stalog<=2,list(exclus=TRUE, kWh_rank=0))%>% #on exclut ceux qui sont passés au dessus de 0.297
+    mutate_when(year_neuf>0,list(exclus=TRUE, kWh_rank=0)) #on exclut ceux qui 
   
   
   
   # BASCULE DES MENAGES --------------------------------------------------------------
-  
   
   for (dep in LETTERS[1:7]){
     #dep : classe DPE de départ
@@ -505,14 +496,13 @@ for (Y in 2010:horizon){
           # identifiant du ménage sélectionné 
           im<-as.numeric((menage_echelle_classe %>% filter(kWh_rank==i) %>% select(ident_men))[1,])
           ident_r<-c(ident_r,im)
-          
+
           # Modification des variables REHAB et class_arr dans la base globale
-          
+
           menage_echelle<- menage_echelle %>% 
             mutate(REHAB=ifelse(ident_men==im,TRUE,REHAB))%>%
             mutate(year_rehab=ifelse(ident_men==im,Y,year_rehab))%>%
             mutate(classe_arr=ifelse(ident_men==im,arr,classe_arr))
-          
           
           
           ###
@@ -822,12 +812,12 @@ for (Y in 2010:horizon){
   menage_echelle<-
     menage_echelle %>% 
     mutate(
-      dep_Elec_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Elec"))),
-      dep_Gaz_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Gaz"))),
-      dep_GPL_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("GPL"))),
-      dep_Fuel_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Fuel"))),
-      dep_Urbain_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Urbain"))),
-      dep_Solides_verif=rowSums(menage_echelle %>% select(list_source_usage) %>% select(starts_with("Solides")))
+      dep_Elec_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Elec"))),
+      dep_Gaz_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Gaz"))),
+      dep_GPL_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("GPL"))),
+      dep_Fuel_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Fuel"))),
+      dep_Urbain_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Urbain"))),
+      dep_Solides_verif=rowSums(menage_echelle %>% select(all_of(list_source_usage)) %>% select(starts_with("Solides")))
     )
   
   # Due à la fusion Sources et Dep_sources sont redondants, la mise à jour de Sources permet de déduire facilement le solde sur tous les sources d'énergie
@@ -859,9 +849,9 @@ for (Y in 2010:horizon){
       menage_echelle %>% 
       mutate(DPE_dep=classe_arr)%>% 
       mutate(principal_dette=0)%>%
-      mutate(subvention=0)}
-  
-  
+      mutate(subvention=0) %>%
+      mutate(DPE_stalog_propri= paste(DPE_dep,stalog_propri,sep="_"))  
+  }
   #FIN BOUCLE sur Y 
 }
 
@@ -964,40 +954,21 @@ save(menage_echelle,file=MatisseFiles$menage_echelle_33_pre_revent_rd)
 sauv_avant_reventil<-menage_echelle
 menage_echelle_33 <- Ventil_solde(solde,menage_echelle,step="REHAB")
 
-###
-# Test
-###
-Solde_Ener_tot<-
-  rbind(Solde_Ener_tot,
-        c(Y,
-          menage_echelle %>%
-            filter(REHAB) %>%
-            filter(stalog>=4 & stalog<=5) %>%
-            filter(propri==2) %>%
-            summarise(sum(solde_ener*pondmen))))
-
-
 
 # UPADTE Energie Surfacique (kWh) -----------------------------------------
 menage_ener_dom<-energie_dom_surf(menage_echelle, F)
 menage_echelle_33<- 
   menage_echelle_33 %>%
   select(-ener_dom_surf,-ener_dom) %>%
-  left_join(menage_ener_dom,by="ident_men")
-
-
-
+  left_join(menage_ener_dom,by="ident_men") %>% 
+  mutate(DPE_horizon=classe_arr)
 
 
 # SAVE --------------------------------------------------------------------
 
-
-menage_echelle <- menage_echelle %>% mutate(DPE_horizon=classe_arr)
-
 inter<-intersect(colnames(menage_echelle_33), colnames(menage_echelle_32))
 not_inter<-setdiff(colnames(menage_echelle_33), colnames(menage_echelle_32))
-
-menage_echelle_33<-menage_echelle %>% select(inter,year_rehab,DPE_horizon,solv)
+menage_echelle_33 <- menage_echelle_33 %>% select(inter,year_rehab,DPE_horizon,solv)
 save(menage_echelle_33, file=MatisseFiles$menage_echelle_33_rd)
 
 
