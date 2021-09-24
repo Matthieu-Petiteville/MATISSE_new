@@ -2,7 +2,7 @@
 # Mise en forme des élasticités
 # Lecture depuis fichier excel, converti en Rdata format long
 # Output : elasticite_demande.RData
-#Commentaire
+
 
 # Libraries ---------------------------------------------------------------
 
